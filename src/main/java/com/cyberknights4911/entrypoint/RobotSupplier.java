@@ -5,15 +5,15 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 final class RobotSupplier implements Supplier<Robot> {
 
-    private final LoggedDashboardChooser<RobotConfig> chooser;
+  private final LoggedDashboardChooser<RobotConfig> chooser;
 
-    public RobotSupplier() {
-        chooser = new LoggedDashboardChooser<>("Robot Picker");
-        // chooser.addDefaultOption("Wham", () -> new Wham());
-    }
+  public RobotSupplier() {
+    chooser = new LoggedDashboardChooser<>("Robot Picker");
+    // chooser.addDefaultOption("Wham", () -> new Wham());
+  }
 
-    @Override
-    public Robot get() {
-        return new Robot(chooser.get());
-    }
+  @Override
+  public Robot get() {
+    return new Robot(chooser.get());
+  }
 }

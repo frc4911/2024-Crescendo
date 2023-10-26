@@ -4,5 +4,5 @@ import com.ctre.phoenix.sensors.BasePigeon;
 
 /** Factory for creating BasePigeon objects. */
 public interface PigeonFactory {
-    BasePigeon create(int id);
+  BasePigeon create(int id);
 }

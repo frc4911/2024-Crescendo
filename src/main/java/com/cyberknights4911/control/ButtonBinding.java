@@ -1,8 +1,7 @@
 package com.cyberknights4911.control;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.function.BooleanSupplier;
 
 /**
  * An abstraction layer for controller button bindings. 
@@ -11,7 +10,7 @@ public interface ButtonBinding<E extends ButtonAction> {
     /**
      * A dummy trigger that is always false. Use this as a placeholder or a fallback.
      */
-    public static final Trigger ALWAYS_FALSE = new Trigger(new BooleanSupplier() {
+    Trigger ALWAYS_FALSE = new Trigger(new BooleanSupplier() {
         @Override
         public boolean getAsBoolean() {
             return false;

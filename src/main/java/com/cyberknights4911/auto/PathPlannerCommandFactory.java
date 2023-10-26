@@ -9,21 +9,18 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 /** Factory for creating PathPlanner auto path. */
 public final class PathPlannerCommandFactory {
 
-    public PathPlannerCommandFactory(
-        HolonomicPathFollowerConfig followerConfig,
-        AutoDrive autoDrive,
-        Subsystem driveSubsystem
-    ) {
-        AutoBuilder.configureHolonomic(
-            autoDrive::getPose,
-            autoDrive::resetPose,
-            autoDrive::getRobotRelativeSpeeds,
-            autoDrive::getRobotRelativeSpeeds,
-            followerConfig,
-            driveSubsystem);
-    }
-    
-    public Command createAutoCommand(String name) {
-        return new PathPlannerAuto(name);
-    }
+  public PathPlannerCommandFactory(
+      HolonomicPathFollowerConfig followerConfig, AutoDrive autoDrive, Subsystem driveSubsystem) {
+    AutoBuilder.configureHolonomic(
+        autoDrive::getPose,
+        autoDrive::resetPose,
+        autoDrive::getRobotRelativeSpeeds,
+        autoDrive::getRobotRelativeSpeeds,
+        followerConfig,
+        driveSubsystem);
+  }
+
+  public Command createAutoCommand(String name) {
+    return new PathPlannerAuto(name);
+  }
 }

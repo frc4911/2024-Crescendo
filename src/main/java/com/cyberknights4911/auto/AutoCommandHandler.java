@@ -1,10 +1,9 @@
 package com.cyberknights4911.auto;
 
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public final class AutoCommandHandler {
     private final LoggedDashboardChooser<Command> loggedDashboardChooser;
@@ -38,13 +37,11 @@ public final class AutoCommandHandler {
         if (currentAutoCommand != null) {
             if (!currentAutoCommand.isScheduled() && !autoMessagePrinted) {
                 if (DriverStation.isAutonomousEnabled()) {
-                    System.out.println(
-                        String.format(
-                            "*** Auto finished in %.2f secs ***", Timer.getFPGATimestamp() - autoStart));
+                    System.out.printf(
+                            "*** Auto finished in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
                 } else {
-                    System.out.println(
-                        String.format(
-                            "*** Auto cancelled in %.2f secs ***", Timer.getFPGATimestamp() - autoStart));
+                    System.out.printf(
+                            "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
                 }
                 autoMessagePrinted = true;
             }
