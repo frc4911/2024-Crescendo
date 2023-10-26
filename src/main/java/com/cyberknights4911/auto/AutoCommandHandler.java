@@ -38,13 +38,11 @@ public final class AutoCommandHandler {
         if (currentAutoCommand != null) {
             if (!currentAutoCommand.isScheduled() && !autoMessagePrinted) {
                 if (DriverStation.isAutonomousEnabled()) {
-                    System.out.println(
-                        String.format(
-                            "*** Auto finished in %.2f secs ***", Timer.getFPGATimestamp() - autoStart));
+                    System.out.printf(
+                            "*** Auto finished in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
                 } else {
-                    System.out.println(
-                        String.format(
-                            "*** Auto cancelled in %.2f secs ***", Timer.getFPGATimestamp() - autoStart));
+                    System.out.printf(
+                            "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
                 }
                 autoMessagePrinted = true;
             }

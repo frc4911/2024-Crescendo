@@ -9,7 +9,7 @@ public interface StickBinding {
     /**
      * A dummy supplier that is always zero. Use this as a placeholder or a fallback.
      */
-    public static final DoubleSupplier ALWAYS_ZERO = () -> 0.0;
+    DoubleSupplier ALWAYS_ZERO = () -> 0.0;
 
     /**
      * Given a desired stick action, return the actual stick input supplier.
