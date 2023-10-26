@@ -10,7 +10,7 @@ public interface ButtonBinding<E extends ButtonAction> {
     /**
      * A dummy trigger that is always false. Use this as a placeholder or a fallback.
      */
-    public static final Trigger ALWAYS_FALSE = new Trigger(new BooleanSupplier() {
+    Trigger ALWAYS_FALSE = new Trigger(new BooleanSupplier() {
         @Override
         public boolean getAsBoolean() {
             return false;
