@@ -1,10 +1,9 @@
 package com.cyberknights4911.auto;
 
-import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public final class AutoCommandHandler {
     private final LoggedDashboardChooser<Command> loggedDashboardChooser;
