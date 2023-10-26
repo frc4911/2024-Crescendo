@@ -1,8 +1,8 @@
 package com.cyberknights4911.entrypoint;
 
-import java.util.function.Supplier;
 import com.cyberknights4911.logging.Mode;
 import com.google.auto.value.AutoValue;
+import java.util.function.Supplier;
 
 @AutoValue
 public abstract class RobotConfig {

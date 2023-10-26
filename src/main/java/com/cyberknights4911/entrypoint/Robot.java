@@ -1,10 +1,9 @@
 package com.cyberknights4911.entrypoint;
 
-import org.littletonrobotics.junction.LoggedRobot;
-import org.littletonrobotics.junction.Logger;
 import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.logging.RobotLogger;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.littletonrobotics.junction.LoggedRobot;
 
 public final class Robot extends LoggedRobot {
   private final RobotLogger robotLogger;

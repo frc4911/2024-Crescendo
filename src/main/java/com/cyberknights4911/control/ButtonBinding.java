@@ -1,8 +1,7 @@
 package com.cyberknights4911.control;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import java.util.function.BooleanSupplier;
 
 /**
  * An abstraction layer for controller button bindings. 
