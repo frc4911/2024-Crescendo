@@ -1,6 +1,7 @@
 package com.cyberknights4911.entrypoint;
 
 import com.cyberknights4911.auto.AutoCommandHandler;
+import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.logging.RobotLogger;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -8,15 +9,15 @@ import org.littletonrobotics.junction.LoggedRobot;
 public final class Robot extends LoggedRobot {
   private final RobotLogger robotLogger;
   private final AutoCommandHandler autoCommandHandler;
-  private final RobotConfig config;
+  private final Constants constants;
   private final CommandScheduler scheduler;
 
   private RobotContainer container;
 
-  public Robot(RobotConfig config) {
+  public Robot(Constants constants) {
     super();
-    this.config = config;
-    robotLogger = new RobotLogger(config, CommandScheduler.getInstance());
+    this.constants = constants;
+    robotLogger = new RobotLogger(constants, CommandScheduler.getInstance());
     autoCommandHandler = new AutoCommandHandler();
     scheduler = CommandScheduler.getInstance();
   }
@@ -24,7 +25,7 @@ public final class Robot extends LoggedRobot {
   @Override
   public void robotInit() {
     robotLogger.startLogging(this);
-    container = config.containerSupplier().get();
+    container = constants.supplier().get();
     container.setupAutos(autoCommandHandler);
   }
 

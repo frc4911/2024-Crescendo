@@ -68,8 +68,8 @@ configurations.all {
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
-    compileOnly "com.google.auto.value:auto-value-annotations:1.7"
-    annotationProcessor "com.google.auto.value:auto-value:1.7"
+    annotationProcessor "io.soabase.record-builder:record-builder-processor:37"
+    compileOnly "io.soabase.record-builder:record-builder-core:37"
 
     def akitJson = new JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)
     annotationProcessor "org.littletonrobotics.akit.junction:junction-autolog:$akitJson.version"
@@ -136,4 +136,3 @@ gversion {
   indent       = "  "
   annotate     = false
 }
-

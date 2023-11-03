@@ -15,7 +15,7 @@ public final class PathPlannerCommandFactory {
         autoDrive::getPose,
         autoDrive::resetPose,
         autoDrive::getRobotRelativeSpeeds,
-        autoDrive::getRobotRelativeSpeeds,
+        autoDrive::setRobotRelativeSpeeds,
         followerConfig,
         driveSubsystem);
   }
