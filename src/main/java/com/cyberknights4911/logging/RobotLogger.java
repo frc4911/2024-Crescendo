@@ -1,7 +1,7 @@
 package com.cyberknights4911.logging;
 
 import com.cyberknights4911.BuildConstants;
-import com.cyberknights4911.entrypoint.RobotConfig;
+import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.logging.Alert.AlertType;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -44,16 +44,16 @@ public final class RobotLogger {
           AlertType.WARNING);
 
   private final CommandScheduler scheduler;
-  private final RobotConfig config;
+  private final Constants constants;
 
-  public RobotLogger(RobotConfig config, CommandScheduler scheduler) {
+  public RobotLogger(Constants constants, CommandScheduler scheduler) {
+    this.constants = constants;
     this.scheduler = scheduler;
-    this.config = config;
   }
 
   public void startLogging(LoggedRobot robot) {
     // Record metadata
-    Logger.recordMetadata("Robot", config.name());
+    Logger.recordMetadata("Robot", constants.name());
     System.out.println("[Init] Starting AdvantageKit");
     Logger.recordMetadata("TuningMode", Boolean.toString(TuningMode.IS_ENABLED));
     Logger.recordMetadata("RuntimeType", LoggedRobot.getRuntimeType().toString());
@@ -75,9 +75,9 @@ public final class RobotLogger {
     }
 
     // Set up data receivers & replay source
-    switch (config.mode()) {
+    switch (constants.mode()) {
       case REAL:
-        String folder = config.logPath();
+        String folder = constants.logPath();
         if (folder != null) {
           Logger.addDataReceiver(new WPILOGWriter(folder));
         } else {
@@ -100,7 +100,7 @@ public final class RobotLogger {
     }
 
     // Start AdvantageKit logger
-    robot.setUseTiming(config.mode() != Mode.REPLAY);
+    robot.setUseTiming(constants.mode() != Mode.REPLAY);
     Logger.start();
 
     // Log active commands
@@ -128,7 +128,7 @@ public final class RobotLogger {
       });
 
     // Default to blue alliance in sim
-    if (config.mode() == Mode.SIM) {
+    if (constants.mode() == Mode.SIM) {
       DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
     }
 

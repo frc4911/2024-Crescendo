@@ -12,45 +12,45 @@ public final class AutoCommandHandler {
     private Command currentAutoCommand;
 
     public AutoCommandHandler() {
-        loggedDashboardChooser = new LoggedDashboardChooser<Command>("Auto Routine");
+      loggedDashboardChooser = new LoggedDashboardChooser<Command>("Auto Routine");
     }
 
     public void addDefaultOption(String key, Command command) {
-        loggedDashboardChooser.addDefaultOption(key, command);
+      loggedDashboardChooser.addDefaultOption(key, command);
     }
 
     public void addOption(String key, Command command) {
-        loggedDashboardChooser.addOption(key, command);
+      loggedDashboardChooser.addOption(key, command);
     }
 
     public void startCurrentCommand() {
-        stopCurrentCommand();
-        autoStart = Timer.getFPGATimestamp();
-        currentAutoCommand = loggedDashboardChooser.get();
-        if (currentAutoCommand != null) {
-            currentAutoCommand.schedule();
-        }
+      stopCurrentCommand();
+      autoStart = Timer.getFPGATimestamp();
+      currentAutoCommand = loggedDashboardChooser.get();
+      if (currentAutoCommand != null) {
+        currentAutoCommand.schedule();
+      }
     }
 
     public void checkCurrentCommand() {
-        // Print auto duration
-        if (currentAutoCommand != null) {
-            if (!currentAutoCommand.isScheduled() && !autoMessagePrinted) {
-                if (DriverStation.isAutonomousEnabled()) {
-                    System.out.printf(
-                            "*** Auto finished in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
-                } else {
-                    System.out.printf(
-                            "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
-                }
-                autoMessagePrinted = true;
-            }
+      // Print auto duration
+      if (currentAutoCommand != null) {
+        if (!currentAutoCommand.isScheduled() && !autoMessagePrinted) {
+          if (DriverStation.isAutonomousEnabled()) {
+            System.out.printf(
+                    "*** Auto finished in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
+          } else {
+            System.out.printf(
+                    "*** Auto cancelled in %.2f secs ***%n", Timer.getFPGATimestamp() - autoStart);
+          }
+          autoMessagePrinted = true;
         }
+      }
     }
 
-    public void stopCurrentCommand() {
-        if (currentAutoCommand != null) {
-            currentAutoCommand.cancel();
-        }
+  public void stopCurrentCommand() {
+    if (currentAutoCommand != null) {
+      currentAutoCommand.cancel();
     }
+  }
 }
