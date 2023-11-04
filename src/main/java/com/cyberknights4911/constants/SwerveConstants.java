@@ -1,10 +1,10 @@
 package com.cyberknights4911.constants;
 
-import java.util.HashMap;
-import java.util.Map;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.util.Units;
 import io.soabase.recordbuilder.core.RecordBuilder;
+import java.util.HashMap;
+import java.util.Map;
 
 @RecordBuilder
 public record SwerveConstants(
@@ -34,12 +34,16 @@ public record SwerveConstants(
 ) {
 
   public static SwerveConstants get() {
-    return ROBOTS.get(Constants.get().name());
+    SwerveConstants constants = ROBOTS.get(Constants.get().name());
+    if (constants == null) {
+      throw new IllegalStateException(
+        "No SwerveConstants defined for robot named: " + Constants.get().name());
+    }
+    return constants;
   }
 
   private static Map<String, SwerveConstants> ROBOTS = new HashMap<>();
   static {
-    // ROBOTS.put(Constants.SIM_BOT.name(), getSimBotConstants());
     ROBOTS.put(Constants.WHAM.name(), getWhamConstants());
     // TODO: put others here too
   }

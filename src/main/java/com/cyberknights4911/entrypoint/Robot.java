@@ -2,7 +2,10 @@ package com.cyberknights4911.entrypoint;
 
 import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.constants.Constants;
+import com.cyberknights4911.logging.Alert;
+import com.cyberknights4911.logging.Alert.AlertType;
 import com.cyberknights4911.logging.RobotLogger;
+import com.cyberknights4911.logging.TuningMode;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -27,6 +30,7 @@ public final class Robot extends LoggedRobot {
     robotLogger.startLogging(this);
     container = constants.supplier().get();
     container.setupAutos(autoCommandHandler);
+    checkStartupAlerts();
   }
 
   @Override
@@ -46,5 +50,11 @@ public final class Robot extends LoggedRobot {
   @Override
   public void teleopInit() {
     autoCommandHandler.stopCurrentCommand();
+  }
+
+  private void checkStartupAlerts() {
+    if (TuningMode.IS_ENABLED) {
+      new Alert("Tuning mode active, do not use in competition.", AlertType.INFO).set(true);
+    }
   }
 }
