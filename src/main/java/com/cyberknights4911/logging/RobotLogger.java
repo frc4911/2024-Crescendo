@@ -1,3 +1,10 @@
+// Copyright (c) 2023 FRC 4911
+// https://github.com/frc4911
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
 package com.cyberknights4911.logging;
 
 import com.cyberknights4911.BuildConstants;
@@ -111,21 +118,22 @@ public final class RobotLogger {
           int count = commandCounts.getOrDefault(name, 0) + (active ? 1 : -1);
           commandCounts.put(name, count);
           // Logger.recordOutput(
-          //         "CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()), active);
+          //         "CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()),
+          // active);
           Logger.recordOutput("CommandsAll/" + name, count > 0);
         };
     scheduler.onCommandInitialize(
-      (Command command) -> {
-        logCommandFunction.accept(command, true);
-      });
+        (Command command) -> {
+          logCommandFunction.accept(command, true);
+        });
     scheduler.onCommandFinish(
-      (Command command) -> {
-        logCommandFunction.accept(command, false);
-      });
+        (Command command) -> {
+          logCommandFunction.accept(command, false);
+        });
     scheduler.onCommandInterrupt(
-      (Command command) -> {
-        logCommandFunction.accept(command, false);
-      });
+        (Command command) -> {
+          logCommandFunction.accept(command, false);
+        });
 
     // Default to blue alliance in sim
     if (constants.mode() == Mode.SIM) {
