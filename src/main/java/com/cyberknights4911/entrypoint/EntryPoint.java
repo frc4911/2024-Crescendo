@@ -7,13 +7,13 @@
 
 package com.cyberknights4911.entrypoint;
 
-import com.cyberknights4911.wham.WhamConstants;
+import com.cyberknights4911.constants.Constants;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class EntryPoint {
   private EntryPoint() {}
 
   public static void main(String... args) {
-    RobotBase.startRobot(() -> new Robot(WhamConstants.WHAM));
+    RobotBase.startRobot(() -> new Robot(Constants.get()));
   }
 }

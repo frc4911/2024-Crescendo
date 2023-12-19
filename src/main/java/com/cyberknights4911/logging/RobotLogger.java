@@ -62,7 +62,7 @@ public final class RobotLogger {
     // Record metadata
     Logger.recordMetadata("Robot", constants.name());
     System.out.println("[Init] Starting AdvantageKit");
-    Logger.recordMetadata("TuningMode", Boolean.toString(TuningMode.IS_ENABLED));
+    Logger.recordMetadata("TuningMode", Boolean.toString(constants.tuningMode()));
     Logger.recordMetadata("RuntimeType", LoggedRobot.getRuntimeType().toString());
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -91,7 +91,7 @@ public final class RobotLogger {
           logNoFileAlert.set(true);
         }
         Logger.addDataReceiver(new NT4Publisher());
-        // TODO set this up if using rev
+        // TODO: set this up if using rev
         // LoggedPowerDistribution.getInstance(50, ModuleType.kRev);
         break;
 

@@ -12,7 +12,6 @@ import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.logging.Alert;
 import com.cyberknights4911.logging.Alert.AlertType;
 import com.cyberknights4911.logging.RobotLogger;
-import com.cyberknights4911.logging.TuningMode;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -60,7 +59,7 @@ public final class Robot extends LoggedRobot {
   }
 
   private void checkStartupAlerts() {
-    if (TuningMode.IS_ENABLED) {
+    if (constants.tuningMode()) {
       new Alert("Tuning mode active, do not use in competition.", AlertType.INFO).set(true);
     }
   }
