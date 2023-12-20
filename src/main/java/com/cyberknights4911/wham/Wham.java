@@ -9,7 +9,6 @@ package com.cyberknights4911.wham;
 
 import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.constants.Constants;
-import com.cyberknights4911.control.StickAction;
 import com.cyberknights4911.entrypoint.RobotContainer;
 import com.cyberknights4911.subsystems.drive.Drive;
 import com.cyberknights4911.subsystems.drive.GyroIO;
@@ -36,9 +35,9 @@ public final class Wham implements RobotContainer {
     drive.setDefaultCommand(
         drive.joystickDrive(
             WhamConstants.CONTROL_CONSTANTS,
-            binding.supplierFor(StickAction.FORWARD),
-            binding.supplierFor(StickAction.STRAFE),
-            binding.supplierFor(StickAction.ROTATE)));
+            binding.supplierFor(WhamSticks.FORWARD),
+            binding.supplierFor(WhamSticks.STRAFE),
+            binding.supplierFor(WhamSticks.ROTATE)));
 
     binding.triggersFor(WhamButtons.Brake).whileTrue(drive.stopWithX());
 

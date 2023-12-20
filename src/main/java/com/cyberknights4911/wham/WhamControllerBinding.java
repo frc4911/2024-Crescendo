@@ -8,13 +8,13 @@
 package com.cyberknights4911.wham;
 
 import com.cyberknights4911.control.ButtonBinding;
-import com.cyberknights4911.control.StickAction;
 import com.cyberknights4911.control.StickBinding;
 import com.cyberknights4911.control.Triggers;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.function.DoubleSupplier;
 
-public final class WhamControllerBinding implements StickBinding, ButtonBinding<WhamButtons> {
+public final class WhamControllerBinding
+    implements StickBinding<WhamSticks>, ButtonBinding<WhamButtons> {
   private static final int DRIVER_CONTROLLER_PORT = 0;
   private final CommandXboxController driver;
 
@@ -23,7 +23,7 @@ public final class WhamControllerBinding implements StickBinding, ButtonBinding<
   }
 
   @Override
-  public DoubleSupplier supplierFor(StickAction action) {
+  public DoubleSupplier supplierFor(WhamSticks action) {
     switch (action) {
       case FORWARD:
         return () -> -driver.getLeftY();
