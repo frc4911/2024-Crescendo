@@ -5,7 +5,12 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package com.cyberknights4911.control;
+package com.cyberknights4911.wham;
 
-/** Robot actions that can be bound to button inputs. */
-public interface ButtonAction {}
+import com.cyberknights4911.control.StickAction;
+
+public enum WhamSticks implements StickAction {
+  FORWARD,
+  STRAFE,
+  ROTATE
+}

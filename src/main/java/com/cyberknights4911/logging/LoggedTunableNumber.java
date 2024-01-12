@@ -1,12 +1,13 @@
-package com.cyberknights4911.logging;
-
-// Copyright (c) 2023 FRC 6328
-// http://github.com/Mechanical-Advantage
+// Copyright (c) 2023 FRC 4911
+// https://github.com/frc4911
 //
 // Use of this source code is governed by an MIT-style
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
+package com.cyberknights4911.logging;
+
+import com.cyberknights4911.constants.Constants;
 import java.util.HashMap;
 import java.util.Map;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
@@ -53,7 +54,7 @@ public final class LoggedTunableNumber {
     if (!hasDefault) {
       hasDefault = true;
       this.defaultValue = defaultValue;
-      if (TuningMode.IS_ENABLED) {
+      if (Constants.get().tuningMode()) {
         dashboardNumber = new LoggedDashboardNumber(key, defaultValue);
       }
     }
@@ -68,7 +69,7 @@ public final class LoggedTunableNumber {
     if (!hasDefault) {
       return 0.0;
     } else {
-      return TuningMode.IS_ENABLED ? dashboardNumber.get() : defaultValue;
+      return Constants.get().tuningMode() ? dashboardNumber.get() : defaultValue;
     }
   }
 

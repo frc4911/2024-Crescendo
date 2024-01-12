@@ -7,5 +7,5 @@
 
 package com.cyberknights4911.control;
 
-/** Robot actions that can be bound to button inputs. */
-public interface ButtonAction {}
+/** Robot actions that can be bound to stick inputs. */
+public interface StickAction {}
