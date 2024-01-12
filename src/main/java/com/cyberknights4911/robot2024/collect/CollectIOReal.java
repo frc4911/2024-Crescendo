@@ -29,7 +29,7 @@ public class CollectIOReal implements CollectIO {
   public void updateInputs(CollectIOInputs inputs) {
     inputs.appliedVoltsLeft = collectLeft.getAppliedOutput() * collectLeft.getBusVoltage();
     inputs.appliedVoltsRight = collectRight.getAppliedOutput() * collectRight.getBusVoltage();
-    inputs.currentAmpsLeft = collectLeft.getAppliedOutput();
-    inputs.currentAmpsRight = collectRight.getAppliedOutput();
+    inputs.currentAmpsLeft = collectLeft.getOutputCurrent();
+    inputs.currentAmpsRight = collectRight.getOutputCurrent();
   }
 }

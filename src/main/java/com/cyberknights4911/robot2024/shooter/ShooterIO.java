@@ -7,4 +7,24 @@
 
 package com.cyberknights4911.robot2024.shooter;
 
-public class ShooterIO {}
+import org.littletonrobotics.junction.AutoLog;
+
+public interface ShooterIO {
+  @AutoLog
+  public static class ShooterIOInputs {
+    public double positionRadLeft = 0.0;
+    public double positionRadRight = 0.0;
+    public double velocityRadPerSecLeft = 0.0;
+    public double velocityRadPerSecRight = 0.0;
+
+    public double appliedVoltsLeft = 0.0;
+    public double appliedVoltsRight = 0.0;
+    public double currentLeftAmps = 0.0;
+    public double currentRightAmps = 0.0;
+  }
+  /** Updates the set of loggable inputs. */
+  public default void updateInputs(ShooterIOInputs inputs) {}
+
+  /** Run the motor at the specified voltage. */
+  public default void setVoltage(double volts) {}
+}

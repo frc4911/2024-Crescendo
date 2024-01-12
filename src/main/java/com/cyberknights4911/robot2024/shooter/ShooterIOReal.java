@@ -7,4 +7,37 @@
 
 package com.cyberknights4911.robot2024.shooter;
 
-public class ShooterIOReal {}
+import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.CANSparkMax;
+
+public class ShooterIOReal implements ShooterIO {
+  private final CANSparkMax shootLeft;
+  private final CANSparkMax shootRight;
+
+  public ShooterIOReal() {
+    shootLeft = new CANSparkMax(0, MotorType.kBrushless);
+    shootRight = new CANSparkMax(0, MotorType.kBrushless);
+  }
+
+  @Override
+  public void setVoltage(double volts) {
+    shootLeft.setVoltage(volts);
+    shootRight.setVoltage(volts);
+  }
+
+  @Override
+  public void updateInputs(ShooterIOInputs inputs) {
+    inputs.appliedVoltsLeft = shootLeft.getAppliedOutput() * shootLeft.getBusVoltage();
+    inputs.appliedVoltsRight = shootRight.getAppliedOutput() * shootRight.getBusVoltage();
+
+    inputs.currentLeftAmps = shootLeft.getOutputCurrent();
+    inputs.currentRightAmps = shootRight.getOutputCurrent();
+
+    // inputs.positionRadLeft = shootLeft.getEncoder().getPosition();
+    // inputs.positionRadRight = shootRight.getEncoder().getPosition();
+
+    // inputs.velocityRadPerSecLeft = shootLeft.getEncoder().getVelocity();
+    // inputs.velocityRadPerSecRight = shootRight.getEncoder().getVelocity();
+
+  }
+}
