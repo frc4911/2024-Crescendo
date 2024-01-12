@@ -7,4 +7,27 @@
 
 package com.cyberknights4911.robot2024.climb;
 
-public interface ClimbIO {}
+import org.littletonrobotics.junction.AutoLog;
+
+public interface ClimbIO {
+  @AutoLog
+  public static class ClimbIOInputs {
+    public double positionRadLeft = 0.0;
+    public double positionRadRight = 0.0;
+    public double velocityRadPerSecLeft = 0.0;
+    public double velocityRadPerSecRight = 0.0;
+    public double appliedVoltsLeft = 0.0;
+    public double appliedVoltsRight = 0.0;
+    public double currentAmpsRight = 0.0;
+    public double currentAmpsLeft = 0.0;
+  }
+
+  /** Updates the set of loggable inputs. */
+  public default void updateInputs(ClimbIOInputs inputs) {}
+
+  /** Run the motor at the specified voltage. */
+  public default void setVoltage(double volts) {}
+
+  /** Enable or disable brake mode on the motor. */
+  public default void setBrakeMode(boolean enable) {}
+}
