@@ -7,9 +7,8 @@
 
 package com.cyberknights4911.robot2024.shooter;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
   private final ShooterIO shooterIO;

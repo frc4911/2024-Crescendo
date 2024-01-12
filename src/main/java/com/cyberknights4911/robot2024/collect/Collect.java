@@ -7,9 +7,8 @@
 
 package com.cyberknights4911.robot2024.collect;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
 public class Collect extends SubsystemBase {
   // Collect
