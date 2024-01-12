@@ -1,7 +1,14 @@
+// Copyright (c) 2023 FRC 4911
+// https://github.com/frc4911
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
 package com.cyberknights4911.wham.yeet;
 
-import org.littletonrobotics.junction.AutoLog;
 import edu.wpi.first.math.geometry.Rotation2d;
+import org.littletonrobotics.junction.AutoLog;
 
 public interface YeetIO {
   @AutoLog
@@ -18,7 +25,7 @@ public interface YeetIO {
     public double[] shoulderAppliedVolts = new double[3];
     public double[] shoulderCurrentAmps = new double[3];
   }
-  
+
   /** Updates the set of loggable inputs. */
   public default void updateInputs(YeetIOInputs inputs) {}
 

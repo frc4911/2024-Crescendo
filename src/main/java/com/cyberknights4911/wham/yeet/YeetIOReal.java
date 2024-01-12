@@ -1,3 +1,10 @@
+// Copyright (c) 2023 FRC 4911
+// https://github.com/frc4911
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
 package com.cyberknights4911.wham.yeet;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -8,7 +15,6 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
@@ -38,7 +44,7 @@ public final class YeetIOReal implements YeetIO {
   private final StatusSignal<Double> shoulderCurrent3;
   private final StatusSignal<Double> shoulderAbsolutePosition;
   private final StatusSignal<Double> shoulderEncoderVelocity;
-  
+
   private final CANcoder shoulderCancoder;
   private final CANcoder wristCancoder;
 
@@ -52,7 +58,7 @@ public final class YeetIOReal implements YeetIO {
     shoulderTalon2 = new TalonFX(0, CANIVORE);
     shoulderTalon3 = new TalonFX(0, CANIVORE);
     shoulderCancoder = new CANcoder(10, CANIVORE);
-    
+
     wristPosition = wristTalon.getPosition();
     wristVelocity = wristTalon.getVelocity();
     wristAppliedVolts = wristTalon.getMotorVoltage();
@@ -76,26 +82,24 @@ public final class YeetIOReal implements YeetIO {
     wristEncoderOffset = new Rotation2d();
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-      100.0, wristAbsolutePosition, shoulderAbsolutePosition
-    );
-    
+        100.0, wristAbsolutePosition, shoulderAbsolutePosition);
+
     BaseStatusSignal.setUpdateFrequencyForAll(
-      50.0,
-      wristPosition,
-      wristVelocity,
-      wristAppliedVolts,
-      wristCurrent,
-      wristEncoderVelocity,
-      shoulderPosition,
-      shoulderVelocity,
-      shoulderAppliedVolts1,
-      shoulderCurrent1,
-      shoulderAppliedVolts2,
-      shoulderCurrent2,
-      shoulderAppliedVolts3,
-      shoulderCurrent3,
-      shoulderEncoderVelocity
-    );
+        50.0,
+        wristPosition,
+        wristVelocity,
+        wristAppliedVolts,
+        wristCurrent,
+        wristEncoderVelocity,
+        shoulderPosition,
+        shoulderVelocity,
+        shoulderAppliedVolts1,
+        shoulderCurrent1,
+        shoulderAppliedVolts2,
+        shoulderCurrent2,
+        shoulderAppliedVolts3,
+        shoulderCurrent3,
+        shoulderEncoderVelocity);
 
     wristTalon.optimizeBusUtilization();
     wristCancoder.optimizeBusUtilization();
@@ -108,15 +112,14 @@ public final class YeetIOReal implements YeetIO {
   @Override
   public void updateInputs(YeetIOInputs inputs) {
     BaseStatusSignal.refreshAll(
-      wristPosition,
-      wristVelocity,
-      wristAppliedVolts,
-      wristCurrent,
-      wristAbsolutePosition,
-      shoulderAbsolutePosition
-    );
+        wristPosition,
+        wristVelocity,
+        wristAppliedVolts,
+        wristCurrent,
+        wristAbsolutePosition,
+        shoulderAbsolutePosition);
 
-    inputs.wristAbsolutePositionRad = 
+    inputs.wristAbsolutePositionRad =
         Rotation2d.fromRotations(wristAbsolutePosition.getValueAsDouble())
             .minus(wristEncoderOffset);
     inputs.wristPositionRad =
