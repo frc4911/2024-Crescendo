@@ -7,6 +7,27 @@
 
 package com.cyberknights4911.robot2024.climb;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Climb extends SubsystemBase {}
+public class Climb extends SubsystemBase {
+  private final ClimbIO climbIO;
+  private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
+
+  public Climb(ClimbIO climbIO) {
+    super();
+    this.climbIO = climbIO;
+  }
+
+  public void setClimbVoltage(double volts) {
+    climbIO.setVoltage(volts);
+  }
+
+  @Override
+  public void periodic() {
+    climbIO.updateInputs(inputs);
+
+    Logger.processInputs("Climb", inputs);
+  }
+}
