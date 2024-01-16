@@ -24,9 +24,9 @@ public final class Wham implements RobotContainer {
   private final Constants constants;
 
   public Wham() {
+    constants = WhamConstants.WHAM;
     binding = new WhamControllerBinding();
     drive = createDrive();
-    constants = WhamConstants.WHAM;
 
     configureControls();
   }
