@@ -12,6 +12,8 @@ import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.subsystems.drive.Drive;
 import com.cyberknights4911.util.LocalADStarAK;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
@@ -63,8 +65,13 @@ final class Autos {
   }
 
   void addAllAutos(AutoCommandHandler handler) {
+    NamedCommands.registerCommand("Score", Commands.waitSeconds(1).alongWith(Commands.print("SHOOT DA HOOP!!!")));
+    NamedCommands.registerCommand("Collect", Commands.waitSeconds(1).alongWith(Commands.print("EATIN CHEERIOS!!!")));
     handler.addDefaultOption("Nothing", Commands.none());
-    // handler.addOption("Tranlate Test", new PathPlannerAuto("TranslateTest"));
+    handler.addOption("Tranlate Test", new PathPlannerAuto("TranslationTest"));
+    handler.addOption("Rotate Test", new PathPlannerAuto("RotationTest"));
+    handler.addOption("Auto 1", new PathPlannerAuto("Auto1"));
+
 
     // Set up FF characterization routines
     // handler.addOption(

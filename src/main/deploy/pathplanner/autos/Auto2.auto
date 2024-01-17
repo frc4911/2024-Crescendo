@@ -1,0 +1,37 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.4239712279219852,
+      "y": 5.563692620179248
+    },
+    "rotation": 180.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Leave"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ScoreSpeaker"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CollectL"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
