@@ -31,4 +31,8 @@ public final class Slurpp extends SubsystemBase {
       slurppIO.setVoltage(0);
     }
   }
+
+  public void setVoltage(double volts) {
+    slurppIO.setVoltage(volts);
+  }
 }

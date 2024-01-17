@@ -11,6 +11,7 @@ import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.subsystems.drive.Drive;
 import com.cyberknights4911.util.LocalADStarAK;
+import com.cyberknights4911.wham.slurpp.Slurpp;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -25,9 +26,11 @@ import org.littletonrobotics.junction.Logger;
 final class Autos {
 
   private final Drive drive;
+  private final Slurpp slurpp;
 
-  public Autos(DriveConstants driveConstants, Drive drive) {
+  public Autos(DriveConstants driveConstants, Drive drive, Slurpp slurpp) {
     this.drive = drive;
+    this.slurpp = slurpp;
 
     double driveBaseRadius =
         Math.hypot(driveConstants.trackWidthX() / 2.0, driveConstants.trackWidthY() / 2.0);
