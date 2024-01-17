@@ -21,6 +21,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -68,14 +69,46 @@ final class Autos {
   }
 
   void addAllAutos(AutoCommandHandler handler) {
-    NamedCommands.registerCommand("Score", Commands.waitSeconds(1).alongWith(Commands.print("SHOOT DA HOOP!!!")));
-    NamedCommands.registerCommand("Collect", Commands.waitSeconds(1).alongWith(Commands.print("EATIN CHEERIOS!!!")));
+
+    Command score =
+        Commands.waitSeconds(1)
+            .alongWith(
+                Commands.runOnce(
+                    () -> {
+                      slurpp.setVoltage(12 * .6);
+                    },
+                    slurpp))
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      slurpp.setVoltage(0);
+                    },
+                    slurpp));
+
+    Command collect =
+        Commands.waitSeconds(0.75)
+            .alongWith(
+                Commands.runOnce(
+                    () -> {
+                      slurpp.setVoltage(12 * -.2);
+                    },
+                    slurpp))
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      slurpp.setVoltage(0);
+                    },
+                    slurpp));
+
+    NamedCommands.registerCommand("Score", score);
+    NamedCommands.registerCommand("Collect", collect);
+    // NamedCommands.registerCommand("Collect", Commands.waitSeconds(1).alongWith(()));
     handler.addDefaultOption("Nothing", Commands.none());
     handler.addOption("Tranlate Test", new PathPlannerAuto("TranslationTest"));
     handler.addOption("Rotate Test", new PathPlannerAuto("RotationTest"));
     handler.addOption("Auto 1", new PathPlannerAuto("Auto1"));
-
-
+    handler.addOption("Auto 2", new PathPlannerAuto("Auto2"));
+    handler.addOption("Auto 3", new PathPlannerAuto("Auto3"));
     // Set up FF characterization routines
     // handler.addOption(
     //     "Drive FF Characterization",
