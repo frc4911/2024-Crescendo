@@ -102,7 +102,6 @@ final class Autos {
 
     NamedCommands.registerCommand("Score", score);
     NamedCommands.registerCommand("Collect", collect);
-    // NamedCommands.registerCommand("Collect", Commands.waitSeconds(1).alongWith(()));
     handler.addDefaultOption("Nothing", Commands.none());
     handler.addOption("Tranlate Test", new PathPlannerAuto("TranslationTest"));
     handler.addOption("Rotate Test", new PathPlannerAuto("RotationTest"));
