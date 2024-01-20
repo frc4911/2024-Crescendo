@@ -7,4 +7,16 @@
 
 package com.cyberknights4911.wham.vision;
 
-public interface VisionIO {}
+import org.littletonrobotics.junction.AutoLog;
+import org.photonvision.targeting.PhotonPipelineResult;
+
+public interface VisionIO {
+  @AutoLog
+  public static class VisionIOInputs {
+    public boolean isOnline = false;
+    public double lastTimeStamp = 0;
+    public PhotonPipelineResult lastResult = new PhotonPipelineResult();
+  }
+
+  public default void updateInputs(VisionIOInputsAutoLogged inputs) {}
+}
