@@ -8,11 +8,12 @@
 package com.cyberknights4911.wham;
 
 import com.cyberknights4911.auto.AutoCommandHandler;
-import com.cyberknights4911.commands.FeedForwardCharacterization;
 import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.subsystems.drive.Drive;
 import com.cyberknights4911.util.LocalADStarAK;
+import com.cyberknights4911.wham.slurpp.Slurpp;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
@@ -20,6 +21,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -27,9 +29,11 @@ import org.littletonrobotics.junction.Logger;
 final class Autos {
 
   private final Drive drive;
+  private final Slurpp slurpp;
 
-  public Autos(DriveConstants driveConstants, Drive drive) {
+  public Autos(DriveConstants driveConstants, Drive drive, Slurpp slurpp) {
     this.drive = drive;
+    this.slurpp = slurpp;
 
     double driveBaseRadius =
         Math.hypot(driveConstants.trackWidthX() / 2.0, driveConstants.trackWidthY() / 2.0);
@@ -65,13 +69,49 @@ final class Autos {
   }
 
   void addAllAutos(AutoCommandHandler handler) {
-    handler.addDefaultOption("Nothing", Commands.none());
-    handler.addOption("Tranlate Test", new PathPlannerAuto("TranslateTest"));
 
+    Command score =
+        Commands.waitSeconds(1)
+            .alongWith(
+                Commands.runOnce(
+                    () -> {
+                      slurpp.setVoltage(12 * .6);
+                    },
+                    slurpp))
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      slurpp.setVoltage(0);
+                    },
+                    slurpp));
+
+    Command collect =
+        Commands.waitSeconds(0.75)
+            .alongWith(
+                Commands.runOnce(
+                    () -> {
+                      slurpp.setVoltage(12 * -.2);
+                    },
+                    slurpp))
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      slurpp.setVoltage(0);
+                    },
+                    slurpp));
+
+    NamedCommands.registerCommand("Score", score);
+    NamedCommands.registerCommand("Collect", collect);
+    handler.addDefaultOption("Nothing", Commands.none());
+    handler.addOption("Tranlate Test", new PathPlannerAuto("TranslationTest"));
+    handler.addOption("Rotate Test", new PathPlannerAuto("RotationTest"));
+    handler.addOption("Auto 1", new PathPlannerAuto("Auto1"));
+    handler.addOption("Auto 2", new PathPlannerAuto("Auto2"));
+    handler.addOption("Auto 3", new PathPlannerAuto("Auto3"));
     // Set up FF characterization routines
-    handler.addOption(
-        "Drive FF Characterization",
-        new FeedForwardCharacterization(
-            drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity));
+    // handler.addOption(
+    //     "Drive FF Characterization",
+    //     new FeedForwardCharacterization(
+    //         drive, drive::runCharacterizationVolts, drive::getCharacterizationVelocity));
   }
 }
