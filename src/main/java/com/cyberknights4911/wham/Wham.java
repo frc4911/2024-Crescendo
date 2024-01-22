@@ -20,12 +20,15 @@ import com.cyberknights4911.wham.slurpp.Slurpp;
 import com.cyberknights4911.wham.slurpp.SlurppIO;
 import com.cyberknights4911.wham.slurpp.SlurppIOReal;
 import com.cyberknights4911.wham.slurpp.SlurppIOSim;
+import com.cyberknights4911.wham.vision.Vision;
+import com.cyberknights4911.wham.vision.VisionIOPhoton;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.littletonrobotics.junction.LoggedRobot;
 
 public final class Wham implements RobotContainer {
   private final Drive drive;
   private final Slurpp slurpp;
+  private final Vision vision;
   private final WhamControllerBinding binding;
   private final Constants constants;
 
@@ -34,6 +37,7 @@ public final class Wham implements RobotContainer {
     binding = new WhamControllerBinding();
     drive = createDrive();
     slurpp = createSlurpp();
+    vision = new Vision(new VisionIOPhoton("Arducam_OV2311_USB_Camera"));
 
     configureControls();
   }
