@@ -14,8 +14,21 @@ import com.cyberknights4911.constants.ControlConstantsBuilder;
 import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.constants.DriveConstantsBuilder;
 import com.cyberknights4911.constants.DriveConstantsModuleConstantsBuilder;
+import com.cyberknights4911.logging.Alert;
+import com.cyberknights4911.logging.Alert.AlertType;
 import com.cyberknights4911.logging.Mode;
+import com.cyberknights4911.vision.CameraConstants;
+import com.cyberknights4911.vision.CameraConstantsBuilder;
+import com.cyberknights4911.vision.VisionConstants;
+import com.cyberknights4911.vision.VisionConstantsBuilder;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import java.io.UncheckedIOException;
+import java.util.ArrayList;
 
 public final class WhamConstants {
   private WhamConstants() {}
@@ -25,7 +38,7 @@ public final class WhamConstants {
           .name("Wham")
           .loopPeriodSecs(0.02)
           .tuningMode(true)
-          .logPath("/media/sda1/")
+          .logPath(null)
           .mode(Mode.REAL)
           .supplier(Wham::new)
           .build();
@@ -78,5 +91,38 @@ public final class WhamConstants {
                   .encoderId(3)
                   .encoderOffset(1.804 - Math.PI)
                   .build())
+          .build();
+
+  private static Alert noAprilTagLayoutAlert =
+      new Alert("No AprilTag layout file found. Update VisionConstants.", AlertType.WARNING);
+
+  private static AprilTagFieldLayout getLayout() {
+    try {
+      noAprilTagLayoutAlert.set(false);
+      return AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
+    } catch (UncheckedIOException e) {
+      noAprilTagLayoutAlert.set(true);
+      return new AprilTagFieldLayout(
+          new ArrayList<>(), Units.feetToMeters(12), Units.feetToMeters(12));
+    }
+  }
+
+  public static final VisionConstants VISION_CONSTANTS =
+      VisionConstantsBuilder.builder()
+          .layout(getLayout())
+          .maxAmbiguity(0.03)
+          .maxValidDistanceMeters(3.0)
+          .build();
+
+  // 10 inches back of center, 36 inches from floor, 3 inches left of center
+  public static final CameraConstants CAMERA_CONSTANTS =
+      CameraConstantsBuilder.builder()
+          .name("whamcam")
+          .photonCameraName("Arducam_OV2311_USB_Camera")
+          .robotToCamera(
+              new Transform3d(
+                  new Translation3d(
+                      Units.inchesToMeters(-10), Units.inchesToMeters(3), Units.inchesToMeters(36)),
+                  new Rotation3d(0, 0, 0)))
           .build();
 }

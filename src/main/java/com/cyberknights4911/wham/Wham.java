@@ -15,13 +15,16 @@ import com.cyberknights4911.drive.GyroIOPigeon2;
 import com.cyberknights4911.drive.ModuleIO;
 import com.cyberknights4911.drive.ModuleIOSim;
 import com.cyberknights4911.entrypoint.RobotContainer;
+import com.cyberknights4911.vision.CameraConfig;
+import com.cyberknights4911.vision.Vision;
+import com.cyberknights4911.vision.VisionIOInputsAutoLogged;
+import com.cyberknights4911.vision.VisionIOPhoton;
+import com.cyberknights4911.vision.VisionUpdate;
 import com.cyberknights4911.wham.drive.ModuleIOTalonFX;
 import com.cyberknights4911.wham.slurpp.Slurpp;
 import com.cyberknights4911.wham.slurpp.SlurppIO;
 import com.cyberknights4911.wham.slurpp.SlurppIOReal;
 import com.cyberknights4911.wham.slurpp.SlurppIOSim;
-import com.cyberknights4911.wham.vision.Vision;
-import com.cyberknights4911.wham.vision.VisionIOPhoton;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -37,7 +40,17 @@ public final class Wham implements RobotContainer {
     binding = new WhamControllerBinding();
     drive = createDrive();
     slurpp = createSlurpp();
-    vision = new Vision(new VisionIOPhoton("Arducam_OV2311_USB_Camera"));
+    vision =
+        new Vision(
+            WhamConstants.VISION_CONSTANTS,
+            drive::getPose,
+            (VisionUpdate update) -> {
+              System.out.println("Vision update at time: " + update.timestamp());
+            },
+            new CameraConfig(
+                WhamConstants.CAMERA_CONSTANTS,
+                new VisionIOPhoton(WhamConstants.VISION_CONSTANTS, WhamConstants.CAMERA_CONSTANTS),
+                new VisionIOInputsAutoLogged()));
 
     configureControls();
   }
