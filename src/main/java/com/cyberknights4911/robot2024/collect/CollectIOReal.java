@@ -7,16 +7,18 @@
 
 package com.cyberknights4911.robot2024.collect;
 
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 
 public class CollectIOReal implements CollectIO {
-  private final CANSparkMax collectLeft;
-  private final CANSparkMax collectRight;
+  private final CANSparkFlex collectLeft;
+  private final CANSparkFlex collectRight;
 
   public CollectIOReal() {
-    collectLeft = new CANSparkMax(0, MotorType.kBrushless);
-    collectRight = new CANSparkMax(0, MotorType.kBrushless);
+    collectLeft = new CANSparkFlex(0, MotorType.kBrushless);
+    collectRight = new CANSparkFlex(0, MotorType.kBrushless);
+
+    configureDevices();
   }
 
   @Override
@@ -31,5 +33,12 @@ public class CollectIOReal implements CollectIO {
     inputs.appliedVoltsRight = collectRight.getAppliedOutput() * collectRight.getBusVoltage();
     inputs.currentAmpsLeft = collectLeft.getOutputCurrent();
     inputs.currentAmpsRight = collectRight.getOutputCurrent();
+  }
+
+  private void configureDevices() {
+    collectLeft.restoreFactoryDefaults();
+    collectRight.restoreFactoryDefaults();
+
+    collectLeft.follow(collectRight, true);
   }
 }

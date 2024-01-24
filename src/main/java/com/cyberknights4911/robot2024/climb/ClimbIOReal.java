@@ -7,17 +7,17 @@
 
 package com.cyberknights4911.robot2024.climb;
 
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 
 public class ClimbIOReal implements ClimbIO {
 
-  private final CANSparkMax climbLeft;
-  private final CANSparkMax climbRight;
+  private final CANSparkFlex climbLeft;
+  private final CANSparkFlex climbRight;
 
   public ClimbIOReal() {
-    climbLeft = new CANSparkMax(0, MotorType.kBrushless);
-    climbRight = new CANSparkMax(0, MotorType.kBrushless);
+    climbLeft = new CANSparkFlex(0, MotorType.kBrushless);
+    climbRight = new CANSparkFlex(0, MotorType.kBrushless);
   }
 
   @Override
@@ -32,5 +32,12 @@ public class ClimbIOReal implements ClimbIO {
     inputs.appliedVoltsRight = climbRight.getAppliedOutput() * climbRight.getBusVoltage();
     inputs.currentAmpsLeft = climbLeft.getOutputCurrent();
     inputs.currentAmpsRight = climbRight.getOutputCurrent();
+  }
+
+  private void configureDevices() {
+    climbLeft.restoreFactoryDefaults();
+    climbRight.restoreFactoryDefaults();
+
+    climbLeft.follow(climbRight, true);
   }
 }
