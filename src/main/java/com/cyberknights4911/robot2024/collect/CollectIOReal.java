@@ -17,7 +17,7 @@ public class CollectIOReal implements CollectIO {
   public CollectIOReal() {
     collectLeft = new CANSparkFlex(0, MotorType.kBrushless);
     collectRight = new CANSparkFlex(0, MotorType.kBrushless);
-    
+
     configureDevices();
   }
 
@@ -34,7 +34,6 @@ public class CollectIOReal implements CollectIO {
     inputs.currentAmpsLeft = collectLeft.getOutputCurrent();
     inputs.currentAmpsRight = collectRight.getOutputCurrent();
   }
-  
 
   private void configureDevices() {
     collectLeft.restoreFactoryDefaults();

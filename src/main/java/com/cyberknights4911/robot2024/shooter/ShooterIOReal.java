@@ -7,8 +7,8 @@
 
 package com.cyberknights4911.robot2024.shooter;
 
-import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class ShooterIOReal implements ShooterIO {
   private final CANSparkFlex shootLeft;
@@ -41,7 +41,6 @@ public class ShooterIOReal implements ShooterIO {
 
   }
 
-  
   private void configureDevices() {
     shootLeft.restoreFactoryDefaults();
     shootRight.restoreFactoryDefaults();

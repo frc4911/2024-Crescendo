@@ -10,8 +10,8 @@ package com.cyberknights4911.robot2024.drive;
 import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.drive.ModuleIO;
 import com.revrobotics.CANSparkBase.IdleMode;
-import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -30,7 +30,7 @@ import edu.wpi.first.wpilibj.RobotController;
  * absolute encoders using AdvantageScope. These values are logged under
  * "/Drive/ModuleX/TurnAbsolutePositionRad"
  */
-public class ModuleIOSparkMax implements ModuleIO {
+public class ModuleIOSparkFlex implements ModuleIO {
 
   private final CANSparkFlex driveSparkMax;
   private final CANSparkFlex turnSparkMax;
@@ -43,7 +43,7 @@ public class ModuleIOSparkMax implements ModuleIO {
   private final Rotation2d absoluteEncoderOffset;
   private final DriveConstants driveConstants;
 
-  public ModuleIOSparkMax(
+  public ModuleIOSparkFlex(
       DriveConstants driveConstants, DriveConstants.ModuleConstants moduleConstants) {
     this.driveConstants = driveConstants;
     driveSparkMax = new CANSparkFlex(moduleConstants.driveMotorId(), MotorType.kBrushless);

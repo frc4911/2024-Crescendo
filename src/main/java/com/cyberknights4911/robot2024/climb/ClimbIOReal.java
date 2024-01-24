@@ -7,8 +7,8 @@
 
 package com.cyberknights4911.robot2024.climb;
 
-import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.CANSparkFlex;
+import com.revrobotics.CANSparkLowLevel.MotorType;
 
 public class ClimbIOReal implements ClimbIO {
 
@@ -34,7 +34,6 @@ public class ClimbIOReal implements ClimbIO {
     inputs.currentAmpsRight = climbRight.getOutputCurrent();
   }
 
-  
   private void configureDevices() {
     climbLeft.restoreFactoryDefaults();
     climbRight.restoreFactoryDefaults();
