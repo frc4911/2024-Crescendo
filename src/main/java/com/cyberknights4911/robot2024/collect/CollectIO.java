@@ -13,10 +13,8 @@ public interface CollectIO {
 
   @AutoLog
   public static class CollectIOInputs {
-    public double positionRadLeft = 0.0;
-    public double positionRadRight = 0.0;
-    public double velocityRadPerSecLeft = 0.0;
-    public double velocityRadPerSecRight = 0.0;
+    public double positionRad = 0.0;
+    public double velocityRadPerSec = 0.0;
     public double appliedVoltsLeft = 0.0;
     public double appliedVoltsRight = 0.0;
     public double currentAmpsLeft = 0.0;
