@@ -19,7 +19,6 @@ public class ShooterIOReal implements ShooterIO {
   private final CANSparkFlex shootRight;
 
   private final RelativeEncoder encoderRight;
-  private final RelativeEncoder encoderLeft;
 
   public ShooterIOReal() {
     shootLeft = new CANSparkFlex(0, MotorType.kBrushless);
