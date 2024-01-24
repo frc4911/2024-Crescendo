@@ -24,6 +24,6 @@ public interface CollectIO {
   /** Updates the set of loggable inputs. */
   public default void updateInputs(CollectIOInputs inputs) {}
 
-  /** Run the motor at the specified voltage. */
-  public default void setVoltage(double volts) {}
+  /** Run the motor at the specified velocity. */
+  public default void setVelocity(double velocity) {}
 }
