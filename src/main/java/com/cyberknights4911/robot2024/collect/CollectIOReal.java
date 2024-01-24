@@ -27,7 +27,6 @@ public class CollectIOReal implements CollectIO {
     collectRight = new CANSparkFlex(0, MotorType.kBrushless);
 
     encoderRight = collectRight.getEncoder();
-    encoderLeft = collectLeft.getEncoder();
 
     configureDevices();
   }
