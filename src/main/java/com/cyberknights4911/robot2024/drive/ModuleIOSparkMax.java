@@ -11,7 +11,7 @@ import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.drive.ModuleIO;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -32,8 +32,8 @@ import edu.wpi.first.wpilibj.RobotController;
  */
 public class ModuleIOSparkMax implements ModuleIO {
 
-  private final CANSparkMax driveSparkMax;
-  private final CANSparkMax turnSparkMax;
+  private final CANSparkFlex driveSparkMax;
+  private final CANSparkFlex turnSparkMax;
 
   private final RelativeEncoder driveEncoder;
   private final RelativeEncoder turnRelativeEncoder;
@@ -46,8 +46,8 @@ public class ModuleIOSparkMax implements ModuleIO {
   public ModuleIOSparkMax(
       DriveConstants driveConstants, DriveConstants.ModuleConstants moduleConstants) {
     this.driveConstants = driveConstants;
-    driveSparkMax = new CANSparkMax(moduleConstants.driveMotorId(), MotorType.kBrushless);
-    turnSparkMax = new CANSparkMax(moduleConstants.turnMotorId(), MotorType.kBrushless);
+    driveSparkMax = new CANSparkFlex(moduleConstants.driveMotorId(), MotorType.kBrushless);
+    turnSparkMax = new CANSparkFlex(moduleConstants.turnMotorId(), MotorType.kBrushless);
     turnAbsoluteEncoder = new AnalogInput(moduleConstants.encoderId());
     absoluteEncoderOffset = new Rotation2d(moduleConstants.encoderOffset());
 
