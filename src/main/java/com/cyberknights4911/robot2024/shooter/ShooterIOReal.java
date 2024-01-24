@@ -26,7 +26,6 @@ public class ShooterIOReal implements ShooterIO {
     shootRight = new CANSparkFlex(0, MotorType.kBrushless);
 
     encoderRight = shootRight.getEncoder();
-    encoderLeft = shootLeft.getEncoder();
   }
 
   @Override
