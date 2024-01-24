@@ -7,8 +7,8 @@
 
 package com.cyberknights4911.robot2024.collect;
 
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.util.Units;
@@ -16,35 +16,32 @@ import edu.wpi.first.math.util.Units;
 public class CollectIOReal implements CollectIO {
   // TODO: modify this value to match that of the actual collector
   private static final double GEAR_RATIO = 1.0;
-  private static final double KP = 6e-5;
-  private static final double KFF = 0.000015;
+  private static final double KP = 0;
+  private static final double KI = 0;
+  private static final double KFF = 0;
   // TODO: determine this via characterization
   private static final double MAX_RPM = 1_000;
 
-  private final CANSparkMax collectLeft;
-  private final CANSparkMax collectRight;
+  private final CANSparkFlex collectLeft;
+  private final CANSparkFlex collectRight;
 
   private final RelativeEncoder encoder;
   private final SparkPIDController pidController;
 
   public CollectIOReal() {
-    collectLeft = new CANSparkMax(0, MotorType.kBrushless);
-    collectRight = new CANSparkMax(0, MotorType.kBrushless);
+    collectLeft = new CANSparkFlex(0, MotorType.kBrushless);
+    collectRight = new CANSparkFlex(0, MotorType.kBrushless);
 
     encoder = collectRight.getEncoder();
     pidController = collectRight.getPIDController();
-    configurePidController();
-  }
 
-  private void configurePidController() {
-    pidController.setI(KP);
-    pidController.setFF(KFF);
-    pidController.setOutputRange(-1, 1);
+    configureDevices();
+    configurePidController();
   }
 
   @Override
   public void setVelocity(double velocity) {
-    pidController.setReference(velocity * MAX_RPM, CANSparkMax.ControlType.kVelocity);
+    pidController.setReference(velocity * MAX_RPM, CANSparkFlex.ControlType.kVelocity);
   }
 
   @Override
@@ -56,5 +53,19 @@ public class CollectIOReal implements CollectIO {
     inputs.appliedVoltsRight = collectRight.getAppliedOutput() * collectRight.getBusVoltage();
     inputs.currentAmpsLeft = collectLeft.getOutputCurrent();
     inputs.currentAmpsRight = collectRight.getOutputCurrent();
+  }
+
+  private void configureDevices() {
+    collectLeft.restoreFactoryDefaults();
+    collectRight.restoreFactoryDefaults();
+
+    collectLeft.follow(collectRight, true);
+  }
+
+  private void configurePidController() {
+    pidController.setP(KP);
+    pidController.setI(KI);
+    pidController.setFF(KFF);
+    pidController.setOutputRange(-1, 1);
   }
 }

@@ -7,16 +7,16 @@
 
 package com.cyberknights4911.robot2024.shooter;
 
+import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.CANSparkMax;
 
 public class ShooterIOReal implements ShooterIO {
-  private final CANSparkMax shootLeft;
-  private final CANSparkMax shootRight;
+  private final CANSparkFlex shootLeft;
+  private final CANSparkFlex shootRight;
 
   public ShooterIOReal() {
-    shootLeft = new CANSparkMax(0, MotorType.kBrushless);
-    shootRight = new CANSparkMax(0, MotorType.kBrushless);
+    shootLeft = new CANSparkFlex(0, MotorType.kBrushless);
+    shootRight = new CANSparkFlex(0, MotorType.kBrushless);
   }
 
   @Override
@@ -39,5 +39,12 @@ public class ShooterIOReal implements ShooterIO {
     // inputs.velocityRadPerSecLeft = shootLeft.getEncoder().getVelocity();
     // inputs.velocityRadPerSecRight = shootRight.getEncoder().getVelocity();
 
+  }
+
+  private void configureDevices() {
+    shootLeft.restoreFactoryDefaults();
+    shootRight.restoreFactoryDefaults();
+
+    shootLeft.follow(shootRight, true);
   }
 }
