@@ -14,7 +14,7 @@ import edu.wpi.first.math.util.Units;
 
 public class ClimbIOReal implements ClimbIO {
 
-  // TODO: modify this value to match that of the actual collector
+  // TODO: modify this value to match that of the actual climber
   private static final double GEAR_RATIO = 1.0;
   private final CANSparkFlex climbLeft;
   private final CANSparkFlex climbRight;
