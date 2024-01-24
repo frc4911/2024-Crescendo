@@ -9,24 +9,14 @@ package com.cyberknights4911.robot2024.shooter;
 
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
-import edu.wpi.first.math.util.Units;
 
 public class ShooterIOReal implements ShooterIO {
-  // TODO: modify this value to match that of the actual collector
-  private static final double GEAR_RATIO = 1.0;
   private final CANSparkFlex shootLeft;
   private final CANSparkFlex shootRight;
-
-  private final RelativeEncoder encoderRight;
-  private final RelativeEncoder encoderLeft;
 
   public ShooterIOReal() {
     shootLeft = new CANSparkFlex(0, MotorType.kBrushless);
     shootRight = new CANSparkFlex(0, MotorType.kBrushless);
-
-    encoderRight = shootRight.getEncoder();
-    encoderLeft = shootLeft.getEncoder();
   }
 
   @Override
@@ -37,12 +27,6 @@ public class ShooterIOReal implements ShooterIO {
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    inputs.positionRadRight = Units.rotationsToRadians(encoderRight.getPosition()) / GEAR_RATIO;
-    inputs.velocityRadPerSecRight =
-        Units.rotationsPerMinuteToRadiansPerSecond(encoderRight.getVelocity()) / GEAR_RATIO;
-    inputs.positionRadLeft = Units.rotationsToRadians(encoderLeft.getPosition()) / GEAR_RATIO;
-    inputs.velocityRadPerSecLeft =
-        Units.rotationsPerMinuteToRadiansPerSecond(encoderLeft.getVelocity()) / GEAR_RATIO;
     inputs.appliedVoltsLeft = shootLeft.getAppliedOutput() * shootLeft.getBusVoltage();
     inputs.appliedVoltsRight = shootRight.getAppliedOutput() * shootRight.getBusVoltage();
 
