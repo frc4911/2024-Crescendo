@@ -39,12 +39,9 @@ public class CollectIOReal implements CollectIO {
 
   @Override
   public void updateInputs(CollectIOInputs inputs) {
-    inputs.positionRadRight = Units.rotationsToRadians(encoderRight.getPosition()) / GEAR_RATIO;
-    inputs.velocityRadPerSecRight =
+    inputs.positionRad = Units.rotationsToRadians(encoderRight.getPosition()) / GEAR_RATIO;
+    inputs.velocityRadPerSec =
         Units.rotationsPerMinuteToRadiansPerSecond(encoderRight.getVelocity()) / GEAR_RATIO;
-    inputs.positionRadLeft = Units.rotationsToRadians(encoderLeft.getPosition()) / GEAR_RATIO;
-    inputs.velocityRadPerSecLeft =
-        Units.rotationsPerMinuteToRadiansPerSecond(encoderLeft.getVelocity()) / GEAR_RATIO;
     inputs.appliedVoltsLeft = collectLeft.getAppliedOutput() * collectLeft.getBusVoltage();
     inputs.appliedVoltsRight = collectRight.getAppliedOutput() * collectRight.getBusVoltage();
     inputs.currentAmpsLeft = collectLeft.getOutputCurrent();
