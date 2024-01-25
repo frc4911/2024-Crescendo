@@ -7,6 +7,8 @@
 
 package com.cyberknights4911.constants;
 
+import com.cyberknights4911.util.FeedForwardValues;
+import com.cyberknights4911.util.PidValues;
 import io.soabase.recordbuilder.core.RecordBuilder;
 
 @RecordBuilder
@@ -15,9 +17,11 @@ public record DriveConstants(
     double trackWidthY,
     double maxLinearSpeed,
     double wheelRadius,
-    double treadWear,
     double driveGearRatio,
     double turnGearRatio,
+    PidValues turnFeedBackValues,
+    PidValues driveFeedBackValues,
+    FeedForwardValues driveFeedForwardValues,
     int pigeonId,
     ModuleConstants frontLeft,
     ModuleConstants frontRight,
@@ -32,6 +36,4 @@ public record DriveConstants(
   @RecordBuilder
   public record ModuleConstants(
       String name, int encoderId, int driveMotorId, int turnMotorId, double encoderOffset) {}
-
-  public static record PidValues(double p, double i, double d, double s, double v, double a) {}
 }

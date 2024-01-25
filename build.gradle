@@ -73,8 +73,8 @@ def includeDesktopSupport = false
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
-    annotationProcessor "io.soabase.record-builder:record-builder-processor:37"
-    compileOnly "io.soabase.record-builder:record-builder-core:37"
+    annotationProcessor "io.soabase.record-builder:record-builder-processor:40"
+    compileOnly "io.soabase.record-builder:record-builder-core:40"
 
     implementation 'gov.nist.math:jama:1.0.3'
     
