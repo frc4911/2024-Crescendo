@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 public class Collect extends SubsystemBase {
-  // Collect
   private final CollectIO collectIO;
   private final CollectIOInputsAutoLogged inputs = new CollectIOInputsAutoLogged();
 
@@ -20,7 +19,7 @@ public class Collect extends SubsystemBase {
     this.collectIO = collectIO;
   }
 
-  public void setCollectVelocity(double velocity) {
+  public void setVelocity(double velocity) {
     collectIO.setVelocity(velocity);
   }
 
