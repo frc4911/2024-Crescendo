@@ -9,42 +9,47 @@ package com.cyberknights4911.robot2024.shooter;
 
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.math.util.Units;
 
 public class ShooterIOReal implements ShooterIO {
-  private final CANSparkFlex shootLeft;
-  private final CANSparkFlex shootRight;
+  // TODO: modify this value to match that of the actual collector
+  private static final double GEAR_RATIO = 1.0;
+  private final CANSparkFlex left;
+  private final CANSparkFlex right;
+
+  private final RelativeEncoder encoderRight;
 
   public ShooterIOReal() {
-    shootLeft = new CANSparkFlex(0, MotorType.kBrushless);
-    shootRight = new CANSparkFlex(0, MotorType.kBrushless);
+    left = new CANSparkFlex(0, MotorType.kBrushless);
+    right = new CANSparkFlex(0, MotorType.kBrushless);
+
+    encoderRight = right.getEncoder();
+
+    configureDevices();
   }
 
   @Override
   public void setVoltage(double volts) {
-    shootLeft.setVoltage(volts);
-    shootRight.setVoltage(volts);
+    right.setVoltage(volts);
   }
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    inputs.appliedVoltsLeft = shootLeft.getAppliedOutput() * shootLeft.getBusVoltage();
-    inputs.appliedVoltsRight = shootRight.getAppliedOutput() * shootRight.getBusVoltage();
+    inputs.positionRad = Units.rotationsToRadians(encoderRight.getPosition()) / GEAR_RATIO;
+    inputs.velocityRadPerSec =
+        Units.rotationsPerMinuteToRadiansPerSecond(encoderRight.getVelocity()) / GEAR_RATIO;
 
-    inputs.currentLeftAmps = shootLeft.getOutputCurrent();
-    inputs.currentRightAmps = shootRight.getOutputCurrent();
-
-    // inputs.positionRadLeft = shootLeft.getEncoder().getPosition();
-    // inputs.positionRadRight = shootRight.getEncoder().getPosition();
-
-    // inputs.velocityRadPerSecLeft = shootLeft.getEncoder().getVelocity();
-    // inputs.velocityRadPerSecRight = shootRight.getEncoder().getVelocity();
-
+    inputs.appliedVoltsLeft = left.getAppliedOutput() * left.getBusVoltage();
+    inputs.appliedVoltsRight = right.getAppliedOutput() * right.getBusVoltage();
+    inputs.currentLeftAmps = left.getOutputCurrent();
+    inputs.currentRightAmps = right.getOutputCurrent();
   }
 
   private void configureDevices() {
-    shootLeft.restoreFactoryDefaults();
-    shootRight.restoreFactoryDefaults();
+    left.restoreFactoryDefaults();
+    right.restoreFactoryDefaults();
 
-    shootLeft.follow(shootRight, true);
+    left.follow(right, true);
   }
 }
