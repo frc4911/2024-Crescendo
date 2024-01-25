@@ -7,6 +7,7 @@
 
 package com.cyberknights4911.robot2024.collect;
 
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -54,6 +55,7 @@ public class CollectIOReal implements CollectIO {
   private void configureDevices() {
     collect.restoreFactoryDefaults();
 
+    collect.setIdleMode(IdleMode.kBrake);
     collect.setCANTimeout(250);
     collect.setSmartCurrentLimit(25);
     collect.enableVoltageCompensation(12.0);
