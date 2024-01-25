@@ -18,13 +18,13 @@ public class ShooterIOReal implements ShooterIO {
   private final CANSparkFlex left;
   private final CANSparkFlex right;
 
-  private final RelativeEncoder encoderRight;
+  private final RelativeEncoder encoder;
 
   public ShooterIOReal() {
     left = new CANSparkFlex(0, MotorType.kBrushless);
     right = new CANSparkFlex(0, MotorType.kBrushless);
 
-    encoderRight = right.getEncoder();
+    encoder = right.getEncoder();
 
     configureDevices();
   }
@@ -36,9 +36,9 @@ public class ShooterIOReal implements ShooterIO {
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    inputs.positionRad = Units.rotationsToRadians(encoderRight.getPosition()) / GEAR_RATIO;
+    inputs.positionRad = Units.rotationsToRadians(encoder.getPosition()) / GEAR_RATIO;
     inputs.velocityRadPerSec =
-        Units.rotationsPerMinuteToRadiansPerSecond(encoderRight.getVelocity()) / GEAR_RATIO;
+        Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity()) / GEAR_RATIO;
 
     inputs.appliedVoltsLeft = left.getAppliedOutput() * left.getBusVoltage();
     inputs.appliedVoltsRight = right.getAppliedOutput() * right.getBusVoltage();
@@ -50,6 +50,25 @@ public class ShooterIOReal implements ShooterIO {
     left.restoreFactoryDefaults();
     right.restoreFactoryDefaults();
 
+    left.setCANTimeout(250);
+    right.setCANTimeout(250);
+
+    left.setSmartCurrentLimit(25);
+    right.setSmartCurrentLimit(25);
+
+    left.enableVoltageCompensation(12.0);
+    right.enableVoltageCompensation(12.0);
+
     left.follow(right, true);
+
+    encoder.setPosition(0.0);
+    encoder.setMeasurementPeriod(10);
+    encoder.setAverageDepth(2);
+
+    left.setCANTimeout(0);
+    right.setCANTimeout(0);
+
+    left.burnFlash();
+    right.burnFlash();
   }
 }

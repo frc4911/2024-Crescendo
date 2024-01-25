@@ -16,24 +16,26 @@ public class ClimbIOReal implements ClimbIO {
 
   // TODO: modify this value to match that of the actual climber
   private static final double GEAR_RATIO = 1.0;
-  private final CANSparkFlex climbLeft;
-  private final CANSparkFlex climbRight;
+  private final CANSparkFlex left;
+  private final CANSparkFlex right;
 
   private final RelativeEncoder encoderRight;
   private final RelativeEncoder encoderLeft;
 
   public ClimbIOReal() {
-    climbLeft = new CANSparkFlex(0, MotorType.kBrushless);
-    climbRight = new CANSparkFlex(0, MotorType.kBrushless);
+    left = new CANSparkFlex(0, MotorType.kBrushless);
+    right = new CANSparkFlex(0, MotorType.kBrushless);
 
-    encoderRight = climbRight.getEncoder();
-    encoderLeft = climbLeft.getEncoder();
+    encoderRight = right.getEncoder();
+    encoderLeft = left.getEncoder();
+
+    configureDevices();
   }
 
   @Override
   public void setVoltage(double volts) {
-    climbLeft.setVoltage(volts);
-    climbRight.setVoltage(volts);
+    left.setVoltage(volts);
+    right.setVoltage(volts);
   }
 
   @Override
@@ -44,16 +46,38 @@ public class ClimbIOReal implements ClimbIO {
     inputs.positionRadLeft = Units.rotationsToRadians(encoderLeft.getPosition()) / GEAR_RATIO;
     inputs.velocityRadPerSecLeft =
         Units.rotationsPerMinuteToRadiansPerSecond(encoderLeft.getVelocity()) / GEAR_RATIO;
-    inputs.appliedVoltsLeft = climbLeft.getAppliedOutput() * climbLeft.getBusVoltage();
-    inputs.appliedVoltsRight = climbRight.getAppliedOutput() * climbRight.getBusVoltage();
-    inputs.currentAmpsLeft = climbLeft.getOutputCurrent();
-    inputs.currentAmpsRight = climbRight.getOutputCurrent();
+
+    inputs.appliedVoltsLeft = left.getAppliedOutput() * left.getBusVoltage();
+    inputs.appliedVoltsRight = right.getAppliedOutput() * right.getBusVoltage();
+    inputs.currentAmpsLeft = left.getOutputCurrent();
+    inputs.currentAmpsRight = right.getOutputCurrent();
   }
 
   private void configureDevices() {
-    climbLeft.restoreFactoryDefaults();
-    climbRight.restoreFactoryDefaults();
+    left.restoreFactoryDefaults();
+    right.restoreFactoryDefaults();
 
-    climbLeft.follow(climbRight, true);
+    left.setCANTimeout(250);
+    right.setCANTimeout(250);
+
+    left.setSmartCurrentLimit(25);
+    right.setSmartCurrentLimit(25);
+
+    left.enableVoltageCompensation(12.0);
+    right.enableVoltageCompensation(12.0);
+
+    encoderLeft.setPosition(0.0);
+    encoderLeft.setMeasurementPeriod(10);
+    encoderLeft.setAverageDepth(2);
+
+    encoderRight.setPosition(0.0);
+    encoderRight.setMeasurementPeriod(10);
+    encoderRight.setAverageDepth(2);
+
+    left.setCANTimeout(0);
+    right.setCANTimeout(0);
+
+    left.burnFlash();
+    right.burnFlash();
   }
 }

@@ -59,7 +59,26 @@ public final class ArmIOReal implements ArmIO {
     left.restoreFactoryDefaults();
     right.restoreFactoryDefaults();
 
+    left.setCANTimeout(250);
+    right.setCANTimeout(250);
+
+    left.setSmartCurrentLimit(25);
+    right.setSmartCurrentLimit(25);
+
+    left.enableVoltageCompensation(12.0);
+    right.enableVoltageCompensation(12.0);
+
     left.follow(right, true);
+
+    encoder.setPosition(0.0);
+    encoder.setMeasurementPeriod(10);
+    encoder.setAverageDepth(2);
+
+    left.setCANTimeout(0);
+    right.setCANTimeout(0);
+
+    left.burnFlash();
+    right.burnFlash();
   }
 
   private void configurePidController() {
