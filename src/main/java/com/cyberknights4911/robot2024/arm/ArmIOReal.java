@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package com.cyberknights4911.robot2024.collect;
+package com.cyberknights4911.robot2024.arm;
 
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -13,7 +13,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.util.Units;
 
-public class CollectIOReal implements CollectIO {
+public final class ArmIOReal implements ArmIO {
   // TODO: modify this value to match that of the actual collector
   private static final double GEAR_RATIO = 1.0;
   private static final double KP = 0;
@@ -22,16 +22,18 @@ public class CollectIOReal implements CollectIO {
   // TODO: determine this via characterization
   private static final double MAX_RPM = 1_000;
 
-  private final CANSparkFlex collect;
+  private final CANSparkFlex left;
+  private final CANSparkFlex right;
 
   private final RelativeEncoder encoder;
   private final SparkPIDController pidController;
 
-  public CollectIOReal() {
-    collect = new CANSparkFlex(0, MotorType.kBrushless);
+  public ArmIOReal() {
+    left = new CANSparkFlex(0, MotorType.kBrushless);
+    right = new CANSparkFlex(0, MotorType.kBrushless);
 
-    encoder = collect.getEncoder();
-    pidController = collect.getPIDController();
+    encoder = right.getEncoder();
+    pidController = right.getPIDController();
 
     configureDevices();
     configurePidController();
@@ -43,28 +45,40 @@ public class CollectIOReal implements CollectIO {
   }
 
   @Override
-  public void updateInputs(CollectIOInputs inputs) {
+  public void updateInputs(ArmIOInputs inputs) {
     inputs.positionRad = Units.rotationsToRadians(encoder.getPosition()) / GEAR_RATIO;
     inputs.velocityRadPerSec =
         Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity()) / GEAR_RATIO;
-    inputs.appliedVolts = collect.getAppliedOutput() * collect.getBusVoltage();
-    inputs.currentAmps = collect.getOutputCurrent();
+    inputs.appliedVoltsLeft = left.getAppliedOutput() * left.getBusVoltage();
+    inputs.appliedVoltsRight = right.getAppliedOutput() * right.getBusVoltage();
+    inputs.currentAmpsLeft = left.getOutputCurrent();
+    inputs.currentAmpsRight = right.getOutputCurrent();
   }
 
   private void configureDevices() {
-    collect.restoreFactoryDefaults();
+    left.restoreFactoryDefaults();
+    right.restoreFactoryDefaults();
 
-    collect.setCANTimeout(250);
-    collect.setSmartCurrentLimit(25);
-    collect.enableVoltageCompensation(12.0);
+    left.setCANTimeout(250);
+    right.setCANTimeout(250);
+
+    left.setSmartCurrentLimit(25);
+    right.setSmartCurrentLimit(25);
+
+    left.enableVoltageCompensation(12.0);
+    right.enableVoltageCompensation(12.0);
+
+    left.follow(right, true);
 
     encoder.setPosition(0.0);
     encoder.setMeasurementPeriod(10);
     encoder.setAverageDepth(2);
 
-    collect.setCANTimeout(0);
+    left.setCANTimeout(0);
+    right.setCANTimeout(0);
 
-    collect.burnFlash();
+    left.burnFlash();
+    right.burnFlash();
   }
 
   private void configurePidController() {
