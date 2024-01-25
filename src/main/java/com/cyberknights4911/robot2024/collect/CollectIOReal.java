@@ -16,25 +16,24 @@ public class CollectIOReal implements CollectIO {
 
   // TODO: modify this value to match that of the actual collector
   private static final double GEAR_RATIO = 1.0;
-  private final CANSparkFlex collectLeft;
-  private final CANSparkFlex collectRight;
+  private final CANSparkFlex left;
+  private final CANSparkFlex right;
 
   private final RelativeEncoder encoderRight;
-  private final RelativeEncoder encoderLeft;
 
   public CollectIOReal() {
-    collectLeft = new CANSparkFlex(0, MotorType.kBrushless);
-    collectRight = new CANSparkFlex(0, MotorType.kBrushless);
+    left = new CANSparkFlex(0, MotorType.kBrushless);
+    right = new CANSparkFlex(0, MotorType.kBrushless);
 
-    encoderRight = collectRight.getEncoder();
+    encoderRight = right.getEncoder();
 
     configureDevices();
   }
 
   @Override
   public void setVoltage(double volts) {
-    collectLeft.setVoltage(volts);
-    collectRight.setVoltage(volts);
+    left.setVoltage(volts);
+    right.setVoltage(volts);
   }
 
   @Override
@@ -42,17 +41,17 @@ public class CollectIOReal implements CollectIO {
     inputs.positionRad = Units.rotationsToRadians(encoderRight.getPosition()) / GEAR_RATIO;
     inputs.velocityRadPerSec =
         Units.rotationsPerMinuteToRadiansPerSecond(encoderRight.getVelocity()) / GEAR_RATIO;
-    inputs.appliedVoltsLeft = collectLeft.getAppliedOutput() * collectLeft.getBusVoltage();
-    inputs.appliedVoltsRight = collectRight.getAppliedOutput() * collectRight.getBusVoltage();
-    inputs.currentAmpsLeft = collectLeft.getOutputCurrent();
-    inputs.currentAmpsRight = collectRight.getOutputCurrent();
+    inputs.appliedVoltsLeft = left.getAppliedOutput() * left.getBusVoltage();
+    inputs.appliedVoltsRight = right.getAppliedOutput() * right.getBusVoltage();
+    inputs.currentAmpsLeft = left.getOutputCurrent();
+    inputs.currentAmpsRight = right.getOutputCurrent();
   }
 
   private void configureDevices() {
 
-    collectLeft.restoreFactoryDefaults();
-    collectRight.restoreFactoryDefaults();
+    left.restoreFactoryDefaults();
+    right.restoreFactoryDefaults();
 
-    collectLeft.follow(collectRight, true);
+    left.follow(right, true);
   }
 }
