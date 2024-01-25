@@ -19,8 +19,8 @@ public class Collect extends SubsystemBase {
     this.collectIO = collectIO;
   }
 
-  public void setCollectVoltage(double volts) {
-    collectIO.setVoltage(volts);
+  public void setVelocity(double velocity) {
+    collectIO.setVelocity(velocity);
   }
 
   @Override

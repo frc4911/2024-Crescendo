@@ -15,15 +15,13 @@ public interface CollectIO {
   public static class CollectIOInputs {
     public double positionRad = 0.0;
     public double velocityRadPerSec = 0.0;
-    public double appliedVoltsLeft = 0.0;
-    public double appliedVoltsRight = 0.0;
-    public double currentAmpsLeft = 0.0;
-    public double currentAmpsRight = 0.0;
+    public double appliedVolts = 0.0;
+    public double currentAmps = 0.0;
   }
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(CollectIOInputs inputs) {}
 
-  /** Run the motor at the specified voltage. */
-  public default void setVoltage(double volts) {}
+  /** Run the motor at the specified velocity. */
+  public default void setVelocity(double velocity) {}
 }
