@@ -9,36 +9,49 @@ package com.cyberknights4911.robot2024.collect;
 
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
+import edu.wpi.first.math.util.Units;
 
 public class CollectIOReal implements CollectIO {
-  private final CANSparkFlex collectLeft;
-  private final CANSparkFlex collectRight;
+
+  // TODO: modify this value to match that of the actual collector
+  private static final double GEAR_RATIO = 1.0;
+  private final CANSparkFlex left;
+  private final CANSparkFlex right;
+
+  private final RelativeEncoder encoderRight;
 
   public CollectIOReal() {
-    collectLeft = new CANSparkFlex(0, MotorType.kBrushless);
-    collectRight = new CANSparkFlex(0, MotorType.kBrushless);
+    left = new CANSparkFlex(0, MotorType.kBrushless);
+    right = new CANSparkFlex(0, MotorType.kBrushless);
+
+    encoderRight = right.getEncoder();
 
     configureDevices();
   }
 
   @Override
   public void setVoltage(double volts) {
-    collectLeft.setVoltage(volts);
-    collectRight.setVoltage(volts);
+    left.setVoltage(volts);
+    right.setVoltage(volts);
   }
 
   @Override
   public void updateInputs(CollectIOInputs inputs) {
-    inputs.appliedVoltsLeft = collectLeft.getAppliedOutput() * collectLeft.getBusVoltage();
-    inputs.appliedVoltsRight = collectRight.getAppliedOutput() * collectRight.getBusVoltage();
-    inputs.currentAmpsLeft = collectLeft.getOutputCurrent();
-    inputs.currentAmpsRight = collectRight.getOutputCurrent();
+    inputs.positionRad = Units.rotationsToRadians(encoderRight.getPosition()) / GEAR_RATIO;
+    inputs.velocityRadPerSec =
+        Units.rotationsPerMinuteToRadiansPerSecond(encoderRight.getVelocity()) / GEAR_RATIO;
+    inputs.appliedVoltsLeft = left.getAppliedOutput() * left.getBusVoltage();
+    inputs.appliedVoltsRight = right.getAppliedOutput() * right.getBusVoltage();
+    inputs.currentAmpsLeft = left.getOutputCurrent();
+    inputs.currentAmpsRight = right.getOutputCurrent();
   }
 
   private void configureDevices() {
-    collectLeft.restoreFactoryDefaults();
-    collectRight.restoreFactoryDefaults();
 
-    collectLeft.follow(collectRight, true);
+    left.restoreFactoryDefaults();
+    right.restoreFactoryDefaults();
+
+    left.follow(right, true);
   }
 }
