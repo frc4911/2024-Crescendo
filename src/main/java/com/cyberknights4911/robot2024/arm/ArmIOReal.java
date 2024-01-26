@@ -7,6 +7,7 @@
 
 package com.cyberknights4911.robot2024.arm;
 
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -16,11 +17,6 @@ import edu.wpi.first.math.util.Units;
 public final class ArmIOReal implements ArmIO {
   // TODO: modify this value to match that of the actual collector
   private static final double GEAR_RATIO = 1.0;
-  private static final double KP = 0;
-  private static final double KI = 0;
-  private static final double KFF = 0;
-  // TODO: determine this via characterization
-  private static final double MAX_RPM = 1_000;
 
   private final CANSparkFlex left;
   private final CANSparkFlex right;
@@ -36,12 +32,6 @@ public final class ArmIOReal implements ArmIO {
     pidController = right.getPIDController();
 
     configureDevices();
-    configurePidController();
-  }
-
-  @Override
-  public void setVelocity(double velocity) {
-    pidController.setReference(velocity * MAX_RPM, CANSparkFlex.ControlType.kVelocity);
   }
 
   @Override
@@ -49,10 +39,26 @@ public final class ArmIOReal implements ArmIO {
     inputs.positionRad = Units.rotationsToRadians(encoder.getPosition()) / GEAR_RATIO;
     inputs.velocityRadPerSec =
         Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity()) / GEAR_RATIO;
-    inputs.appliedVoltsLeft = left.getAppliedOutput() * left.getBusVoltage();
-    inputs.appliedVoltsRight = right.getAppliedOutput() * right.getBusVoltage();
-    inputs.currentAmpsLeft = left.getOutputCurrent();
-    inputs.currentAmpsRight = right.getOutputCurrent();
+    inputs.appliedVolts = right.getAppliedOutput() * right.getBusVoltage();
+    inputs.currentAmps = new double[] {right.getOutputCurrent(), left.getOutputCurrent()};
+  }
+
+  @Override
+  public void setVoltage(double volts) {
+    right.setVoltage(volts);
+  }
+
+  @Override
+  public void setBrakeMode(boolean enable) {
+    right.setIdleMode(enable ? IdleMode.kBrake : IdleMode.kCoast);
+  }
+
+  @Override
+  public void configurePID(double kP, double kI, double kD) {
+    pidController.setP(kP);
+    pidController.setI(kI);
+    pidController.setD(kD);
+    pidController.setOutputRange(-1, 1);
   }
 
   private void configureDevices() {
@@ -79,12 +85,5 @@ public final class ArmIOReal implements ArmIO {
 
     left.burnFlash();
     right.burnFlash();
-  }
-
-  private void configurePidController() {
-    pidController.setP(KP);
-    pidController.setI(KI);
-    pidController.setFF(KFF);
-    pidController.setOutputRange(-1, 1);
   }
 }

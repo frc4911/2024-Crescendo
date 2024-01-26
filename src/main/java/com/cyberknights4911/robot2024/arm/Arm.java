@@ -19,8 +19,8 @@ public final class Arm extends SubsystemBase {
     this.armIO = armIO;
   }
 
-  public void setVelocity(double volts) {
-    armIO.setVelocity(volts);
+  public void setVoltage(double volts) {
+    armIO.setVoltage(volts);
   }
 
   @Override

@@ -17,16 +17,14 @@ import com.revrobotics.SparkPIDController.ArbFFUnits;
 import edu.wpi.first.math.util.Units;
 
 public class CollectIOReal implements CollectIO {
-  // TODO: modify this value to match that of the actual collector
-  private static final double GEAR_RATIO = 1.0;
-
   private final CANSparkFlex collect;
-
   private final RelativeEncoder encoder;
   private final SparkPIDController pidController;
+  private final double gearRatio;
 
-  public CollectIOReal() {
-    collect = new CANSparkFlex(0, MotorType.kBrushless);
+  public CollectIOReal(CollectConstants collectConstants) {
+    collect = new CANSparkFlex(collectConstants.motorId(), MotorType.kBrushless);
+    gearRatio = collectConstants.gearRatio();
 
     encoder = collect.getEncoder();
     pidController = collect.getPIDController();
@@ -36,9 +34,9 @@ public class CollectIOReal implements CollectIO {
 
   @Override
   public void updateInputs(CollectIOInputs inputs) {
-    inputs.positionRad = Units.rotationsToRadians(encoder.getPosition() / GEAR_RATIO);
+    inputs.positionRad = Units.rotationsToRadians(encoder.getPosition() / gearRatio);
     inputs.velocityRadPerSec =
-        Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity() / GEAR_RATIO);
+        Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity() / gearRatio);
     inputs.appliedVolts = collect.getAppliedOutput() * collect.getBusVoltage();
     inputs.currentAmps = collect.getOutputCurrent();
   }
@@ -51,7 +49,7 @@ public class CollectIOReal implements CollectIO {
   @Override
   public void setVelocity(double velocityRadPerSec, double ffVolts) {
     pidController.setReference(
-        Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec) * GEAR_RATIO,
+        Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec) * gearRatio,
         ControlType.kVelocity,
         0,
         ffVolts,

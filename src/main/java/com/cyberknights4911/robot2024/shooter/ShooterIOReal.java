@@ -40,10 +40,8 @@ public class ShooterIOReal implements ShooterIO {
     inputs.velocityRadPerSec =
         Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity()) / GEAR_RATIO;
 
-    inputs.appliedVoltsLeft = left.getAppliedOutput() * left.getBusVoltage();
-    inputs.appliedVoltsRight = right.getAppliedOutput() * right.getBusVoltage();
-    inputs.currentLeftAmps = left.getOutputCurrent();
-    inputs.currentRightAmps = right.getOutputCurrent();
+    inputs.appliedVolts = right.getAppliedOutput() * right.getBusVoltage();
+    inputs.currentAmps = new double[] {right.getOutputCurrent(), left.getOutputCurrent()};
   }
 
   private void configureDevices() {
