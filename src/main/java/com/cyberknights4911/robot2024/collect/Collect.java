@@ -7,10 +7,10 @@
 
 package com.cyberknights4911.robot2024.collect;
 
-import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -22,34 +22,41 @@ public class Collect extends SubsystemBase {
       new LoggedTunableNumber("Collect/IntakeMediumVelocityRPM", 1_000);
   private static final LoggedTunableNumber collectSlowSpeed =
       new LoggedTunableNumber("Collect/IntakeSlowVelocityRPM", 500);
+  private static final LoggedTunableNumber kP = new LoggedTunableNumber("Collect/kP");
+  private static final LoggedTunableNumber kD = new LoggedTunableNumber("Collect/kD");
+  private static final LoggedTunableNumber kS = new LoggedTunableNumber("Collect/kS");
+  private static final LoggedTunableNumber kV = new LoggedTunableNumber("Collect/kV");
 
   private final CollectIO collectIO;
   private final CollectIOInputsAutoLogged inputs = new CollectIOInputsAutoLogged();
-  private final SimpleMotorFeedforward feedforward;
+  private SimpleMotorFeedforward feedforward;
 
-  public Collect(CollectIO collectIO) {
+  public Collect(CollectConstants constants, CollectIO collectIO) {
     super();
     this.collectIO = collectIO;
-    switch (Constants.get().mode()) {
-      case REAL:
-      case REPLAY:
-        feedforward = new SimpleMotorFeedforward(0.0, 0.0);
-        collectIO.configurePID(0.0, 0.0, 0.0);
-        break;
-      case SIM:
-        feedforward = new SimpleMotorFeedforward(0.0, 0.0);
-        collectIO.configurePID(0.0, 0.0, 0.0);
-        break;
-      default:
-        feedforward = new SimpleMotorFeedforward(0.0, 0.0);
-        break;
-    }
+    kS.initDefault(constants.feedForwardValues().kS());
+    kV.initDefault(constants.feedForwardValues().kV());
+    kP.initDefault(constants.feedBackValues().kP());
+    kD.initDefault(constants.feedBackValues().kD());
+    feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
+    collectIO.configurePID(kP.get(), 0.0, kD.get());
   }
 
   @Override
   public void periodic() {
     collectIO.updateInputs(inputs);
     Logger.processInputs("Collect", inputs);
+
+    if (kP.hasChanged(hashCode()) || kD.hasChanged(hashCode())) {
+      collectIO.configurePID(kP.get(), 0.0, kD.get());
+    }
+    if (kS.hasChanged(hashCode()) || kV.hasChanged(hashCode())) {
+      feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
+    }
+
+    if (DriverStation.isDisabled()) {
+      stop();
+    }
   }
 
   /** Run closed loop at the specified velocity. */

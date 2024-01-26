@@ -17,6 +17,8 @@ import com.cyberknights4911.constants.DriveConstantsModuleConstantsBuilder;
 import com.cyberknights4911.logging.Alert;
 import com.cyberknights4911.logging.Alert.AlertType;
 import com.cyberknights4911.logging.Mode;
+import com.cyberknights4911.util.FeedForwardValues;
+import com.cyberknights4911.util.PidValues;
 import com.cyberknights4911.vision.CameraConstants;
 import com.cyberknights4911.vision.CameraConstantsBuilder;
 import com.cyberknights4911.vision.VisionConstants;
@@ -56,9 +58,12 @@ public final class WhamConstants {
           .trackWidthX(Units.inchesToMeters(22.75))
           .trackWidthY(Units.inchesToMeters(22.75))
           .wheelRadius(Units.inchesToMeters(2))
-          .treadWear(0)
           .turnGearRatio(DriveConstants.TURN_GEAR_RATIO)
           .driveGearRatio(DriveConstants.L1_GEAR_RATIO)
+          .pigeonId(0)
+          .turnFeedBackValues(new PidValues(7.0, 0.0, 0.0))
+          .driveFeedBackValues(new PidValues(0.05, 0.0, 0.0))
+          .driveFeedForwardValues(new FeedForwardValues(0.1, 0.13))
           .frontLeft(
               DriveConstantsModuleConstantsBuilder.builder()
                   .name("FrontLeft")

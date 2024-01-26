@@ -9,22 +9,37 @@ package com.cyberknights4911.drive;
 
 import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.constants.DriveConstants;
+import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
+  private static final LoggedTunableNumber wheelRadius =
+      new LoggedTunableNumber("Drive/Module/WheelRadius");
+  private static final LoggedTunableNumber driveKp =
+      new LoggedTunableNumber("Drive/Module/DriveKp");
+  private static final LoggedTunableNumber driveKd =
+      new LoggedTunableNumber("Drive/Module/DriveKd");
+  private static final LoggedTunableNumber driveKs =
+      new LoggedTunableNumber("Drive/Module/DriveKs");
+  private static final LoggedTunableNumber driveKv =
+      new LoggedTunableNumber("Drive/Module/DriveKv");
+  private static final LoggedTunableNumber turnKp = new LoggedTunableNumber("Drive/Module/TurnKp");
+  private static final LoggedTunableNumber turnKd = new LoggedTunableNumber("Drive/Module/TurnKd");
+
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
   private final DriveConstants driveConstants;
   private final DriveConstants.ModuleConstants moduleConstants;
 
-  private final SimpleMotorFeedforward driveFeedforward;
   private final PIDController driveFeedback;
   private final PIDController turnFeedback;
+  private SimpleMotorFeedforward driveFeedforward;
   private Rotation2d angleSetpoint = null; // Setpoint for closed loop control, null for open loop
   private Double speedSetpoint = null; // Setpoint for closed loop control, null for open loop
   private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
@@ -39,26 +54,17 @@ public class Module {
     this.moduleConstants = moduleConstants;
     this.io = io;
 
-    // Switch constants based on mode (the physics simulator is treated as a
-    // separate robot with different tuning)
-    switch (constants.mode()) {
-      case REAL:
-      case REPLAY:
-        driveFeedforward = new SimpleMotorFeedforward(0.1, 0.13);
-        driveFeedback = new PIDController(0.05, 0.0, 0.0);
-        turnFeedback = new PIDController(7.0, 0.0, 0.0);
-        break;
-      case SIM:
-        driveFeedforward = new SimpleMotorFeedforward(0.0, 0.13);
-        driveFeedback = new PIDController(0.1, 0.0, 0.0);
-        turnFeedback = new PIDController(10.0, 0.0, 0.0);
-        break;
-      default:
-        driveFeedforward = new SimpleMotorFeedforward(0.0, 0.0);
-        driveFeedback = new PIDController(0.0, 0.0, 0.0);
-        turnFeedback = new PIDController(0.0, 0.0, 0.0);
-        break;
-    }
+    wheelRadius.initDefault(Units.inchesToMeters(driveConstants.wheelRadius()));
+    driveKp.initDefault(driveConstants.driveFeedBackValues().kP());
+    driveKd.initDefault(driveConstants.driveFeedBackValues().kD());
+    driveKs.initDefault(driveConstants.driveFeedForwardValues().kS());
+    driveKv.initDefault(driveConstants.driveFeedForwardValues().kV());
+    turnKp.initDefault(driveConstants.turnFeedBackValues().kP());
+    turnKd.initDefault(driveConstants.turnFeedBackValues().kD());
+
+    driveFeedforward = new SimpleMotorFeedforward(driveKs.get(), driveKv.get());
+    driveFeedback = new PIDController(driveKp.get(), 0.0, driveKv.get());
+    turnFeedback = new PIDController(turnKp.get(), 0.0, turnKd.get());
 
     turnFeedback.enableContinuousInput(-Math.PI, Math.PI);
     setBrakeMode(true);
@@ -67,6 +73,17 @@ public class Module {
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs("Drive/Module" + moduleConstants.name(), inputs);
+
+    // Update controllers if tunable numbers have changed
+    if (driveKp.hasChanged(hashCode()) || driveKd.hasChanged(hashCode())) {
+      driveFeedback.setPID(driveKp.get(), 0.0, driveKd.get());
+    }
+    if (turnKp.hasChanged(hashCode()) || turnKd.hasChanged(hashCode())) {
+      turnFeedback.setPID(turnKp.get(), 0.0, turnKd.get());
+    }
+    if (driveKs.hasChanged(hashCode()) || driveKv.hasChanged(hashCode())) {
+      driveFeedforward = new SimpleMotorFeedforward(driveKs.get(), driveKv.get());
+    }
 
     // On first cycle, reset relative turn encoder
     // Wait until absolute angle is nonzero in case it wasn't initialized yet
