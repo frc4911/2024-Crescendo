@@ -15,30 +15,29 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.util.Units;
 
 public final class ArmIOReal implements ArmIO {
-  // TODO: modify this value to match that of the actual collector
-  private static final double GEAR_RATIO = 1.0;
-
   private final CANSparkFlex left;
   private final CANSparkFlex right;
 
   private final RelativeEncoder encoder;
   private final SparkPIDController pidController;
+  private final double gearRatio;
 
-  public ArmIOReal() {
-    left = new CANSparkFlex(0, MotorType.kBrushless);
-    right = new CANSparkFlex(0, MotorType.kBrushless);
+  public ArmIOReal(ArmConstants armConstants) {
+    left = new CANSparkFlex(armConstants.motorId1(), MotorType.kBrushless);
+    right = new CANSparkFlex(armConstants.motorId2(), MotorType.kBrushless);
 
     encoder = right.getEncoder();
     pidController = right.getPIDController();
+    gearRatio = armConstants.gearRatio();
 
     configureDevices();
   }
 
   @Override
   public void updateInputs(ArmIOInputs inputs) {
-    inputs.positionRad = Units.rotationsToRadians(encoder.getPosition()) / GEAR_RATIO;
+    inputs.positionRad = Units.rotationsToRadians(encoder.getPosition()) / gearRatio;
     inputs.velocityRadPerSec =
-        Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity()) / GEAR_RATIO;
+        Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity()) / gearRatio;
     inputs.appliedVolts = right.getAppliedOutput() * right.getBusVoltage();
     inputs.currentAmps = new double[] {right.getOutputCurrent(), left.getOutputCurrent()};
   }
