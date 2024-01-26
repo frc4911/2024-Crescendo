@@ -10,21 +10,22 @@ package com.cyberknights4911.robot2024.climb;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.util.Units;
 
 public class ClimbIOReal implements ClimbIO {
-  // TODO: modify this value to match that of the actual climber
-  private static final double GEAR_RATIO = 1.0;
   private final CANSparkFlex left;
   private final CANSparkFlex right;
-
   private final RelativeEncoder encoder;
+  private final SparkPIDController pidController;
+  private final double gearRatio;
 
-  public ClimbIOReal() {
-    left = new CANSparkFlex(0, MotorType.kBrushless);
-    right = new CANSparkFlex(0, MotorType.kBrushless);
-
+  public ClimbIOReal(ClimbConstants constants) {
+    left = new CANSparkFlex(constants.motorId1(), MotorType.kBrushless);
+    right = new CANSparkFlex(constants.motorId2(), MotorType.kBrushless);
     encoder = right.getEncoder();
+    pidController = right.getPIDController();
+    gearRatio = constants.gearRatio();
 
     configureDevices();
   }
@@ -36,9 +37,9 @@ public class ClimbIOReal implements ClimbIO {
 
   @Override
   public void updateInputs(ClimbIOInputs inputs) {
-    inputs.positionRad = Units.rotationsToRadians(encoder.getPosition()) / GEAR_RATIO;
+    inputs.positionRad = Units.rotationsToRadians(encoder.getPosition()) / gearRatio;
     inputs.velocityRadPerSec =
-        Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity()) / GEAR_RATIO;
+        Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity()) / gearRatio;
 
     inputs.appliedVolts = left.getAppliedOutput() * left.getBusVoltage();
     inputs.currentAmps = new double[] {right.getOutputCurrent(), left.getOutputCurrent()};
@@ -47,6 +48,14 @@ public class ClimbIOReal implements ClimbIO {
   @Override
   public void stop() {
     right.stopMotor();
+  }
+
+  @Override
+  public void configurePID(double kP, double kI, double kD) {
+    pidController.setP(kP, 0);
+    pidController.setI(kI, 0);
+    pidController.setD(kD, 0);
+    pidController.setFF(0, 0);
   }
 
   private void configureDevices() {

@@ -17,9 +17,9 @@ public final class ArmIOSim implements ArmIO {
 
   private double appliedVolts = 0.0;
 
-  public ArmIOSim() {
-    // TODO: determine gear ratio and moment of inertia
-    sim = new DCMotorSim(DCMotor.getNeoVortex(2), 1.0, 0.004);
+  public ArmIOSim(ArmConstants constants) {
+    // TODO: determine moment of inertia
+    sim = new DCMotorSim(DCMotor.getNeoVortex(2), constants.gearRatio(), 0.004);
     pid = new PIDController(0.0, 0.0, 0.0);
   }
 

@@ -20,9 +20,9 @@ public final class CollectIOSim implements CollectIO {
   private double ffVolts = 0.0;
   private double appliedVolts = 0.0;
 
-  public CollectIOSim(CollectConstants collectConstants) {
+  public CollectIOSim(CollectConstants constants) {
     // TODO: determine moment of inertia
-    sim = new DCMotorSim(DCMotor.getNeoVortex(1), collectConstants.gearRatio(), 0.004);
+    sim = new DCMotorSim(DCMotor.getNeoVortex(1), constants.gearRatio(), 0.004);
     pid = new PIDController(0.0, 0.0, 0.0);
   }
 

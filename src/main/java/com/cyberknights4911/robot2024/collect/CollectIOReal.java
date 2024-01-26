@@ -24,10 +24,9 @@ public class CollectIOReal implements CollectIO {
 
   public CollectIOReal(CollectConstants collectConstants) {
     collect = new CANSparkFlex(collectConstants.motorId(), MotorType.kBrushless);
-    gearRatio = collectConstants.gearRatio();
-
     encoder = collect.getEncoder();
     pidController = collect.getPIDController();
+    gearRatio = collectConstants.gearRatio();
 
     configureDevices();
   }
