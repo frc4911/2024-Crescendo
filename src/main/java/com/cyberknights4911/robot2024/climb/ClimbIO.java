@@ -12,14 +12,11 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ClimbIO {
   @AutoLog
   public static class ClimbIOInputs {
-    public double positionRadLeft = 0.0;
-    public double positionRadRight = 0.0;
-    public double velocityRadPerSecLeft = 0.0;
-    public double velocityRadPerSecRight = 0.0;
-    public double appliedVoltsLeft = 0.0;
-    public double appliedVoltsRight = 0.0;
-    public double currentAmpsRight = 0.0;
-    public double currentAmpsLeft = 0.0;
+    public double positionRad = 0.0;
+    public double velocityRadPerSec = 0.0;
+
+    public double appliedVolts = 0.0;
+    public double[] currentAmps = new double[] {};
   }
 
   /** Updates the set of loggable inputs. */
@@ -30,4 +27,10 @@ public interface ClimbIO {
 
   /** Enable or disable brake mode on the motor. */
   public default void setBrakeMode(boolean enable) {}
+
+  /** Stop in open loop. */
+  public default void stop() {}
+
+  /** Set velocity PID constants. */
+  public default void configurePID(double kP, double kI, double kD) {}
 }

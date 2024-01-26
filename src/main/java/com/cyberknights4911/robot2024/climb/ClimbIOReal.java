@@ -13,49 +13,48 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.util.Units;
 
 public class ClimbIOReal implements ClimbIO {
-
   // TODO: modify this value to match that of the actual climber
   private static final double GEAR_RATIO = 1.0;
   private final CANSparkFlex left;
   private final CANSparkFlex right;
 
-  private final RelativeEncoder encoderRight;
-  private final RelativeEncoder encoderLeft;
+  private final RelativeEncoder encoder;
 
   public ClimbIOReal() {
     left = new CANSparkFlex(0, MotorType.kBrushless);
     right = new CANSparkFlex(0, MotorType.kBrushless);
 
-    encoderRight = right.getEncoder();
-    encoderLeft = left.getEncoder();
+    encoder = right.getEncoder();
 
     configureDevices();
   }
 
   @Override
   public void setVoltage(double volts) {
-    left.setVoltage(volts);
     right.setVoltage(volts);
   }
 
   @Override
   public void updateInputs(ClimbIOInputs inputs) {
-    inputs.positionRadRight = Units.rotationsToRadians(encoderRight.getPosition()) / GEAR_RATIO;
-    inputs.velocityRadPerSecRight =
-        Units.rotationsPerMinuteToRadiansPerSecond(encoderRight.getVelocity()) / GEAR_RATIO;
-    inputs.positionRadLeft = Units.rotationsToRadians(encoderLeft.getPosition()) / GEAR_RATIO;
-    inputs.velocityRadPerSecLeft =
-        Units.rotationsPerMinuteToRadiansPerSecond(encoderLeft.getVelocity()) / GEAR_RATIO;
+    inputs.positionRad = Units.rotationsToRadians(encoder.getPosition()) / GEAR_RATIO;
+    inputs.velocityRadPerSec =
+        Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity()) / GEAR_RATIO;
 
-    inputs.appliedVoltsLeft = left.getAppliedOutput() * left.getBusVoltage();
-    inputs.appliedVoltsRight = right.getAppliedOutput() * right.getBusVoltage();
-    inputs.currentAmpsLeft = left.getOutputCurrent();
-    inputs.currentAmpsRight = right.getOutputCurrent();
+    inputs.appliedVolts = left.getAppliedOutput() * left.getBusVoltage();
+    inputs.currentAmps = new double[] {right.getOutputCurrent(), left.getOutputCurrent()};
+  }
+
+  @Override
+  public void stop() {
+    right.stopMotor();
   }
 
   private void configureDevices() {
     left.restoreFactoryDefaults();
     right.restoreFactoryDefaults();
+
+    // TODO: determine follow config
+    left.follow(right, false);
 
     left.setCANTimeout(250);
     right.setCANTimeout(250);
@@ -66,13 +65,9 @@ public class ClimbIOReal implements ClimbIO {
     left.enableVoltageCompensation(12.0);
     right.enableVoltageCompensation(12.0);
 
-    encoderLeft.setPosition(0.0);
-    encoderLeft.setMeasurementPeriod(10);
-    encoderLeft.setAverageDepth(2);
-
-    encoderRight.setPosition(0.0);
-    encoderRight.setMeasurementPeriod(10);
-    encoderRight.setAverageDepth(2);
+    encoder.setPosition(0.0);
+    encoder.setMeasurementPeriod(10);
+    encoder.setAverageDepth(2);
 
     left.setCANTimeout(0);
     right.setCANTimeout(0);

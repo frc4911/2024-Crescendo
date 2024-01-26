@@ -15,14 +15,18 @@ public interface ShooterIO {
     public double positionRad = 0.0;
     public double velocityRadPerSec = 0.0;
 
-    public double appliedVoltsLeft = 0.0;
-    public double appliedVoltsRight = 0.0;
-    public double currentLeftAmps = 0.0;
-    public double currentRightAmps = 0.0;
+    public double appliedVolts = 0.0;
+    public double[] currentAmps = new double[] {};
   }
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ShooterIOInputs inputs) {}
 
   /** Run the motor at the specified voltage. */
   public default void setVoltage(double volts) {}
+
+  /** Stop in open loop. */
+  public default void stop() {}
+
+  /** Set velocity PID constants. */
+  public default void configurePID(double kP, double kI, double kD) {}
 }
