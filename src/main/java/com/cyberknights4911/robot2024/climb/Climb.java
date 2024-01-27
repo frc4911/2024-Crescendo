@@ -24,7 +24,7 @@ public class Climb extends SubsystemBase {
 
   private static final LoggedTunableNumber forwardLimit =
       new LoggedTunableNumber("Climb/forwardLimit");
-private static final LoggedTunableNumber backwardLimit =
+  private static final LoggedTunableNumber backwardLimit =
       new LoggedTunableNumber("Climb/backwardLimit");
 
   private final ClimbIO climbIO;

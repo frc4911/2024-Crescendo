@@ -124,13 +124,14 @@ public class Collect extends SubsystemBase {
   public Command collectGamePiece() {
     return Commands.sequence(
         collectAtSpeed(collectSpeed),
-        Commands.waitUntil(() -> {
-          return isBeamBreakBlocked();
-        }),
-        Commands.runOnce(() -> {
-          stop();
-        })
-        );
+        Commands.waitUntil(
+            () -> {
+              return isBeamBreakBlocked();
+            }),
+        Commands.runOnce(
+            () -> {
+              stop();
+            }));
   }
 
   /** Creates a command that runs the collector in the mode for feeding gamepieces to the shooter */
@@ -142,10 +143,10 @@ public class Collect extends SubsystemBase {
   public Command ejectGamePiece() {
     return Commands.sequence(
         collectAtSpeed(ejectSpeed),
-        Commands.waitSeconds(ejectSpeed.get()), // replace this one with a command that waits at a fixed interval
-        Commands.runOnce(() -> {
-          stop();
-        })
-        );
+        Commands.waitSeconds(ejectTime.get()),
+        Commands.runOnce(
+            () -> {
+              stop();
+            }));
   }
 }

@@ -9,7 +9,6 @@ package com.cyberknights4911.robot2024.shooter;
 
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import com.cyberknights4911.robot2024.collect.Collect;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -23,6 +22,7 @@ public class Shooter extends SubsystemBase {
   private static final LoggedTunableNumber kD = new LoggedTunableNumber("Shooter/kD");
   private static final LoggedTunableNumber kS = new LoggedTunableNumber("Shooter/kS");
   private static final LoggedTunableNumber kV = new LoggedTunableNumber("Shooter/kV");
+  private static final LoggedTunableNumber feedTime = new LoggedTunableNumber("Shooter/feedTime");
   private static final LoggedTunableNumber shootFastSpeed =
       new LoggedTunableNumber("Shooter/FastVelocityRPM", 2_000);
   private static final LoggedTunableNumber shootMediumSpeed =
@@ -43,6 +43,7 @@ public class Shooter extends SubsystemBase {
     kV.initDefault(constants.feedForwardValues().kV());
     kP.initDefault(constants.feedBackValues().kP());
     kD.initDefault(constants.feedBackValues().kD());
+    feedTime.initDefault(constants.feedTime());
     shootFastSpeed.initDefault(constants.fastVelocityRpm());
     shootMediumSpeed.initDefault(constants.mediumVelocityRpm());
     shootSlowSpeed.initDefault(constants.slowVelocityRpm());
@@ -148,6 +149,7 @@ public class Shooter extends SubsystemBase {
 
   /**
    * Creates a complete command for firing a note
+   *
    * @param collect the collector subsystem
    */
   public Command fireNote(Collect collect) {
@@ -157,6 +159,16 @@ public class Shooter extends SubsystemBase {
     // 3. wait fixed delay
     // 4. stop shooter and collector
 
-    return Commands.none();
+    return spinFast()
+        .andThen(collect.feedGamePieceToShooter())
+        .andThen(Commands.waitSeconds(feedTime.get()))
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  stop();
+                  collect.stop();
+                },
+                this,
+                collect));
   }
 }
