@@ -18,6 +18,8 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Collect extends SubsystemBase {
+  private static final LoggedTunableNumber beamThreshold =
+      new LoggedTunableNumber("Collect/beamThreshold");
   private static final LoggedTunableNumber collectMediumSpeed =
       new LoggedTunableNumber("Collect/IntakeMediumVelocityRPM", 1_000);
   private static final LoggedTunableNumber collectSlowSpeed =
@@ -40,6 +42,14 @@ public class Collect extends SubsystemBase {
     kD.initDefault(constants.feedBackValues().kD());
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     collectIO.configurePID(kP.get(), 0.0, kD.get());
+  }
+
+  public boolean isBeamBreakBlocked() {
+    return inputs.beamBreakVoltage > beamThreshold.get();
+  }
+
+  public void setCollectVoltage(double volts) {
+    collectIO.setVoltage(volts);
   }
 
   @Override
