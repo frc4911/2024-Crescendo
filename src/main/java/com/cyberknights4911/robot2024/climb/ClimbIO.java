@@ -33,4 +33,6 @@ public interface ClimbIO {
 
   /** Set velocity PID constants. */
   public default void configurePID(double kP, double kI, double kD) {}
+
+  public default void configureLimits(double forwardLimit, double backwardLimit) {}
 }
