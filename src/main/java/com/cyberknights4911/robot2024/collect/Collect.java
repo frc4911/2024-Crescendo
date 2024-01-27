@@ -29,6 +29,7 @@ public class Collect extends SubsystemBase {
   private static final LoggedTunableNumber kD = new LoggedTunableNumber("Collect/kD");
   private static final LoggedTunableNumber kS = new LoggedTunableNumber("Collect/kS");
   private static final LoggedTunableNumber kV = new LoggedTunableNumber("Collect/kV");
+  private static final LoggedTunableNumber ejectTime = new LoggedTunableNumber("Collect/ejectTime");
 
   private final CollectIO collectIO;
   private final CollectIOInputsAutoLogged inputs = new CollectIOInputsAutoLogged();
@@ -44,6 +45,7 @@ public class Collect extends SubsystemBase {
     feedShooterSpeed.initDefault(constants.feedShooterSpeed());
     collectSpeed.initDefault(constants.collectSpeed());
     ejectSpeed.initDefault(constants.ejectSpeed());
+    ejectTime.initDefault(constants.ejectTime());
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     collectIO.configurePID(kP.get(), 0.0, kD.get());
   }
@@ -121,27 +123,29 @@ public class Collect extends SubsystemBase {
    */
   public Command collectGamePiece() {
     return Commands.sequence(
-      Commands.none(), // replace this one with a command that sets the collector speed
-      Commands.none(), // replace this one with a command that waits for the sensor to trip
-      Commands.none()  // replace this one with a command that stops the collector
-    );
+        collectAtSpeed(collectSpeed),
+        Commands.waitUntil(() -> {
+          return isBeamBreakBlocked();
+        }),
+        Commands.runOnce(() -> {
+          stop();
+        })
+        );
   }
 
-  /**
-   * Creates a command that runs the collector in the mode for feeding gamepieces to the shooter
-   */
+  /** Creates a command that runs the collector in the mode for feeding gamepieces to the shooter */
   public Command feedGamePieceToShooter() {
-    return Commands.none(); // replace this with a command that sets the collector at the feed speed
+    return collectAtSpeed(feedShooterSpeed);
   }
 
-  /**
-   * Creates a command for ejecting gamepieces backwards, out of the collector.
-   */
+  /** Creates a command for ejecting gamepieces backwards, out of the collector. */
   public Command ejectGamePiece() {
     return Commands.sequence(
-      Commands.none(), // replace this one with a command that runs the collector backwards
-      Commands.none(), // replace this one with a command that waits at a fixed interval
-      Commands.none()  // replace this one with a command that stops the collector
-    );
+        collectAtSpeed(ejectSpeed),
+        Commands.waitSeconds(ejectSpeed.get()), // replace this one with a command that waits at a fixed interval
+        Commands.runOnce(() -> {
+          stop();
+        })
+        );
   }
 }
