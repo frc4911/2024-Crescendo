@@ -15,11 +15,13 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.AnalogInput;
 
 public class CollectIOReal implements CollectIO {
   private final CANSparkFlex collect;
   private final RelativeEncoder encoder;
   private final SparkPIDController pidController;
+  private final AnalogInput beamBreak;
   private final double gearRatio;
 
   public CollectIOReal(CollectConstants collectConstants) {
@@ -27,6 +29,7 @@ public class CollectIOReal implements CollectIO {
     encoder = collect.getEncoder();
     pidController = collect.getPIDController();
     gearRatio = collectConstants.gearRatio();
+    beamBreak = new AnalogInput(collectConstants.sensorId());
 
     configureDevices();
   }
@@ -38,6 +41,7 @@ public class CollectIOReal implements CollectIO {
         Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity() / gearRatio);
     inputs.appliedVolts = collect.getAppliedOutput() * collect.getBusVoltage();
     inputs.currentAmps = collect.getOutputCurrent();
+    inputs.beamBreakVoltage = beamBreak.getVoltage();
   }
 
   @Override
