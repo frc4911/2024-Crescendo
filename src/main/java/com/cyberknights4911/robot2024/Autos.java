@@ -35,5 +35,9 @@ public final class Autos {
         "Collector FF Characterization",
         new FeedForwardCharacterization(
             collect, collect::runCharacterizationVolts, collect::getCharacterizationVelocity));
+    handler.addOption(
+        "Shooter FF Characterization",
+        new FeedForwardCharacterization(
+            shooter, shooter::runCharacterizationVolts, shooter::getCharacterizationVelocity));
   }
 }
