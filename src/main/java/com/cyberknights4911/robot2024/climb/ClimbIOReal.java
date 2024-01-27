@@ -7,6 +7,7 @@
 
 package com.cyberknights4911.robot2024.climb;
 
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -28,6 +29,14 @@ public class ClimbIOReal implements ClimbIO {
     gearRatio = constants.gearRatio();
 
     configureDevices();
+  }
+
+  @Override
+  public void configureLimits(double forwardLimit, double backwardLimit) {
+    right.enableSoftLimit(CANSparkBase.SoftLimitDirection.kForward, true);
+    right.enableSoftLimit(CANSparkBase.SoftLimitDirection.kReverse, true);
+    right.setSoftLimit(CANSparkBase.SoftLimitDirection.kForward, (float) forwardLimit);
+    right.setSoftLimit(CANSparkBase.SoftLimitDirection.kReverse, (float) backwardLimit);
   }
 
   @Override

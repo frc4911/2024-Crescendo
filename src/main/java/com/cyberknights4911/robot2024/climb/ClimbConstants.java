@@ -14,7 +14,9 @@ import io.soabase.recordbuilder.core.RecordBuilder;
 @RecordBuilder
 public record ClimbConstants(
     int motorId1,
-    int motorId2,
+    int motorId2, // Is there more than one motor for climb?
+    double forwardLimit,
+    double backwardLimit,
     double gearRatio,
     double lockToggleTime,
     PidValues feedBackValues,
