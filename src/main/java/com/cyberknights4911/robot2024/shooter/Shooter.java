@@ -8,6 +8,8 @@
 package com.cyberknights4911.robot2024.shooter;
 
 import com.cyberknights4911.logging.LoggedTunableNumber;
+import com.cyberknights4911.robot2024.collect.Collect;
+
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -142,5 +144,19 @@ public class Shooter extends SubsystemBase {
    */
   public Command spinSlow() {
     return spinAtSpeed(shootSlowSpeed);
+  }
+
+  /**
+   * Creates a complete command for firing a note
+   * @param collect the collector subsystem
+   */
+  public Command fireNote(Collect collect) {
+    // sequence:
+    // 1. spin shooter
+    // 2. feed gamepiece
+    // 3. wait fixed delay
+    // 4. stop shooter and collector
+
+    return Commands.none();
   }
 }
