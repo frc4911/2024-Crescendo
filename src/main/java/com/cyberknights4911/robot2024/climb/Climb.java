@@ -22,6 +22,11 @@ public class Climb extends SubsystemBase {
   private static final LoggedTunableNumber kS = new LoggedTunableNumber("Climb/kS");
   private static final LoggedTunableNumber kV = new LoggedTunableNumber("Climb/kV");
 
+  private static final LoggedTunableNumber forwardLimit =
+      new LoggedTunableNumber("Climb/forwardLimit");
+private static final LoggedTunableNumber backwardLimit =
+      new LoggedTunableNumber("Climb/backwardLimit");
+
   private final ClimbIO climbIO;
   private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
   private final Mechanism2d mechanism = new Mechanism2d(3, 3);
@@ -34,6 +39,8 @@ public class Climb extends SubsystemBase {
     kV.initDefault(constants.feedForwardValues().kV());
     kP.initDefault(constants.feedBackValues().kP());
     kD.initDefault(constants.feedBackValues().kD());
+    forwardLimit.initDefault(constants.forwardLimit());
+    backwardLimit.initDefault(constants.backwardLimit());
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     climbIO.configurePID(kP.get(), 0.0, kD.get());
 
@@ -54,6 +61,9 @@ public class Climb extends SubsystemBase {
     }
     if (kS.hasChanged(hashCode()) || kV.hasChanged(hashCode())) {
       feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
+    }
+    if (forwardLimit.hasChanged(hashCode()) || backwardLimit.hasChanged(hashCode())) {
+      climbIO.configureLimits(forwardLimit.get(), backwardLimit.get());
     }
 
     if (DriverStation.isDisabled()) {
