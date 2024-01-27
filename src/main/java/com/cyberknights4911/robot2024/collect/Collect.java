@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Collect extends SubsystemBase {
@@ -60,23 +59,18 @@ public class Collect extends SubsystemBase {
   }
 
   /** Run closed loop at the specified velocity. */
-  public void runVelocity(double velocityRPM) {
-    var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
+  public void runVelocity(double velocityRpm) {
+    var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRpm);
     collectIO.setVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
 
-    // Log collector setpoint
-    Logger.recordOutput("Collect/SetpointRPM", velocityRPM);
-  }
-
-  /** Stops the collector. */
-  public void stop() {
-    collectIO.stop();
+    Logger.recordOutput("Collect/SetpointRPM", velocityRpm);
   }
 
   /** Returns the current velocity in RPM. */
-  @AutoLogOutput
-  public double getVelocityRPM() {
-    return Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec);
+  public double getVelocityRpm() {
+    double velocityRpm = Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec);
+    Logger.recordOutput("Collect/VelocityRPM", velocityRpm);
+    return velocityRpm;
   }
 
   /** Runs forwards at the commanded voltage. */
@@ -87,6 +81,11 @@ public class Collect extends SubsystemBase {
   /** Returns the average velocity in radians/sec. */
   public double getCharacterizationVelocity() {
     return inputs.velocityRadPerSec;
+  }
+
+  /** Stops the collector. */
+  public void stop() {
+    collectIO.stop();
   }
 
   /** Creates a command that collects at the medium speed stops when interrupted. */
