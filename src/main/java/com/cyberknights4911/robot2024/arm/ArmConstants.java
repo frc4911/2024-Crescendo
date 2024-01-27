@@ -16,6 +16,8 @@ public record ArmConstants(
     int motorId1,
     int motorId2,
     int solenoidId,
+    double forwardLimit,
+    double backwardLimit,
     double gearRatio,
     PidValues feedBackValues,
     ArmFeedForwardValues feedForwardValues) {}

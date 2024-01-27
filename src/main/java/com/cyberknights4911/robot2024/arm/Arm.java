@@ -22,6 +22,10 @@ public final class Arm extends SubsystemBase {
   private static final LoggedTunableNumber kS = new LoggedTunableNumber("Arm/kS");
   private static final LoggedTunableNumber kG = new LoggedTunableNumber("Arm/kG");
   private static final LoggedTunableNumber kV = new LoggedTunableNumber("Arm/kV");
+  private static final LoggedTunableNumber forwardLimit =
+      new LoggedTunableNumber("Arm/forwardLimit");
+  private static final LoggedTunableNumber backwardLimit =
+      new LoggedTunableNumber("Arm/backwardLimit");
 
   private final ArmIO armIO;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
@@ -35,6 +39,8 @@ public final class Arm extends SubsystemBase {
     kV.initDefault(constants.feedForwardValues().kV());
     kP.initDefault(constants.feedBackValues().kP());
     kD.initDefault(constants.feedBackValues().kD());
+    forwardLimit.initDefault(constants.forwardLimit());
+    backwardLimit.initDefault(constants.backwardLimit());
     feedforward = new ArmFeedforward(0, 0, 0);
     armIO.configurePID(kP.get(), kG.get(), kD.get());
 
@@ -58,6 +64,9 @@ public final class Arm extends SubsystemBase {
     }
     if (kS.hasChanged(hashCode()) || kG.hasChanged(hashCode()) || kV.hasChanged(hashCode())) {
       feedforward = new ArmFeedforward(kS.get(), kG.get(), kV.get());
+    }
+    if (forwardLimit.hasChanged(hashCode()) || backwardLimit.hasChanged(hashCode())) {
+      armIO.configureLimits(forwardLimit.get(), backwardLimit.get());
     }
 
     if (DriverStation.isDisabled()) {
