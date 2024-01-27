@@ -16,5 +16,9 @@ public record ShooterConstants(
     int motorId1,
     int motorId2,
     double gearRatio,
+    double fastVelocityRpm,
+    double mediumVelocityRpm,
+    double slowVelocityRpm,
+    double errorVelocityRpm,
     PidValues feedBackValues,
     FeedForwardValues feedForwardValues) {}
