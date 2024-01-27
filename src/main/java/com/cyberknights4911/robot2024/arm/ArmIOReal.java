@@ -13,11 +13,13 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 
 public final class ArmIOReal implements ArmIO {
   private final CANSparkFlex left;
   private final CANSparkFlex right;
-
+  private final Solenoid armSolenoid;
   private final RelativeEncoder encoder;
   private final SparkPIDController pidController;
   private final double gearRatio;
@@ -25,7 +27,8 @@ public final class ArmIOReal implements ArmIO {
   public ArmIOReal(ArmConstants armConstants) {
     left = new CANSparkFlex(armConstants.motorId1(), MotorType.kBrushless);
     right = new CANSparkFlex(armConstants.motorId2(), MotorType.kBrushless);
-
+    // TODO verify module type
+    armSolenoid = new Solenoid(PneumaticsModuleType.REVPH, armConstants.solenoidId());
     encoder = right.getEncoder();
     pidController = right.getPIDController();
     gearRatio = armConstants.gearRatio();
@@ -41,6 +44,12 @@ public final class ArmIOReal implements ArmIO {
     // TODO: read solenoid state and write to inputs
     inputs.appliedVolts = right.getAppliedOutput() * right.getBusVoltage();
     inputs.currentAmps = new double[] {right.getOutputCurrent(), left.getOutputCurrent()};
+    inputs.solenoidState = armSolenoid.get();
+  }
+
+  @Override
+  public void setSolenoidState(boolean state) {
+    armSolenoid.set(state);
   }
 
   @Override

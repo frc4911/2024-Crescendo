@@ -45,6 +45,14 @@ public final class Arm extends SubsystemBase {
     armIO.setVoltage(volts);
   }
 
+  public void setCollectorAngle(CollectorAngle angle) {
+    if (angle == CollectorAngle.EIGHTY) {
+      armIO.setSolenoidState(true);
+    } else if (angle == CollectorAngle.FORTY_FIVE) {
+      armIO.setSolenoidState(false);
+    }
+  }
+
   @Override
   public void periodic() {
     armIO.updateInputs(inputs);
