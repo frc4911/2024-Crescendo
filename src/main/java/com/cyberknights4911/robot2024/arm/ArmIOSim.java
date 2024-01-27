@@ -48,4 +48,9 @@ public final class ArmIOSim implements ArmIO {
   public void configurePID(double kP, double kI, double kD) {
     pid.setPID(kP, kI, kD);
   }
+
+  @Override
+  public void setSolenoid(boolean on) {
+    // TODO: pass on to sim solenoid
+  }
 }

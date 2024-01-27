@@ -9,7 +9,9 @@ package com.cyberknights4911.robot2024.shooter;
 
 import com.cyberknights4911.util.FeedForwardValues;
 import com.cyberknights4911.util.PidValues;
+import io.soabase.recordbuilder.core.RecordBuilder;
 
+@RecordBuilder
 public record ShooterConstants(
     int motorId1,
     int motorId2,

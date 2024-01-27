@@ -9,15 +9,21 @@ package com.cyberknights4911.robot2024;
 
 import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.commands.FeedForwardCharacterization;
+import com.cyberknights4911.robot2024.arm.Arm;
 import com.cyberknights4911.robot2024.collect.Collect;
+import com.cyberknights4911.robot2024.shooter.Shooter;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public final class Autos {
+  private final Arm arm;
   private final Collect collect;
+  private final Shooter shooter;
 
-  public Autos(Collect collect) {
+  public Autos(Arm arm, Collect collect, Shooter shooter) {
+    this.arm = arm;
     this.collect = collect;
+    this.shooter = shooter;
   }
 
   public void addAllAutos(AutoCommandHandler handler) {

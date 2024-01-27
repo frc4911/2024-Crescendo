@@ -10,10 +10,12 @@ package com.cyberknights4911.robot2024.collect;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.simulation.AnalogInputSim;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 
 public final class CollectIOSim implements CollectIO {
   private final DCMotorSim sim;
+  private final AnalogInputSim beamBreakSim;
   private final PIDController pid;
 
   private boolean closedLoop = false;
@@ -24,6 +26,7 @@ public final class CollectIOSim implements CollectIO {
     // TODO: determine moment of inertia
     sim = new DCMotorSim(DCMotor.getNeoVortex(1), constants.gearRatio(), 0.004);
     pid = new PIDController(0.0, 0.0, 0.0);
+    beamBreakSim = new AnalogInputSim(0);
   }
 
   @Override
@@ -36,7 +39,8 @@ public final class CollectIOSim implements CollectIO {
 
     sim.update(0.02);
 
-    inputs.positionRad = 0.0;
+    inputs.beamBreakVoltage = beamBreakSim.getVoltage();
+    inputs.positionRad = sim.getAngularPositionRad();
     inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
     inputs.appliedVolts = appliedVolts;
     inputs.currentAmps = sim.getCurrentDrawAmps();

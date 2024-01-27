@@ -10,6 +10,9 @@ package com.cyberknights4911.robot2024.arm;
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -22,6 +25,7 @@ public final class Arm extends SubsystemBase {
 
   private final ArmIO armIO;
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
+  private final Mechanism2d mechanism = new Mechanism2d(3, 3);
   private ArmFeedforward feedforward;
 
   public Arm(ArmConstants constants, ArmIO armIO) {
@@ -33,6 +37,8 @@ public final class Arm extends SubsystemBase {
     kD.initDefault(constants.feedBackValues().kD());
     feedforward = new ArmFeedforward(0, 0, 0);
     armIO.configurePID(kP.get(), kG.get(), kD.get());
+
+    setupArmMechanism(mechanism);
   }
 
   public void setVoltage(double volts) {
@@ -43,6 +49,9 @@ public final class Arm extends SubsystemBase {
   public void periodic() {
     armIO.updateInputs(inputs);
     Logger.processInputs("Arm", inputs);
+
+    // TODO: Update the mechanism based on positionRad and solenoidState
+    Logger.recordOutput("Arm/Mechanism", mechanism);
 
     if (kP.hasChanged(hashCode()) || kD.hasChanged(hashCode())) {
       armIO.configurePID(kP.get(), 0.0, kD.get());
@@ -59,5 +68,16 @@ public final class Arm extends SubsystemBase {
   /** Stops the arm. */
   public void stop() {
     armIO.stop();
+  }
+
+  private void setupArmMechanism(Mechanism2d mechanism2) {
+    // Where the arm is attached
+    MechanismRoot2d root = mechanism.getRoot("arm", 1, .5);
+    // The first arm segment. This points downward in the initial configuration.
+    MechanismLigament2d segment1 = root.append(new MechanismLigament2d("segment1", .25, 270));
+    // The second arm segment. This is ALWAYS at a fixed angle relative to the first segment.
+    MechanismLigament2d segment2 = segment1.append(new MechanismLigament2d("segment2", 1.5, 180));
+    // The shooter. It's attached to end of arm and toggles between two fixed angles
+    segment2.append(new MechanismLigament2d("shooter", 1, 225));
   }
 }

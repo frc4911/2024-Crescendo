@@ -14,6 +14,7 @@ public interface ArmIO {
   public static class ArmIOInputs {
     public double positionRad = 0.0;
     public double velocityRadPerSec = 0.0;
+    public boolean solenoidState = false;
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
   }
@@ -29,6 +30,8 @@ public interface ArmIO {
 
   /** Stop in open loop. */
   public default void stop() {}
+
+  public default void setSolenoid(boolean on) {}
 
   /** Set velocity PID constants. */
   public default void configurePID(double kP, double kI, double kD) {}
