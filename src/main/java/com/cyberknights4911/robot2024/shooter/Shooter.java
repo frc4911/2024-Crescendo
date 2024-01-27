@@ -47,7 +47,7 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    shooterIO.updateInputs(null);
+    shooterIO.updateInputs(inputs);
     Logger.processInputs("Shooter", inputs);
 
     if (kP.hasChanged(hashCode()) || kD.hasChanged(hashCode())) {

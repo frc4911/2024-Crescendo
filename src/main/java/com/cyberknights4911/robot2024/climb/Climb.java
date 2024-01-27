@@ -10,6 +10,9 @@ package com.cyberknights4911.robot2024.climb;
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -21,6 +24,7 @@ public class Climb extends SubsystemBase {
 
   private final ClimbIO climbIO;
   private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
+  private final Mechanism2d mechanism = new Mechanism2d(3, 3);
   private SimpleMotorFeedforward feedforward;
 
   public Climb(ClimbConstants constants, ClimbIO climbIO) {
@@ -32,6 +36,8 @@ public class Climb extends SubsystemBase {
     kD.initDefault(constants.feedBackValues().kD());
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     climbIO.configurePID(kP.get(), 0.0, kD.get());
+
+    setupClimberMechanism(mechanism);
   }
 
   public void setClimbVoltage(double volts) {
@@ -58,5 +64,14 @@ public class Climb extends SubsystemBase {
   /** Stops the climber. */
   public void stop() {
     climbIO.stop();
+  }
+
+  private void setupClimberMechanism(Mechanism2d mechanism2) {
+    // Where the climber is attached
+    MechanismRoot2d root = mechanism.getRoot("climber", 1.5, 0);
+    // The first climber segment. This is the portion that is always at a fixed height.
+    MechanismLigament2d segment = root.append(new MechanismLigament2d("segment1", 1, 90));
+    // The second climber segment. This represents the section that extends upward.
+    segment.append(new MechanismLigament2d("segment2", 0, 90));
   }
 }

@@ -15,6 +15,7 @@ import io.soabase.recordbuilder.core.RecordBuilder;
 public record ArmConstants(
     int motorId1,
     int motorId2,
+    int solenoidId,
     double gearRatio,
     PidValues feedBackValues,
     ArmFeedForwardValues feedForwardValues) {}

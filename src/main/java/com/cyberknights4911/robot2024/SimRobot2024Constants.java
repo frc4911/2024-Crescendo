@@ -28,17 +28,17 @@ import com.cyberknights4911.util.FeedForwardValues;
 import com.cyberknights4911.util.PidValues;
 import edu.wpi.first.math.util.Units;
 
-public final class Robot2024Constants {
+public final class SimRobot2024Constants {
 
-  private Robot2024Constants() {}
+  private SimRobot2024Constants() {}
 
-  public static final Constants ROBOT_2024 =
+  public static final Constants SIM_ROBOT_2024 =
       ConstantsBuilder.builder()
-          .name("Robot2024")
+          .name("SimRobot2024")
           .loopPeriodSecs(0.02)
           .tuningMode(true)
           .logPath(null)
-          .mode(Mode.REAL)
+          .mode(Mode.SIM)
           .supplier(Robot2024::new)
           .build();
 

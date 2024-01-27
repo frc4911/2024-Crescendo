@@ -15,6 +15,7 @@ public interface CollectIO {
   public static class CollectIOInputs {
     public double positionRad = 0.0;
     public double velocityRadPerSec = 0.0;
+    public double beamBreakVoltage = 0.0;
     public double appliedVolts = 0.0;
     public double currentAmps = 0.0;
   }

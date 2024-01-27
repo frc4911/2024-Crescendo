@@ -38,6 +38,7 @@ public final class ArmIOReal implements ArmIO {
     inputs.positionRad = Units.rotationsToRadians(encoder.getPosition()) / gearRatio;
     inputs.velocityRadPerSec =
         Units.rotationsPerMinuteToRadiansPerSecond(encoder.getVelocity()) / gearRatio;
+    // TODO: read solenoid state and write to inputs
     inputs.appliedVolts = right.getAppliedOutput() * right.getBusVoltage();
     inputs.currentAmps = new double[] {right.getOutputCurrent(), left.getOutputCurrent()};
   }
@@ -58,6 +59,11 @@ public final class ArmIOReal implements ArmIO {
     pidController.setI(kI);
     pidController.setD(kD);
     pidController.setOutputRange(-1, 1);
+  }
+
+  @Override
+  public void setSolenoid(boolean on) {
+    // TODO: pass on to actual solenoid
   }
 
   private void configureDevices() {
