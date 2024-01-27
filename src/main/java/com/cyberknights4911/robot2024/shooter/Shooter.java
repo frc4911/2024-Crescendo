@@ -24,13 +24,13 @@ public class Shooter extends SubsystemBase {
   private static final LoggedTunableNumber kV = new LoggedTunableNumber("Shooter/kV");
   private static final LoggedTunableNumber feedTime = new LoggedTunableNumber("Shooter/feedTime");
   private static final LoggedTunableNumber shootFastSpeed =
-      new LoggedTunableNumber("Shooter/FastVelocityRPM", 2_000);
+      new LoggedTunableNumber("Shooter/FastVelocityRPM");
   private static final LoggedTunableNumber shootMediumSpeed =
-      new LoggedTunableNumber("Shooter/MediumVelocityRPM", 1_000);
+      new LoggedTunableNumber("Shooter/MediumVelocityRPM");
   private static final LoggedTunableNumber shootSlowSpeed =
-      new LoggedTunableNumber("Shooter/SlowVelocityRPM", 500);
+      new LoggedTunableNumber("Shooter/SlowVelocityRPM");
   private static final LoggedTunableNumber shooterRpmError =
-      new LoggedTunableNumber("Shooter/ErrorRPM", 50);
+      new LoggedTunableNumber("Shooter/ErrorRPM");
 
   private final ShooterIO shooterIO;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
