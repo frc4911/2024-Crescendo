@@ -28,6 +28,9 @@ public interface ClimbIO {
   /** Enable or disable brake mode on the motor. */
   public default void setBrakeMode(boolean enable) {}
 
+  /** Enable or disable the climb lock. */
+  public default void setClimbLock(boolean enable) {}
+
   /** Stop in open loop. */
   public default void stop() {}
 

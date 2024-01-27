@@ -16,5 +16,6 @@ public record ClimbConstants(
     int motorId1,
     int motorId2,
     double gearRatio,
+    double lockToggleTime,
     PidValues feedBackValues,
     FeedForwardValues feedForwardValues) {}

@@ -23,6 +23,8 @@ public class Climb extends SubsystemBase {
   private static final LoggedTunableNumber kD = new LoggedTunableNumber("Climb/kD");
   private static final LoggedTunableNumber kS = new LoggedTunableNumber("Climb/kS");
   private static final LoggedTunableNumber kV = new LoggedTunableNumber("Climb/kV");
+  private static final LoggedTunableNumber lockToggleTime =
+      new LoggedTunableNumber("Climb/LockToggleTime");
 
   private final ClimbIO climbIO;
   private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
@@ -36,6 +38,7 @@ public class Climb extends SubsystemBase {
     kV.initDefault(constants.feedForwardValues().kV());
     kP.initDefault(constants.feedBackValues().kP());
     kD.initDefault(constants.feedBackValues().kD());
+    lockToggleTime.initDefault(constants.lockToggleTime());
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     climbIO.configurePID(kP.get(), 0.0, kD.get());
 
@@ -77,18 +80,37 @@ public class Climb extends SubsystemBase {
     segment.append(new MechanismLigament2d("segment2", 0, 90));
   }
 
+  private Command setClimbLock(boolean locked) {
+    return Commands.runOnce(
+            () -> {
+              // replace this with a request to engage or disengage the climb lock
+            },
+            this)
+        .andThen(
+            Commands
+                .none() // replace this with a command that waits a fix time delay that corresponds
+            // with the time it takes the physical lock to toggle
+            );
+  }
+
   /** Extends the climbers to climbing height. */
   public Command extendClimber() {
     return Commands.runOnce(
             () -> {
-              // replace this with a request to move the lead climb motor to the "extended" position
+              // replace this with a request to disengage the climb lock
             },
             this)
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  // replace this with a request to move the lead climb motor to the "extended"
+                  // position
+                },
+                this))
         .until(
             () -> {
               // replace this with an expression that is only true when the climbers are up all the
               // way
-              // height
               return true;
             });
   }
@@ -104,7 +126,6 @@ public class Climb extends SubsystemBase {
             () -> {
               // replace this with an expression that is only true when the climbers are down all
               // the way
-              // height
               return true;
             })
         .andThen(
