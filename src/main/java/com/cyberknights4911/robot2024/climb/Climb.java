@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -73,5 +75,43 @@ public class Climb extends SubsystemBase {
     MechanismLigament2d segment = root.append(new MechanismLigament2d("segment1", 1, 90));
     // The second climber segment. This represents the section that extends upward.
     segment.append(new MechanismLigament2d("segment2", 0, 90));
+  }
+
+  /** Extends the climbers to climbing height. */
+  public Command extendClimber() {
+    return Commands.runOnce(
+            () -> {
+              // replace this with a request to move the lead climb motor to the "extended" position
+            },
+            this)
+        .until(
+            () -> {
+              // replace this with an expression that is only true when the climbers are up all the
+              // way
+              // height
+              return true;
+            });
+  }
+
+  /** Retracts the climbers to the climbed height. */
+  public Command climb() {
+    return Commands.runOnce(
+            () -> {
+              // replace this with a request to move the lead climb motor to the "climb" position
+            },
+            this)
+        .until(
+            () -> {
+              // replace this with an expression that is only true when the climbers are down all
+              // the way
+              // height
+              return true;
+            })
+        .andThen(
+            () -> {
+              // replace this with a call to "lock" the climbers so that we don't fall after the
+              // match
+            },
+            this);
   }
 }
