@@ -25,5 +25,8 @@ public record CollectConstants(
     int motorId,
     int sensorId,
     double gearRatio,
+    double ejectSpeed,
+    double collectSpeed,
+    double feedShooterSpeed,
     PidValues feedBackValues,
     FeedForwardValues feedForwardValues) {}
