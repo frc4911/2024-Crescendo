@@ -55,6 +55,16 @@ public class ClimbIOReal implements ClimbIO {
   }
 
   @Override
+  public void setBrakeMode(boolean enable) {
+    // TODO: set motors to the corresponding brake mode
+  }
+
+  @Override
+  public void setClimbLock(boolean enable) {
+    // TODO: set the climb lock
+  }
+
+  @Override
   public void stop() {
     right.stopMotor();
   }
