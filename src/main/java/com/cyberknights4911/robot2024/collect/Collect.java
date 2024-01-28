@@ -19,14 +19,17 @@ import org.littletonrobotics.junction.Logger;
 public class Collect extends SubsystemBase {
   private static final LoggedTunableNumber beamThreshold =
       new LoggedTunableNumber("Collect/beamThreshold");
-  private static final LoggedTunableNumber collectMediumSpeed =
-      new LoggedTunableNumber("Collect/IntakeMediumVelocityRPM", 1_000);
-  private static final LoggedTunableNumber collectSlowSpeed =
-      new LoggedTunableNumber("Collect/IntakeSlowVelocityRPM", 500);
+  private static final LoggedTunableNumber ejectSpeed =
+      new LoggedTunableNumber("Collect/EjectVelocityRPM");
+  private static final LoggedTunableNumber collectSpeed =
+      new LoggedTunableNumber("Collect/CollectVelocityRPM");
+  private static final LoggedTunableNumber feedShooterSpeed =
+      new LoggedTunableNumber("Collect/FeedShooterVelocityRPM");
   private static final LoggedTunableNumber kP = new LoggedTunableNumber("Collect/kP");
   private static final LoggedTunableNumber kD = new LoggedTunableNumber("Collect/kD");
   private static final LoggedTunableNumber kS = new LoggedTunableNumber("Collect/kS");
   private static final LoggedTunableNumber kV = new LoggedTunableNumber("Collect/kV");
+  private static final LoggedTunableNumber ejectTime = new LoggedTunableNumber("Collect/ejectTime");
 
   private final CollectIO collectIO;
   private final CollectIOInputsAutoLogged inputs = new CollectIOInputsAutoLogged();
@@ -39,6 +42,10 @@ public class Collect extends SubsystemBase {
     kV.initDefault(constants.feedForwardValues().kV());
     kP.initDefault(constants.feedBackValues().kP());
     kD.initDefault(constants.feedBackValues().kD());
+    feedShooterSpeed.initDefault(constants.feedShooterSpeed());
+    collectSpeed.initDefault(constants.collectSpeed());
+    ejectSpeed.initDefault(constants.ejectSpeed());
+    ejectTime.initDefault(constants.ejectTime());
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     collectIO.configurePID(kP.get(), 0.0, kD.get());
   }
@@ -98,27 +105,48 @@ public class Collect extends SubsystemBase {
     collectIO.stop();
   }
 
-  /** Creates a command that collects at the medium speed stops when interrupted. */
-  public Command collectMedium() {
-    return Commands.startEnd(
+  /**
+   * Creates a command that runs the collector at a desired speed. The collector will stay running
+   * after this command ends
+   */
+  private Command collectAtSpeed(LoggedTunableNumber desiredSpeed) {
+    return Commands.runOnce(
         () -> {
-          runVelocity(collectMediumSpeed.get());
-        },
-        () -> {
-          stop();
+          runVelocity(desiredSpeed.get());
         },
         this);
   }
 
-  /** Creates a command that collects at the slow speed stops when interrupted. */
-  public Command collectSlow() {
-    return Commands.startEnd(
-        () -> {
-          runVelocity(collectSlowSpeed.get());
-        },
-        () -> {
-          stop();
-        },
-        this);
+  /**
+   * Creates a command that runs the collector at the proper collector speed, but stops when the
+   * gamepiece reaches the sensor.
+   */
+  public Command collectGamePiece() {
+    return Commands.sequence(
+        collectAtSpeed(collectSpeed),
+        Commands.waitUntil(
+            () -> {
+              return isBeamBreakBlocked();
+            }),
+        Commands.runOnce(
+            () -> {
+              stop();
+            }));
+  }
+
+  /** Creates a command that runs the collector in the mode for feeding gamepieces to the shooter */
+  public Command feedGamePieceToShooter() {
+    return collectAtSpeed(feedShooterSpeed);
+  }
+
+  /** Creates a command for ejecting gamepieces backwards, out of the collector. */
+  public Command ejectGamePiece() {
+    return Commands.sequence(
+        collectAtSpeed(ejectSpeed),
+        Commands.waitSeconds(ejectTime.get()),
+        Commands.runOnce(
+            () -> {
+              stop();
+            }));
   }
 }
