@@ -13,7 +13,10 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public final class Arm extends SubsystemBase {
@@ -96,5 +99,97 @@ public final class Arm extends SubsystemBase {
     MechanismLigament2d segment2 = segment1.append(new MechanismLigament2d("segment2", 1.5, 180));
     // The shooter. It's attached to end of arm and toggles between two fixed angles
     segment2.append(new MechanismLigament2d("shooter", 1, 225));
+  }
+
+  public Command stowArm() {
+    return Commands.runOnce(
+            () -> {
+              // replace this with a call to move the arm to the stowed position.
+            },
+            this)
+        .andThen(
+            Commands.waitUntil(
+                () -> {
+                  // replace with an expression that only returns true when the arm is in the right
+                  // position
+                  return false;
+                }));
+  }
+
+  public Command aimAmp() {
+    return Commands.runOnce(
+            () -> {
+              // replace this with a call to move the arm to the "score amp" position.
+            },
+            this)
+        .andThen(
+            Commands.waitUntil(
+                () -> {
+                  // replace with an expression that only returns true when the arm is in the right
+                  // position
+                  return false;
+                }));
+  }
+
+  public Command aimSubwoofer() {
+    return Commands.runOnce(
+            () -> {
+              // replace this with a call to move the arm to the "score subwoofer" position.
+            },
+            this)
+        .andThen(
+            Commands.waitUntil(
+                () -> {
+                  // replace with an expression that only returns true when the arm is in the right
+                  // position
+                  return false;
+                }));
+  }
+
+  public Command aimPodium() {
+    return Commands.runOnce(
+            () -> {
+              // replace this with a call to move the arm to the "score podium" position.
+            },
+            this)
+        .andThen(
+            Commands.waitUntil(
+                () -> {
+                  // replace with an expression that only returns true when the arm is in the right
+                  // position
+                  return false;
+                }));
+  }
+
+  /**
+   * Automatically sets the aiming angle for an arbitrary distance from the speaker
+   *
+   * @param distanceMeters the horizontal distance from the speaker opening (not diagonal)
+   */
+  public Command aimForDistance(double distanceMeters) {
+    return Commands.runOnce(
+            () -> {
+              // replace this with a call to move the arm to the optimal angle for the given
+              // distance.
+            },
+            this)
+        .andThen(
+            Commands.waitUntil(
+                () -> {
+                  // replace with an expression that only returns true when the arm is in the right
+                  // position
+                  return false;
+                }));
+  }
+
+  /**
+   * Automatically and continuously sets the aiming angle for an arbitrary distance from the
+   * speaker. Note: this command never finishes on its own, so don't wait for it.
+   *
+   * @param distanceSupplier returns the current horizontal distance from the speaker opening (not
+   *     diagonal)
+   */
+  public Command aimContinuous(DoubleSupplier distanceSupplier) {
+    return new AimContinuousCommand(this, distanceSupplier);
   }
 }
