@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -21,7 +23,8 @@ public class Climb extends SubsystemBase {
   private static final LoggedTunableNumber kD = new LoggedTunableNumber("Climb/kD");
   private static final LoggedTunableNumber kS = new LoggedTunableNumber("Climb/kS");
   private static final LoggedTunableNumber kV = new LoggedTunableNumber("Climb/kV");
-
+  private static final LoggedTunableNumber lockToggleTime =
+      new LoggedTunableNumber("Climb/LockToggleTime");
   private static final LoggedTunableNumber forwardLimit =
       new LoggedTunableNumber("Climb/forwardLimit");
   private static final LoggedTunableNumber backwardLimit =
@@ -41,6 +44,7 @@ public class Climb extends SubsystemBase {
     kD.initDefault(constants.feedBackValues().kD());
     forwardLimit.initDefault(constants.forwardLimit());
     backwardLimit.initDefault(constants.backwardLimit());
+    lockToggleTime.initDefault(constants.lockToggleTime());
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     climbIO.configurePID(kP.get(), 0.0, kD.get());
 
@@ -83,5 +87,52 @@ public class Climb extends SubsystemBase {
     MechanismLigament2d segment = root.append(new MechanismLigament2d("segment1", 1, 90));
     // The second climber segment. This represents the section that extends upward.
     segment.append(new MechanismLigament2d("segment2", 0, 90));
+  }
+
+  private Command setClimbLock(boolean locked) {
+    return Commands.runOnce(
+            () -> {
+              // replace this with a request to engage or disengage the climb lock
+            },
+            this)
+        .andThen(
+            Commands
+                .none() // replace this with a command that waits a fix time delay that corresponds
+            // with the time it takes the physical lock to toggle
+            );
+  }
+
+  /** Extends the climbers to climbing height. */
+  public Command extendClimber() {
+    return setClimbLock(false)
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  // replace this with a request to move the lead climb motor to the "extended"
+                  // position
+                },
+                this))
+        .until(
+            () -> {
+              // replace this with an expression that is only true when the climbers are up all the
+              // way
+              return true;
+            });
+  }
+
+  /** Retracts the climbers to the climbed height. */
+  public Command climb() {
+    return Commands.runOnce(
+            () -> {
+              // replace this with a request to move the lead climb motor to the "climb" position
+            },
+            this)
+        .until(
+            () -> {
+              // replace this with an expression that is only true when the climbers are down all
+              // the way
+              return true;
+            })
+        .andThen(setClimbLock(true));
   }
 }
