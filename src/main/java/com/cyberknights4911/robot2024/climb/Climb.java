@@ -104,11 +104,7 @@ public class Climb extends SubsystemBase {
 
   /** Extends the climbers to climbing height. */
   public Command extendClimber() {
-    return Commands.runOnce(
-            () -> {
-              // replace this with a request to disengage the climb lock
-            },
-            this)
+    return setClimbLock(false)
         .andThen(
             Commands.runOnce(
                 () -> {
@@ -137,11 +133,6 @@ public class Climb extends SubsystemBase {
               // the way
               return true;
             })
-        .andThen(
-            () -> {
-              // replace this with a call to "lock" the climbers so that we don't fall after the
-              // match
-            },
-            this);
+        .andThen(setClimbLock(true));
   }
 }
