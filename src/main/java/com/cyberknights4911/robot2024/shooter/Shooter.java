@@ -8,9 +8,12 @@
 package com.cyberknights4911.robot2024.shooter;
 
 import com.cyberknights4911.logging.LoggedTunableNumber;
+import com.cyberknights4911.robot2024.collect.Collect;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -19,6 +22,15 @@ public class Shooter extends SubsystemBase {
   private static final LoggedTunableNumber kD = new LoggedTunableNumber("Shooter/kD");
   private static final LoggedTunableNumber kS = new LoggedTunableNumber("Shooter/kS");
   private static final LoggedTunableNumber kV = new LoggedTunableNumber("Shooter/kV");
+  private static final LoggedTunableNumber feedTime = new LoggedTunableNumber("Shooter/feedTime");
+  private static final LoggedTunableNumber shootFastSpeed =
+      new LoggedTunableNumber("Shooter/FastVelocityRPM");
+  private static final LoggedTunableNumber shootMediumSpeed =
+      new LoggedTunableNumber("Shooter/MediumVelocityRPM");
+  private static final LoggedTunableNumber shootSlowSpeed =
+      new LoggedTunableNumber("Shooter/SlowVelocityRPM");
+  private static final LoggedTunableNumber shooterRpmError =
+      new LoggedTunableNumber("Shooter/ErrorRPM");
 
   private final ShooterIO shooterIO;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
@@ -31,6 +43,11 @@ public class Shooter extends SubsystemBase {
     kV.initDefault(constants.feedForwardValues().kV());
     kP.initDefault(constants.feedBackValues().kP());
     kD.initDefault(constants.feedBackValues().kD());
+    feedTime.initDefault(constants.feedTime());
+    shootFastSpeed.initDefault(constants.fastVelocityRpm());
+    shootMediumSpeed.initDefault(constants.mediumVelocityRpm());
+    shootSlowSpeed.initDefault(constants.slowVelocityRpm());
+    shooterRpmError.initDefault(constants.errorVelocityRpm());
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     shooterIO.configurePID(kP.get(), 0.0, kD.get());
   }
@@ -80,5 +97,78 @@ public class Shooter extends SubsystemBase {
   /** Stops the shooter. */
   public void stop() {
     shooterIO.stop();
+  }
+
+  /**
+   * Creates a command that spins the shooter at the desired speed. This command will not end until
+   * the actual shooter RPM falls within a configurable margin of error. When this command ends, the
+   * shooter will stay spinning at the set velocity.
+   */
+  private Command spinAtSpeed(LoggedTunableNumber desiredSpeed) {
+    return Commands.sequence(
+        Commands.runOnce(
+            () -> {
+              runVelocity(desiredSpeed.get());
+            },
+            this),
+        Commands.waitUntil(
+            () -> {
+              return Math.abs(
+                      Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec)
+                          - desiredSpeed.get())
+                  < shooterRpmError.get();
+            }));
+  }
+
+  /**
+   * Creates a command that spins the shooter at the fast speed. This command will not end until the
+   * actual shooter RPM falls within a configurable margin of error. When this command ends, the
+   * shooter will stay spinning at the set velocity.
+   */
+  public Command spinFast() {
+    return spinAtSpeed(shootFastSpeed);
+  }
+
+  /**
+   * Creates a command that spins the shooter at the medium speed. This command will not end until
+   * the actual shooter RPM falls within a configurable margin of error. When this command ends, the
+   * shooter will stay spinning at the set velocity.
+   */
+  public Command spinMedium() {
+    return spinAtSpeed(shootMediumSpeed);
+  }
+
+  /**
+   * Creates a command that spins the shooter at the slow speed. This command will not end until the
+   * actual shooter RPM falls within a configurable margin of error. When this command ends, the
+   * shooter will stay spinning at the set velocity.
+   */
+  public Command spinSlow() {
+    return spinAtSpeed(shootSlowSpeed);
+  }
+
+  /**
+   * Creates a complete command for firing a note
+   *
+   * @param collect the collector subsystem
+   */
+  public Command fireNote(Collect collect) {
+    // sequence:
+    // 1. spin shooter
+    // 2. feed gamepiece
+    // 3. wait fixed delay
+    // 4. stop shooter and collector
+
+    return spinFast()
+        .andThen(collect.feedGamePieceToShooter())
+        .andThen(Commands.waitSeconds(feedTime.get()))
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  stop();
+                  collect.stop();
+                },
+                this,
+                collect));
   }
 }

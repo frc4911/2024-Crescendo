@@ -12,7 +12,6 @@ import com.cyberknights4911.commands.FeedForwardCharacterization;
 import com.cyberknights4911.robot2024.arm.Arm;
 import com.cyberknights4911.robot2024.collect.Collect;
 import com.cyberknights4911.robot2024.shooter.Shooter;
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Commands;
 
 public final class Autos {
@@ -27,8 +26,6 @@ public final class Autos {
   }
 
   public void addAllAutos(AutoCommandHandler handler) {
-    NamedCommands.registerCommand("CollectMedium", collect.collectMedium());
-    NamedCommands.registerCommand("CollectSlow", collect.collectSlow());
 
     handler.addDefaultOption("Nothing", Commands.none());
     handler.addOption(
