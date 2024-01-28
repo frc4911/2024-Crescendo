@@ -18,5 +18,6 @@ public record ClimbConstants(
     double forwardLimit,
     double backwardLimit,
     double gearRatio,
+    double lockToggleTime,
     PidValues feedBackValues,
     FeedForwardValues feedForwardValues) {}
