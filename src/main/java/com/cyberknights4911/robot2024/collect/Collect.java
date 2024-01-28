@@ -122,16 +122,7 @@ public class Collect extends SubsystemBase {
    * gamepiece reaches the sensor.
    */
   public Command collectGamePiece() {
-    return Commands.sequence(
-        collectAtSpeed(collectSpeed),
-        Commands.waitUntil(
-            () -> {
-              return isBeamBreakBlocked();
-            }),
-        Commands.runOnce(
-            () -> {
-              stop();
-            }));
+    return collectAtSpeed(collectSpeed).until(this::isBeamBreakBlocked).andThen(this::stop, this);
   }
 
   /** Creates a command that runs the collector in the mode for feeding gamepieces to the shooter */
@@ -141,12 +132,8 @@ public class Collect extends SubsystemBase {
 
   /** Creates a command for ejecting gamepieces backwards, out of the collector. */
   public Command ejectGamePiece() {
-    return Commands.sequence(
-        collectAtSpeed(ejectSpeed),
-        Commands.waitSeconds(ejectTime.get()),
-        Commands.runOnce(
-            () -> {
-              stop();
-            }));
+    return collectAtSpeed(ejectSpeed)
+        .andThen(Commands.waitSeconds(ejectTime.get()))
+        .andThen(this::stop, this);
   }
 }
