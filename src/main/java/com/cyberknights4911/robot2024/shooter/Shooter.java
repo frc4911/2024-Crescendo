@@ -162,13 +162,7 @@ public class Shooter extends SubsystemBase {
     return spinFast()
         .andThen(collect.feedGamePieceToShooter())
         .andThen(Commands.waitSeconds(feedTime.get()))
-        .andThen(
-            Commands.runOnce(
-                () -> {
-                  stop();
-                  collect.stop();
-                },
-                this,
-                collect));
+        .andThen(this::stop, this)
+        .andThen(collect::stop, collect);
   }
 }
