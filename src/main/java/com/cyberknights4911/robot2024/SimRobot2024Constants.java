@@ -43,11 +43,7 @@ public final class SimRobot2024Constants {
           .build();
 
   public static final ControlConstants CONTROL_CONSTANTS =
-      ControlConstantsBuilder.builder()
-          .driverControllerPort(0)
-          .operatorControllerPort(1)
-          .stickDeadband(.1)
-          .build();
+      ControlConstantsBuilder.builder().driverPort(0).operatorPort(1).stickDeadband(.1).build();
 
   public static final DriveConstants DRIVE_CONSTANTS =
       DriveConstantsBuilder.builder()
