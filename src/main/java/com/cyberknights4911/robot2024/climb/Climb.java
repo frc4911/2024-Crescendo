@@ -60,7 +60,7 @@ public class Climb extends SubsystemBase {
                 null,
                 null,
                 null,
-                (state) -> Logger.recordOutput("Shooter/SysIdState", state.toString())),
+                (state) -> Logger.recordOutput("Climb/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism((voltage) -> runVolts(voltage.in(Volts)), null, this));
   }
 

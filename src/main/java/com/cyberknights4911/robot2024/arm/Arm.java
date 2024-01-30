@@ -59,7 +59,7 @@ public final class Arm extends SubsystemBase {
                 null,
                 null,
                 null,
-                (state) -> Logger.recordOutput("Shooter/SysIdState", state.toString())),
+                (state) -> Logger.recordOutput("Arm/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism((voltage) -> runVolts(voltage.in(Volts)), null, this));
   }
 
