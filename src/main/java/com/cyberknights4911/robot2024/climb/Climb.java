@@ -25,6 +25,10 @@ public class Climb extends SubsystemBase {
   private static final LoggedTunableNumber kV = new LoggedTunableNumber("Climb/kV");
   private static final LoggedTunableNumber lockToggleTime =
       new LoggedTunableNumber("Climb/LockToggleTime");
+  private static final LoggedTunableNumber extendPosition =
+      new LoggedTunableNumber("Climb/extendPosition");
+  private static final LoggedTunableNumber retractPosition =
+      new LoggedTunableNumber("Climb/retractPosition");
   private static final LoggedTunableNumber forwardLimit =
       new LoggedTunableNumber("Climb/forwardLimit");
   private static final LoggedTunableNumber backwardLimit =
@@ -44,6 +48,8 @@ public class Climb extends SubsystemBase {
     kD.initDefault(constants.feedBackValues().kD());
     forwardLimit.initDefault(constants.forwardLimit());
     backwardLimit.initDefault(constants.backwardLimit());
+    extendPosition.initDefault(constants.extendPosition());
+    retractPosition.initDefault(constants.retractPosition());
     lockToggleTime.initDefault(constants.lockToggleTime());
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     climbIO.configurePID(kP.get(), 0.0, kD.get());
@@ -92,14 +98,10 @@ public class Climb extends SubsystemBase {
   private Command setClimbLock(boolean locked) {
     return Commands.runOnce(
             () -> {
-              // replace this with a request to engage or disengage the climb lock
+              setClimbLock(locked);
             },
             this)
-        .andThen(
-            Commands
-                .none() // replace this with a command that waits a fix time delay that corresponds
-            // with the time it takes the physical lock to toggle
-            );
+        .andThen(Commands.waitSeconds(lockToggleTime.get()));
   }
 
   /** Extends the climbers to climbing height. */
@@ -108,15 +110,12 @@ public class Climb extends SubsystemBase {
         .andThen(
             Commands.runOnce(
                 () -> {
-                  // replace this with a request to move the lead climb motor to the "extended"
-                  // position
+                  climbIO.setPosition(extendPosition.get());
                 },
                 this))
         .until(
             () -> {
-              // replace this with an expression that is only true when the climbers are up all the
-              // way
-              return true;
+              return inputs.positionLinear >= extendPosition.get();
             });
   }
 
@@ -124,14 +123,12 @@ public class Climb extends SubsystemBase {
   public Command climb() {
     return Commands.runOnce(
             () -> {
-              // replace this with a request to move the lead climb motor to the "climb" position
+              climbIO.setPosition(retractPosition.get());
             },
             this)
         .until(
             () -> {
-              // replace this with an expression that is only true when the climbers are down all
-              // the way
-              return true;
+              return inputs.positionLinear <= retractPosition.get();
             })
         .andThen(setClimbLock(true));
   }
