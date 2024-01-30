@@ -14,6 +14,7 @@ public interface ClimbIO {
   public static class ClimbIOInputs {
     public double positionRad = 0.0;
     public double velocityRadPerSec = 0.0;
+    public double positionLinear = 0.0;
 
     public double appliedVolts = 0.0;
     public double[] currentAmps = new double[] {};
@@ -24,6 +25,9 @@ public interface ClimbIO {
 
   /** Run the motor at the specified voltage. */
   public default void setVoltage(double volts) {}
+
+  /** Set the climber to the desired position. */
+  public default void setPosition(double position) {}
 
   /** Enable or disable brake mode on the motor. */
   public default void setBrakeMode(boolean enable) {}

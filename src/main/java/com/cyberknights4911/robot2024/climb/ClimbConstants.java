@@ -17,6 +17,8 @@ public record ClimbConstants(
     int motorId2, // Is there more than one motor for climb?
     double forwardLimit,
     double backwardLimit,
+    double extendPosition,
+    double retractPosition,
     double gearRatio,
     double lockToggleTime,
     PidValues feedBackValues,
