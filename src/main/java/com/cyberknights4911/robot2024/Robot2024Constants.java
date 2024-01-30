@@ -43,7 +43,11 @@ public final class Robot2024Constants {
           .build();
 
   public static final ControlConstants CONTROL_CONSTANTS =
-      ControlConstantsBuilder.builder().driverPort(0).operatorPort(1).stickDeadband(.1).build();
+      ControlConstantsBuilder.builder()
+          .driverPort(0) // todo: control constants
+          .operatorPort(1)
+          .stickDeadband(.1)
+          .build();
 
   public static final DriveConstants DRIVE_CONSTANTS =
       DriveConstantsBuilder.builder()
@@ -60,70 +64,71 @@ public final class Robot2024Constants {
           .frontLeft(
               DriveConstantsModuleConstantsBuilder.builder()
                   .name("FrontLeft")
-                  .driveMotorId(0)
-                  .turnMotorId(0)
-                  .encoderId(0)
+                  .driveMotorId(1)
+                  .turnMotorId(5)
+                  .encoderId(1)
                   .encoderOffset(0.0 - Math.PI)
                   .build())
           .frontRight(
               DriveConstantsModuleConstantsBuilder.builder()
                   .name("FrontRight")
-                  .driveMotorId(0)
-                  .turnMotorId(0)
-                  .encoderId(0)
+                  .driveMotorId(2)
+                  .turnMotorId(6)
+                  .encoderId(2)
                   .encoderOffset(0.0 - Math.PI)
                   .build())
           .backLeft(
               DriveConstantsModuleConstantsBuilder.builder()
                   .name("BackLeft")
-                  .driveMotorId(0)
-                  .turnMotorId(0)
-                  .encoderId(0)
+                  .driveMotorId(3)
+                  .turnMotorId(7)
+                  .encoderId(3)
                   .encoderOffset(0.0 - Math.PI)
                   .build())
           .backRight(
               DriveConstantsModuleConstantsBuilder.builder()
                   .name("BackRight")
-                  .driveMotorId(0)
-                  .turnMotorId(0)
-                  .encoderId(0)
+                  .driveMotorId(4)
+                  .turnMotorId(8)
+                  .encoderId(4)
                   .encoderOffset(0.0 - Math.PI)
                   .build())
           .build();
 
   public static ArmConstants ARM_CONSTANTS =
       ArmConstantsBuilder.builder()
-          .motorId1(0)
-          .motorId2(0)
-          .solenoidId(0)
-          .gearRatio(1.0)
+          .motorId1(31)
+          .motorId2(32)
+          .solenoidId(33)
+          .gearRatio(1.0) // todo: Find gear ratio for arm
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new ArmFeedForwardValues(0, 0, 0))
           .build();
 
   public static ClimbConstants CLIMB_CONSTANTS =
       ClimbConstantsBuilder.builder()
-          .motorId1(0)
-          .motorId2(0)
-          .gearRatio(1.0)
+          .motorId1(41)
+          .motorId2(42)
+          .gearRatio(1.0) // todo: Find gear ratio for climber, and possible climb hold thing.
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
           .build();
 
   public static CollectConstants COLLECT_CONSTANTS =
       CollectConstantsBuilder.builder()
-          .motorId(0)
-          .sensorId(0)
-          .gearRatio(1.0)
+          .motorId(11)
+          .sensorId(
+              12) // todo: Beam break sensor, if not dependanat on physical port on the roborio.
+          .gearRatio(1.0) // todo: Find gear ratio for collector
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
           .build();
 
   public static ShooterConstants SHOOTER_CONSTANTS =
       ShooterConstantsBuilder.builder()
-          .motorId1(0)
-          .motorId2(0)
-          .gearRatio(1.0)
+          .motorId1(21)
+          .motorId2(22)
+          .gearRatio(1.0) // todo: Find gear ratio for shooter
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
           .build();
