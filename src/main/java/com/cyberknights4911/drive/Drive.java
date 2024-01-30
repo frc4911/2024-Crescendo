@@ -7,6 +7,8 @@
 
 package com.cyberknights4911.drive;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.constants.ControlConstants;
 import com.cyberknights4911.constants.DriveConstants;
@@ -24,6 +26,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
@@ -35,6 +38,7 @@ public class Drive extends SubsystemBase {
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final DriveConstants driveConstants;
   private final double maxAngularSpeedMetersPerSecond;
+  private final SysIdRoutine sysId;
 
   private SwerveDriveKinematics kinematics;
   private Pose2d pose = new Pose2d();
@@ -60,6 +64,22 @@ public class Drive extends SubsystemBase {
     modules[1] = new Module(constants, driveConstants, driveConstants.frontRight(), frModuleIO);
     modules[2] = new Module(constants, driveConstants, driveConstants.backLeft(), blModuleIO);
     modules[3] = new Module(constants, driveConstants, driveConstants.backRight(), brModuleIO);
+
+    sysId =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null,
+                null,
+                null,
+                (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
+            new SysIdRoutine.Mechanism(
+                (voltage) -> {
+                  for (int i = 0; i < 4; i++) {
+                    modules[i].runCharacterization(voltage.in(Volts));
+                  }
+                },
+                null,
+                this));
   }
 
   public ChassisSpeeds getChassisSpeeds() {
@@ -104,6 +124,11 @@ public class Drive extends SubsystemBase {
     }
     // Apply the twist (change since last loop cycle) to the current pose
     pose = pose.exp(twist);
+  }
+
+  /** Returns SysId routine for characterization. */
+  public SysIdRoutine getSysId() {
+    return sysId;
   }
 
   /**

@@ -7,6 +7,8 @@
 
 package com.cyberknights4911.robot2024.arm;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -16,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -34,6 +37,7 @@ public final class Arm extends SubsystemBase {
   private final ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
   private final Mechanism2d mechanism = new Mechanism2d(3, 3);
   private ArmFeedforward feedforward;
+  private final SysIdRoutine sysId;
 
   public Arm(ArmConstants constants, ArmIO armIO) {
     super();
@@ -48,9 +52,19 @@ public final class Arm extends SubsystemBase {
     armIO.configurePID(kP.get(), kG.get(), kD.get());
 
     setupArmMechanism(mechanism);
+
+    sysId =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null,
+                null,
+                null,
+                (state) -> Logger.recordOutput("Arm/SysIdState", state.toString())),
+            new SysIdRoutine.Mechanism((voltage) -> runVolts(voltage.in(Volts)), null, this));
   }
 
-  public void setVoltage(double volts) {
+  /** Run open loop at the specified voltage. */
+  public void runVolts(double volts) {
     armIO.setVoltage(volts);
   }
 
@@ -83,6 +97,11 @@ public final class Arm extends SubsystemBase {
     if (DriverStation.isDisabled()) {
       stop();
     }
+  }
+
+  /** Returns SysId routine for characterization. */
+  public SysIdRoutine getSysId() {
+    return sysId;
   }
 
   /** Stops the arm. */

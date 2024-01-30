@@ -9,6 +9,10 @@ package com.cyberknights4911.robot2024;
 
 import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.constants.Constants;
+import com.cyberknights4911.drive.Drive;
+import com.cyberknights4911.drive.GyroIO;
+import com.cyberknights4911.drive.ModuleIO;
+import com.cyberknights4911.drive.ModuleIOSim;
 import com.cyberknights4911.entrypoint.RobotContainer;
 import com.cyberknights4911.robot2024.arm.Arm;
 import com.cyberknights4911.robot2024.arm.ArmIO;
@@ -31,6 +35,7 @@ public final class Robot2024 implements RobotContainer {
   private final Collect collect;
   private final Shooter shooter;
   private final Constants constants;
+  private final Drive drive;
 
   public Robot2024() {
     constants = Constants.get();
@@ -38,6 +43,7 @@ public final class Robot2024 implements RobotContainer {
     climb = createClimb();
     collect = createCollect();
     shooter = createShooter();
+    drive = createDrive();
   }
 
   @Override
@@ -45,7 +51,7 @@ public final class Robot2024 implements RobotContainer {
 
   @Override
   public void setupAutos(AutoCommandHandler handler) {
-    Autos autos = new Autos(arm, collect, shooter);
+    Autos autos = new Autos(arm, climb, collect, shooter, drive);
     autos.addAllAutos(handler);
   }
 
@@ -97,6 +103,31 @@ public final class Robot2024 implements RobotContainer {
       case REPLAY:
       default:
         return new Shooter(Robot2024Constants.SHOOTER_CONSTANTS, new ShooterIO() {});
+    }
+  }
+
+  private Drive createDrive() {
+    switch (constants.mode()) {
+      case SIM:
+        return new Drive(
+            constants,
+            Robot2024Constants.DRIVE_CONSTANTS,
+            new GyroIO() {},
+            new ModuleIOSim(),
+            new ModuleIOSim(),
+            new ModuleIOSim(),
+            new ModuleIOSim());
+      case REAL:
+      case REPLAY:
+      default:
+        return new Drive(
+            constants,
+            Robot2024Constants.DRIVE_CONSTANTS,
+            new GyroIO() {},
+            new ModuleIO() {},
+            new ModuleIO() {},
+            new ModuleIO() {},
+            new ModuleIO() {});
     }
   }
 }
