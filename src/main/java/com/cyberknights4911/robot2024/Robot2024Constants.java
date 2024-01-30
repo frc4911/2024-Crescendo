@@ -44,7 +44,7 @@ public final class Robot2024Constants {
 
   public static final ControlConstants CONTROL_CONSTANTS =
       ControlConstantsBuilder.builder()
-          .driverControllerPort(0) //todo: control constants
+          .driverControllerPort(0) // todo: control constants
           .operatorControllerPort(1)
           .stickDeadband(.1)
           .build();
@@ -65,7 +65,7 @@ public final class Robot2024Constants {
               DriveConstantsModuleConstantsBuilder.builder()
                   .name("FrontLeft")
                   .driveMotorId(1)
-                  .turnMotorId(7)
+                  .turnMotorId(5)
                   .encoderId(1)
                   .encoderOffset(0.0 - Math.PI)
                   .build())
@@ -100,7 +100,7 @@ public final class Robot2024Constants {
           .motorId1(31)
           .motorId2(32)
           .solenoidId(33)
-          .gearRatio(1.0) //todo: Find gear ratio for arm
+          .gearRatio(1.0) // todo: Find gear ratio for arm
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new ArmFeedForwardValues(0, 0, 0))
           .build();
@@ -109,7 +109,7 @@ public final class Robot2024Constants {
       ClimbConstantsBuilder.builder()
           .motorId1(41)
           .motorId2(42)
-          .gearRatio(1.0) //todo: Find gear ratio for climber, and possible climb hold thing.
+          .gearRatio(1.0) // todo: Find gear ratio for climber, and possible climb hold thing.
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
           .build();
@@ -117,8 +117,9 @@ public final class Robot2024Constants {
   public static CollectConstants COLLECT_CONSTANTS =
       CollectConstantsBuilder.builder()
           .motorId(11)
-          .sensorId(12) // todo: Beam break sensor, if not dependanat on physical port on the roborio.
-          .gearRatio(1.0) //todo: Find gear ratio for collector
+          .sensorId(
+              12) // todo: Beam break sensor, if not dependanat on physical port on the roborio.
+          .gearRatio(1.0) // todo: Find gear ratio for collector
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
           .build();
@@ -127,7 +128,7 @@ public final class Robot2024Constants {
       ShooterConstantsBuilder.builder()
           .motorId1(21)
           .motorId2(22)
-          .gearRatio(1.0) //todo: Find gear ratio for shooter
+          .gearRatio(1.0) // todo: Find gear ratio for shooter
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
           .build();
