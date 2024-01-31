@@ -227,6 +227,30 @@ public class Drive extends SubsystemBase {
         .ignoringDisable(true);
   }
 
+  public Command lockOnToAngleDrive(
+      ControlConstants controlConstants,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      Rotation2d angle) {
+    return joystickDrive(controlConstants, xSupplier, ySupplier, angle::getDegrees);
+  }
+
+  private DoubleSupplier getOmegaSupplierForPoint(double x, double y) {
+    return () -> {
+      // TODO: actually calculate the correct output for facing the point passed in
+      return 0.0;
+    };
+  }
+
+  public Command lockOnToPointDrive(
+      ControlConstants controlConstants,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      double x,
+      double y) {
+    return joystickDrive(controlConstants, xSupplier, ySupplier, getOmegaSupplierForPoint(x, y));
+  }
+
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
