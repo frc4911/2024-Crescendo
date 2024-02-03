@@ -12,7 +12,9 @@ import static edu.wpi.first.units.Units.Volts;
 import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.constants.ControlConstants;
 import com.cyberknights4911.constants.DriveConstants;
+import com.cyberknights4911.vision.VisionUpdate;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -23,6 +25,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -40,7 +43,8 @@ public class Drive extends SubsystemBase {
   private final double maxAngularSpeedMetersPerSecond;
   private final SysIdRoutine sysId;
 
-  private SwerveDriveKinematics kinematics;
+  private final SwerveDriveKinematics kinematics;
+  private final SwerveDrivePoseEstimator poseEstimator;
   private Pose2d pose = new Pose2d();
   private Rotation2d lastGyroRotation = new Rotation2d();
 
@@ -64,6 +68,18 @@ public class Drive extends SubsystemBase {
     modules[1] = new Module(constants, driveConstants, driveConstants.frontRight(), frModuleIO);
     modules[2] = new Module(constants, driveConstants, driveConstants.backLeft(), blModuleIO);
     modules[3] = new Module(constants, driveConstants, driveConstants.backRight(), brModuleIO);
+
+    poseEstimator =
+        new SwerveDrivePoseEstimator(
+            kinematics,
+            lastGyroRotation,
+            new SwerveModulePosition[] {
+              modules[0].getPosition(),
+              modules[1].getPosition(),
+              modules[2].getPosition(),
+              modules[3].getPosition()
+            },
+            new Pose2d());
 
     sysId =
         new SysIdRoutine(
@@ -124,6 +140,21 @@ public class Drive extends SubsystemBase {
     }
     // Apply the twist (change since last loop cycle) to the current pose
     pose = pose.exp(twist);
+
+    poseEstimator.updateWithTime(
+        Timer.getFPGATimestamp(),
+        lastGyroRotation,
+        new SwerveModulePosition[] {
+          modules[0].getPosition(),
+          modules[1].getPosition(),
+          modules[2].getPosition(),
+          modules[3].getPosition()
+        });
+  }
+
+  public void updateVision(VisionUpdate visionUpdate) {
+    poseEstimator.addVisionMeasurement(
+        visionUpdate.pose(), visionUpdate.timestamp(), visionUpdate.stdDevs());
   }
 
   /** Returns SysId routine for characterization. */
@@ -186,8 +217,9 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the current odometry pose. */
-  @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
+    Logger.recordOutput("Odometry/Robot", pose);
+    Logger.recordOutput("Odometry/Vision", poseEstimator.getEstimatedPosition());
     return pose;
   }
 
@@ -199,6 +231,15 @@ public class Drive extends SubsystemBase {
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     this.pose = pose;
+    poseEstimator.resetPosition(
+        lastGyroRotation,
+        new SwerveModulePosition[] {
+          modules[0].getPosition(),
+          modules[1].getPosition(),
+          modules[2].getPosition(),
+          modules[3].getPosition()
+        },
+        pose);
   }
 
   /**

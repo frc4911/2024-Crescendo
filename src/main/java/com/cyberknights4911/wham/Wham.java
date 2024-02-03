@@ -19,12 +19,15 @@ import com.cyberknights4911.vision.CameraConfig;
 import com.cyberknights4911.vision.Vision;
 import com.cyberknights4911.vision.VisionIOInputsAutoLogged;
 import com.cyberknights4911.vision.VisionIOPhoton;
-import com.cyberknights4911.vision.VisionUpdate;
 import com.cyberknights4911.wham.drive.ModuleIOTalonFX;
 import com.cyberknights4911.wham.slurpp.Slurpp;
 import com.cyberknights4911.wham.slurpp.SlurppIO;
 import com.cyberknights4911.wham.slurpp.SlurppIOReal;
 import com.cyberknights4911.wham.slurpp.SlurppIOSim;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -44,9 +47,7 @@ public final class Wham implements RobotContainer {
         new Vision(
             WhamConstants.VISION_CONSTANTS,
             drive::getPose,
-            (VisionUpdate update) -> {
-              System.out.println("Vision update at time: " + update.timestamp());
-            },
+            drive::updateVision,
             new CameraConfig(
                 WhamConstants.CAMERA_CONSTANTS,
                 new VisionIOPhoton(WhamConstants.VISION_CONSTANTS, WhamConstants.CAMERA_CONSTANTS),
@@ -96,6 +97,19 @@ public final class Wham implements RobotContainer {
                   slurpp.setVoltage(0);
                 },
                 slurpp));
+
+    binding
+        .triggersFor(WhamButtons.SetOrigin)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  drive.setPose(
+                      new Pose2d(
+                          new Translation2d(
+                              Units.inchesToMeters(602.73), Units.inchesToMeters(218.42)),
+                          new Rotation2d(Units.degreesToRadians(180))));
+                },
+                drive));
   }
 
   private Drive createDrive() {

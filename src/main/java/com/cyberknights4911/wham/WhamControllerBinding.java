@@ -51,6 +51,8 @@ public final class WhamControllerBinding
         return new Triggers(driver.rightBumper());
       case SimulateScore:
         return new Triggers(driver.rightTrigger());
+      case SetOrigin:
+        return new Triggers(driver.b());
       default:
         return new Triggers(ALWAYS_FALSE);
     }
