@@ -9,7 +9,6 @@ package com.cyberknights4911.robot2024;
 
 import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.drive.Drive;
-import com.cyberknights4911.robot2024.arm.Arm;
 import com.cyberknights4911.robot2024.climb.Climb;
 import com.cyberknights4911.robot2024.collect.Collect;
 import com.cyberknights4911.robot2024.shooter.Shooter;
@@ -17,14 +16,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
 public final class Autos {
-  private final Arm arm;
   private final Climb climb;
   private final Collect collect;
   private final Shooter shooter;
   private final Drive drive;
 
-  public Autos(Arm arm, Climb climb, Collect collect, Shooter shooter, Drive drive) {
-    this.arm = arm;
+  public Autos(Climb climb, Collect collect, Shooter shooter, Drive drive) {
     this.climb = climb;
     this.collect = collect;
     this.shooter = shooter;
@@ -36,7 +33,6 @@ public final class Autos {
     addCharacterization("Climb", climb.getSysId(), handler);
     addCharacterization("Collector", collect.getSysId(), handler);
     addCharacterization("Shooter", shooter.getSysId(), handler);
-    addCharacterization("Arm", arm.getSysId(), handler);
     addCharacterization("Drive", drive.getSysId(), handler);
   }
 
