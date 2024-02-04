@@ -7,6 +7,10 @@
 
 package com.cyberknights4911.robot2024.drive;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.drive.ModuleIO;
 import com.revrobotics.CANSparkBase.IdleMode;
@@ -15,8 +19,6 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.RobotController;
 
 /**
  * Module IO implementation for SparkMax drive motor controller, SparkMax turn motor controller (NEO
@@ -34,10 +36,12 @@ public class ModuleIOSparkFlex implements ModuleIO {
 
   private final CANSparkFlex driveSparkMax;
   private final CANSparkFlex turnSparkMax;
+  private final CANcoder cancoder;
 
   private final RelativeEncoder driveEncoder;
   private final RelativeEncoder turnRelativeEncoder;
-  private final AnalogInput turnAbsoluteEncoder;
+
+  private final StatusSignal<Double> turnAbsolutePosition;
 
   private final boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
@@ -48,8 +52,12 @@ public class ModuleIOSparkFlex implements ModuleIO {
     this.driveConstants = driveConstants;
     driveSparkMax = new CANSparkFlex(moduleConstants.driveMotorId(), MotorType.kBrushless);
     turnSparkMax = new CANSparkFlex(moduleConstants.turnMotorId(), MotorType.kBrushless);
-    turnAbsoluteEncoder = new AnalogInput(moduleConstants.encoderId());
+    cancoder = new CANcoder(moduleConstants.encoderId());
     absoluteEncoderOffset = new Rotation2d(moduleConstants.encoderOffset());
+
+    cancoder.getConfigurator().apply(new CANcoderConfiguration());
+    turnAbsolutePosition = cancoder.getAbsolutePosition();
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, turnAbsolutePosition);
 
     driveSparkMax.restoreFactoryDefaults();
     turnSparkMax.restoreFactoryDefaults();
@@ -83,6 +91,8 @@ public class ModuleIOSparkFlex implements ModuleIO {
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
+    BaseStatusSignal.refreshAll(turnAbsolutePosition);
+
     inputs.drivePositionRad =
         Units.rotationsToRadians(driveEncoder.getPosition()) / driveConstants.driveGearRatio();
     inputs.driveVelocityRadPerSec =
@@ -92,8 +102,7 @@ public class ModuleIOSparkFlex implements ModuleIO {
     inputs.driveCurrentAmps = new double[] {driveSparkMax.getOutputCurrent()};
 
     inputs.turnAbsolutePosition =
-        new Rotation2d(
-                turnAbsoluteEncoder.getVoltage() / RobotController.getVoltage5V() * 2.0 * Math.PI)
+        Rotation2d.fromRotations(turnAbsolutePosition.getValueAsDouble())
             .minus(absoluteEncoderOffset);
     inputs.turnPosition =
         Rotation2d.fromRotations(
