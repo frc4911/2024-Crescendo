@@ -20,6 +20,7 @@ import com.cyberknights4911.robot2024.climb.ClimbIOSim;
 import com.cyberknights4911.robot2024.collect.Collect;
 import com.cyberknights4911.robot2024.collect.CollectIO;
 import com.cyberknights4911.robot2024.collect.CollectIOSim;
+import com.cyberknights4911.robot2024.control.ControllerBinding;
 import com.cyberknights4911.robot2024.shooter.Shooter;
 import com.cyberknights4911.robot2024.shooter.ShooterIO;
 import com.cyberknights4911.robot2024.shooter.ShooterIOSim;
@@ -30,8 +31,9 @@ public final class Robot2024 implements RobotContainer {
   private final Climb climb;
   private final Collect collect;
   private final Shooter shooter;
-  private final Constants constants;
   private final Drive drive;
+  private final Constants constants;
+  private final ControllerBinding binding;
 
   public Robot2024() {
     constants = Constants.get();
@@ -39,7 +41,12 @@ public final class Robot2024 implements RobotContainer {
     collect = createCollect();
     shooter = createShooter();
     drive = createDrive();
+
+    binding = new ControllerBinding(Robot2024Constants.CONTROL_CONSTANTS);
+    configureControls();
   }
+
+  private void configureControls() {}
 
   @Override
   public void onRobotPeriodic(LoggedRobot robot) {}
