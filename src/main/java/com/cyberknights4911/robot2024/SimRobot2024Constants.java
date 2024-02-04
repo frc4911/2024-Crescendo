@@ -15,15 +15,12 @@ import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.constants.DriveConstantsBuilder;
 import com.cyberknights4911.constants.DriveConstantsModuleConstantsBuilder;
 import com.cyberknights4911.logging.Mode;
-import com.cyberknights4911.robot2024.arm.ArmConstants;
-import com.cyberknights4911.robot2024.arm.ArmConstantsBuilder;
 import com.cyberknights4911.robot2024.climb.ClimbConstants;
 import com.cyberknights4911.robot2024.climb.ClimbConstantsBuilder;
 import com.cyberknights4911.robot2024.collect.CollectConstants;
 import com.cyberknights4911.robot2024.collect.CollectConstantsBuilder;
 import com.cyberknights4911.robot2024.shooter.ShooterConstants;
 import com.cyberknights4911.robot2024.shooter.ShooterConstantsBuilder;
-import com.cyberknights4911.util.ArmFeedForwardValues;
 import com.cyberknights4911.util.FeedForwardValues;
 import com.cyberknights4911.util.PidValues;
 import edu.wpi.first.math.util.Units;
@@ -43,11 +40,7 @@ public final class SimRobot2024Constants {
           .build();
 
   public static final ControlConstants CONTROL_CONSTANTS =
-      ControlConstantsBuilder.builder()
-          .driverControllerPort(0)
-          .operatorControllerPort(1)
-          .stickDeadband(.1)
-          .build();
+      ControlConstantsBuilder.builder().driverPort(0).operatorPort(1).stickDeadband(.1).build();
 
   public static final DriveConstants DRIVE_CONSTANTS =
       DriveConstantsBuilder.builder()
@@ -95,15 +88,7 @@ public final class SimRobot2024Constants {
                   .build())
           .build();
 
-  public static ArmConstants ARM_CONSTANTS =
-      ArmConstantsBuilder.builder()
-          .motorId1(0)
-          .motorId2(0)
-          .solenoidId(0)
-          .gearRatio(1.0)
-          .feedBackValues(new PidValues(0, 0, 0))
-          .feedForwardValues(new ArmFeedForwardValues(0, 0, 0))
-          .build();
+  
 
   public static ClimbConstants CLIMB_CONSTANTS =
       ClimbConstantsBuilder.builder()

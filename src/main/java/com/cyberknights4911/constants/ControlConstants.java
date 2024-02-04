@@ -10,5 +10,4 @@ package com.cyberknights4911.constants;
 import io.soabase.recordbuilder.core.RecordBuilder;
 
 @RecordBuilder
-public record ControlConstants(
-    int driverControllerPort, int operatorControllerPort, double stickDeadband) {}
+public record ControlConstants(int driverPort, int operatorPort, double stickDeadband) {}
