@@ -90,9 +90,9 @@ public class Module {
     if (turnRelativeOffset == null && inputs.turnAbsolutePosition.getRadians() != 0.0) {
       turnRelativeOffset = inputs.turnAbsolutePosition.minus(inputs.turnPosition);
     }
-
+    boolean LockedDrive = false;
     // Run closed loop turn control
-    if (angleSetpoint != null) {
+    if (angleSetpoint != null && !LockedDrive) {
       io.setTurnVoltage(
           turnFeedback.calculate(getAngle().getRadians(), angleSetpoint.getRadians()));
 

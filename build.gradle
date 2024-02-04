@@ -76,8 +76,6 @@ def includeDesktopSupport = false
 dependencies {
     annotationProcessor "io.soabase.record-builder:record-builder-processor:40"
     compileOnly "io.soabase.record-builder:record-builder-core:40"
-
-    implementation 'gov.nist.math:jama:1.0.3'
     
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()

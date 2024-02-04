@@ -7,6 +7,8 @@
 
 package com.cyberknights4911.robot2024.shooter;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import com.cyberknights4911.robot2024.collect.Collect;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -15,6 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
@@ -35,6 +38,7 @@ public class Shooter extends SubsystemBase {
   private final ShooterIO shooterIO;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
   private SimpleMotorFeedforward feedforward;
+  private final SysIdRoutine sysId;
 
   public Shooter(ShooterConstants constants, ShooterIO shooterIO) {
     super();
@@ -50,6 +54,28 @@ public class Shooter extends SubsystemBase {
     shooterRpmError.initDefault(constants.errorVelocityRpm());
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     shooterIO.configurePID(kP.get(), 0.0, kD.get());
+
+    sysId =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null,
+                null,
+                null,
+                (state) -> Logger.recordOutput("Shooter/SysIdState", state.toString())),
+            new SysIdRoutine.Mechanism((voltage) -> runVolts(voltage.in(Volts)), null, this));
+  }
+
+  /** Run open loop at the specified voltage. */
+  public void runVolts(double volts) {
+    shooterIO.setVoltage(volts);
+  }
+
+  /** Run closed loop at the specified velocity. */
+  public void runVelocity(double velocityRPM) {
+    var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
+    shooterIO.setVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
+
+    Logger.recordOutput("Shooter/SetpointRPM", velocityRPM);
   }
 
   @Override
@@ -69,12 +95,9 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  /** Run closed loop at the specified velocity. */
-  public void runVelocity(double velocityRPM) {
-    var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
-    shooterIO.setVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
-
-    Logger.recordOutput("Shooter/SetpointRPM", velocityRPM);
+  /** Returns SysId routine for characterization. */
+  public SysIdRoutine getSysId() {
+    return sysId;
   }
 
   /** Returns the current velocity in RPM. */
@@ -82,16 +105,6 @@ public class Shooter extends SubsystemBase {
     double velocityRpm = Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec);
     Logger.recordOutput("Shooter/VelocityRPM", velocityRpm);
     return velocityRpm;
-  }
-
-  /** Runs forwards at the commanded voltage. */
-  public void runCharacterizationVolts(double volts) {
-    shooterIO.setVoltage(volts);
-  }
-
-  /** Returns the average velocity in radians/sec. */
-  public double getCharacterizationVelocity() {
-    return inputs.velocityRadPerSec;
   }
 
   /** Stops the shooter. */

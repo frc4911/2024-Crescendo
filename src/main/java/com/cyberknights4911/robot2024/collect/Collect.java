@@ -7,6 +7,8 @@
 
 package com.cyberknights4911.robot2024.collect;
 
+import static edu.wpi.first.units.Units.Volts;
+
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
@@ -14,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
 
 public class Collect extends SubsystemBase {
@@ -34,6 +37,7 @@ public class Collect extends SubsystemBase {
   private final CollectIO collectIO;
   private final CollectIOInputsAutoLogged inputs = new CollectIOInputsAutoLogged();
   private SimpleMotorFeedforward feedforward;
+  private final SysIdRoutine sysId;
 
   public Collect(CollectConstants constants, CollectIO collectIO) {
     super();
@@ -48,14 +52,32 @@ public class Collect extends SubsystemBase {
     ejectTime.initDefault(constants.ejectTime());
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     collectIO.configurePID(kP.get(), 0.0, kD.get());
+
+    sysId =
+        new SysIdRoutine(
+            new SysIdRoutine.Config(
+                null,
+                null,
+                null,
+                (state) -> Logger.recordOutput("Collect/SysIdState", state.toString())),
+            new SysIdRoutine.Mechanism((voltage) -> runVolts(voltage.in(Volts)), null, this));
   }
 
   public boolean isBeamBreakBlocked() {
     return inputs.beamBreakVoltage > beamThreshold.get();
   }
 
-  public void setCollectVoltage(double volts) {
+  /** Run open loop at the specified voltage. */
+  public void runVolts(double volts) {
     collectIO.setVoltage(volts);
+  }
+
+  /** Run closed loop at the specified velocity. */
+  public void runVelocity(double velocityRpm) {
+    var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRpm);
+    collectIO.setVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
+
+    Logger.recordOutput("Collect/SetpointRPM", velocityRpm);
   }
 
   @Override
@@ -75,12 +97,9 @@ public class Collect extends SubsystemBase {
     }
   }
 
-  /** Run closed loop at the specified velocity. */
-  public void runVelocity(double velocityRpm) {
-    var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRpm);
-    collectIO.setVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
-
-    Logger.recordOutput("Collect/SetpointRPM", velocityRpm);
+  /** Returns SysId routine for characterization. */
+  public SysIdRoutine getSysId() {
+    return sysId;
   }
 
   /** Returns the current velocity in RPM. */
