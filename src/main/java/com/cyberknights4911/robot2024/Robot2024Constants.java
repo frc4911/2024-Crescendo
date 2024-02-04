@@ -41,8 +41,8 @@ public final class Robot2024Constants {
 
   public static final ControlConstants CONTROL_CONSTANTS =
       ControlConstantsBuilder.builder()
-          .driverControllerPort(0) // todo: control constants
-          .operatorControllerPort(1)
+          .driverPort(0) // todo: control constants
+          .operatorPort(1)
           .stickDeadband(.1)
           .build();
 
