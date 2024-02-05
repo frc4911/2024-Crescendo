@@ -88,8 +88,6 @@ public final class SimRobot2024Constants {
                   .build())
           .build();
 
-  
-
   public static ClimbConstants CLIMB_CONSTANTS =
       ClimbConstantsBuilder.builder()
           .motorId1(0)
