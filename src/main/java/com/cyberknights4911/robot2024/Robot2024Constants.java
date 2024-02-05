@@ -54,6 +54,7 @@ public final class Robot2024Constants {
           .wheelRadius(Units.inchesToMeters(2))
           .turnGearRatio(DriveConstants.TURN_GEAR_RATIO)
           .driveGearRatio(DriveConstants.L3_GEAR_RATIO)
+          .odometryFrequency(250.0)
           .pigeonId(0)
           .turnFeedBackValues(new PidValues(0.0, 0.0, 0.0))
           .driveFeedBackValues(new PidValues(0.0, 0.0, 0.0))

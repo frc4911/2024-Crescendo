@@ -21,6 +21,7 @@ import com.cyberknights4911.vision.VisionIOInputsAutoLogged;
 import com.cyberknights4911.vision.VisionIOPhoton;
 import com.cyberknights4911.vision.VisionUpdate;
 import com.cyberknights4911.wham.drive.ModuleIOTalonFX;
+import com.cyberknights4911.wham.drive.PhoenixOdometryThread;
 import com.cyberknights4911.wham.slurpp.Slurpp;
 import com.cyberknights4911.wham.slurpp.SlurppIO;
 import com.cyberknights4911.wham.slurpp.SlurppIOReal;
@@ -99,35 +100,46 @@ public final class Wham implements RobotContainer {
   }
 
   private Drive createDrive() {
+    PhoenixOdometryThread odometryThread = new PhoenixOdometryThread(WhamConstants.DRIVE_CONSTANTS);
     switch (constants.mode()) {
       case REAL:
-        return createRealDrive();
+        return createRealDrive(odometryThread);
       case SIM:
-        return createSimDrive();
+        return createSimDrive(odometryThread);
       default:
-        return createReplayDrive();
+        return createReplayDrive(odometryThread);
     }
   }
 
   // Real robot, instantiate hardware IO implementations
-  private Drive createRealDrive() {
+  private Drive createRealDrive(PhoenixOdometryThread odometryThread) {
     return new Drive(
+        odometryThread,
         constants,
         WhamConstants.DRIVE_CONSTANTS,
-        new GyroIOPigeon2(),
+        new GyroIOPigeon2(WhamConstants.DRIVE_CONSTANTS, odometryThread),
         new ModuleIOTalonFX(
-            WhamConstants.DRIVE_CONSTANTS, WhamConstants.DRIVE_CONSTANTS.frontLeft()),
+            odometryThread,
+            WhamConstants.DRIVE_CONSTANTS,
+            WhamConstants.DRIVE_CONSTANTS.frontLeft()),
         new ModuleIOTalonFX(
-            WhamConstants.DRIVE_CONSTANTS, WhamConstants.DRIVE_CONSTANTS.frontRight()),
+            odometryThread,
+            WhamConstants.DRIVE_CONSTANTS,
+            WhamConstants.DRIVE_CONSTANTS.frontRight()),
         new ModuleIOTalonFX(
-            WhamConstants.DRIVE_CONSTANTS, WhamConstants.DRIVE_CONSTANTS.backLeft()),
+            odometryThread,
+            WhamConstants.DRIVE_CONSTANTS,
+            WhamConstants.DRIVE_CONSTANTS.backLeft()),
         new ModuleIOTalonFX(
-            WhamConstants.DRIVE_CONSTANTS, WhamConstants.DRIVE_CONSTANTS.backRight()));
+            odometryThread,
+            WhamConstants.DRIVE_CONSTANTS,
+            WhamConstants.DRIVE_CONSTANTS.backRight()));
   }
 
   // Sim robot, instantiate physics sim IO implementations
-  private Drive createSimDrive() {
+  private Drive createSimDrive(PhoenixOdometryThread odometryThread) {
     return new Drive(
+        odometryThread,
         constants,
         WhamConstants.DRIVE_CONSTANTS,
         new GyroIO() {},
@@ -138,8 +150,9 @@ public final class Wham implements RobotContainer {
   }
 
   // Replayed robot, disable IO implementations
-  private Drive createReplayDrive() {
+  private Drive createReplayDrive(PhoenixOdometryThread odometryThread) {
     return new Drive(
+        odometryThread,
         constants,
         WhamConstants.DRIVE_CONSTANTS,
         new GyroIO() {},
