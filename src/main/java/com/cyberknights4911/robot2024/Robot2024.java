@@ -11,18 +11,18 @@ import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.drive.Drive;
 import com.cyberknights4911.drive.GyroIO;
+import com.cyberknights4911.drive.GyroIOPigeon2;
 import com.cyberknights4911.drive.ModuleIO;
 import com.cyberknights4911.drive.ModuleIOSim;
 import com.cyberknights4911.entrypoint.RobotContainer;
-import com.cyberknights4911.robot2024.arm.Arm;
-import com.cyberknights4911.robot2024.arm.ArmIO;
-import com.cyberknights4911.robot2024.arm.ArmIOSim;
 import com.cyberknights4911.robot2024.climb.Climb;
 import com.cyberknights4911.robot2024.climb.ClimbIO;
 import com.cyberknights4911.robot2024.climb.ClimbIOSim;
 import com.cyberknights4911.robot2024.collect.Collect;
 import com.cyberknights4911.robot2024.collect.CollectIO;
 import com.cyberknights4911.robot2024.collect.CollectIOSim;
+import com.cyberknights4911.robot2024.control.ControllerBinding;
+import com.cyberknights4911.robot2024.drive.ModuleIOSparkFlex;
 import com.cyberknights4911.robot2024.shooter.Shooter;
 import com.cyberknights4911.robot2024.shooter.ShooterIO;
 import com.cyberknights4911.robot2024.shooter.ShooterIOSim;
@@ -30,41 +30,33 @@ import org.littletonrobotics.junction.LoggedRobot;
 
 /** The main class for the 2024 robot to be named at a future date. */
 public final class Robot2024 implements RobotContainer {
-  private final Arm arm;
   private final Climb climb;
   private final Collect collect;
   private final Shooter shooter;
-  private final Constants constants;
   private final Drive drive;
+  private final Constants constants;
+  private final ControllerBinding binding;
 
   public Robot2024() {
     constants = Constants.get();
-    arm = createArm();
     climb = createClimb();
     collect = createCollect();
     shooter = createShooter();
     drive = createDrive();
+
+    binding = new ControllerBinding(Robot2024Constants.CONTROL_CONSTANTS);
+    configureControls();
   }
+
+  private void configureControls() {}
 
   @Override
   public void onRobotPeriodic(LoggedRobot robot) {}
 
   @Override
   public void setupAutos(AutoCommandHandler handler) {
-    Autos autos = new Autos(arm, climb, collect, shooter, drive);
+    Autos autos = new Autos(climb, collect, shooter, drive);
     autos.addAllAutos(handler);
-  }
-
-  private Arm createArm() {
-    switch (constants.mode()) {
-      case SIM:
-        return new Arm(
-            SimRobot2024Constants.ARM_CONSTANTS, new ArmIOSim(SimRobot2024Constants.ARM_CONSTANTS));
-      case REAL:
-      case REPLAY:
-      default:
-        return new Arm(Robot2024Constants.ARM_CONSTANTS, new ArmIO() {});
-    }
   }
 
   private Climb createClimb() {
@@ -118,6 +110,20 @@ public final class Robot2024 implements RobotContainer {
             new ModuleIOSim(),
             new ModuleIOSim());
       case REAL:
+        return new Drive(
+            constants,
+            Robot2024Constants.DRIVE_CONSTANTS,
+            new GyroIOPigeon2(),
+            new ModuleIOSparkFlex(
+                Robot2024Constants.DRIVE_CONSTANTS, Robot2024Constants.DRIVE_CONSTANTS.frontLeft()),
+            new ModuleIOSparkFlex(
+                Robot2024Constants.DRIVE_CONSTANTS,
+                Robot2024Constants.DRIVE_CONSTANTS.frontRight()),
+            new ModuleIOSparkFlex(
+                Robot2024Constants.DRIVE_CONSTANTS, Robot2024Constants.DRIVE_CONSTANTS.backLeft()),
+            new ModuleIOSparkFlex(
+                Robot2024Constants.DRIVE_CONSTANTS,
+                Robot2024Constants.DRIVE_CONSTANTS.backRight()));
       case REPLAY:
       default:
         return new Drive(
