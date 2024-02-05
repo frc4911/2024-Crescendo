@@ -11,6 +11,7 @@ import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.drive.Drive;
 import com.cyberknights4911.drive.GyroIO;
+import com.cyberknights4911.drive.GyroIOPigeon2;
 import com.cyberknights4911.drive.ModuleIO;
 import com.cyberknights4911.drive.ModuleIOSim;
 import com.cyberknights4911.entrypoint.RobotContainer;
@@ -21,6 +22,7 @@ import com.cyberknights4911.robot2024.collect.Collect;
 import com.cyberknights4911.robot2024.collect.CollectIO;
 import com.cyberknights4911.robot2024.collect.CollectIOSim;
 import com.cyberknights4911.robot2024.control.ControllerBinding;
+import com.cyberknights4911.robot2024.drive.ModuleIOSparkFlex;
 import com.cyberknights4911.robot2024.shooter.Shooter;
 import com.cyberknights4911.robot2024.shooter.ShooterIO;
 import com.cyberknights4911.robot2024.shooter.ShooterIOSim;
@@ -108,6 +110,20 @@ public final class Robot2024 implements RobotContainer {
             new ModuleIOSim(),
             new ModuleIOSim());
       case REAL:
+        return new Drive(
+            constants,
+            Robot2024Constants.DRIVE_CONSTANTS,
+            new GyroIOPigeon2(),
+            new ModuleIOSparkFlex(
+                Robot2024Constants.DRIVE_CONSTANTS, Robot2024Constants.DRIVE_CONSTANTS.frontLeft()),
+            new ModuleIOSparkFlex(
+                Robot2024Constants.DRIVE_CONSTANTS,
+                Robot2024Constants.DRIVE_CONSTANTS.frontRight()),
+            new ModuleIOSparkFlex(
+                Robot2024Constants.DRIVE_CONSTANTS, Robot2024Constants.DRIVE_CONSTANTS.backLeft()),
+            new ModuleIOSparkFlex(
+                Robot2024Constants.DRIVE_CONSTANTS,
+                Robot2024Constants.DRIVE_CONSTANTS.backRight()));
       case REPLAY:
       default:
         return new Drive(
