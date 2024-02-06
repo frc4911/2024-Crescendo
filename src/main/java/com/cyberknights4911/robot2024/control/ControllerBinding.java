@@ -41,6 +41,8 @@ public final class ControllerBinding
   @Override
   public Triggers triggersFor(ButtonActions action) {
     switch (action) {
+      case ZeroGyro:
+        return new Triggers(driver.y());
       default:
         return new Triggers(ALWAYS_FALSE);
     }

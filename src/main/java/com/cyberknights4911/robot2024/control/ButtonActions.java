@@ -10,4 +10,6 @@ package com.cyberknights4911.robot2024.control;
 import com.cyberknights4911.control.ButtonAction;
 
 /** An enumeration of actions for the 2024 robot that can be bound to button inputs. */
-public enum ButtonActions implements ButtonAction {}
+public enum ButtonActions implements ButtonAction {
+  ZeroGyro
+}

@@ -40,11 +40,7 @@ public final class Robot2024Constants {
           .build();
 
   public static final ControlConstants CONTROL_CONSTANTS =
-      ControlConstantsBuilder.builder()
-          .driverPort(0) // todo: control constants
-          .operatorPort(1)
-          .stickDeadband(.1)
-          .build();
+      ControlConstantsBuilder.builder().driverPort(0).operatorPort(1).stickDeadband(.1).build();
 
   public static final DriveConstants DRIVE_CONSTANTS =
       DriveConstantsBuilder.builder()
@@ -53,11 +49,11 @@ public final class Robot2024Constants {
           .trackWidthY(Units.inchesToMeters(22.75))
           .wheelRadius(Units.inchesToMeters(2))
           .turnGearRatio(DriveConstants.TURN_GEAR_RATIO)
-          .driveGearRatio(DriveConstants.L3_GEAR_RATIO)
+          .driveGearRatio(DriveConstants.L2_GEAR_RATIO)
           .odometryFrequency(250.0)
           .pigeonId(0)
-          .turnFeedBackValues(new PidValues(0.0, 0.0, 0.0))
-          .driveFeedBackValues(new PidValues(0.0, 0.0, 0.0))
+          .turnFeedBackValues(new PidValues(7.0, 0.0, 0.0))
+          .driveFeedBackValues(new PidValues(0.05, 0.0, 0.0))
           .driveFeedForwardValues(new FeedForwardValues(0.0, 0.0))
           .frontLeft(
               DriveConstantsModuleConstantsBuilder.builder()
@@ -65,7 +61,7 @@ public final class Robot2024Constants {
                   .driveMotorId(1)
                   .turnMotorId(5)
                   .encoderId(1)
-                  .encoderOffset(0.0 - Math.PI)
+                  .encoderOffset(-2.276)
                   .build())
           .frontRight(
               DriveConstantsModuleConstantsBuilder.builder()
@@ -73,7 +69,7 @@ public final class Robot2024Constants {
                   .driveMotorId(2)
                   .turnMotorId(6)
                   .encoderId(2)
-                  .encoderOffset(0.0 - Math.PI)
+                  .encoderOffset(.561)
                   .build())
           .backLeft(
               DriveConstantsModuleConstantsBuilder.builder()
@@ -81,7 +77,7 @@ public final class Robot2024Constants {
                   .driveMotorId(3)
                   .turnMotorId(7)
                   .encoderId(3)
-                  .encoderOffset(0.0 - Math.PI)
+                  .encoderOffset(0.272)
                   .build())
           .backRight(
               DriveConstantsModuleConstantsBuilder.builder()
@@ -89,7 +85,7 @@ public final class Robot2024Constants {
                   .driveMotorId(4)
                   .turnMotorId(8)
                   .encoderId(4)
-                  .encoderOffset(0.0 - Math.PI)
+                  .encoderOffset(.572)
                   .build())
           .build();
 
