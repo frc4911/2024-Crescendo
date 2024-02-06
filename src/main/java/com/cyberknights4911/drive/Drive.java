@@ -13,6 +13,7 @@ import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.constants.ControlConstants;
 import com.cyberknights4911.constants.DriveConstants;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -232,14 +233,7 @@ public class Drive extends SubsystemBase {
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       Rotation2d angle) {
-    return joystickDrive(controlConstants, xSupplier, ySupplier, angle::getDegrees);
-  }
-
-  private DoubleSupplier getOmegaSupplierForPoint(double x, double y) {
-    return () -> {
-      // TODO: actually calculate the correct output for facing the point passed in
-      return 0.0;
-    };
+    return lockOnDrive(controlConstants, xSupplier, ySupplier, angle::getDegrees);
   }
 
   public Command lockOnToPointDrive(
@@ -248,7 +242,78 @@ public class Drive extends SubsystemBase {
       DoubleSupplier ySupplier,
       double x,
       double y) {
-    return joystickDrive(controlConstants, xSupplier, ySupplier, getOmegaSupplierForPoint(x, y));
+    return lockOnDrive(
+        controlConstants,
+        xSupplier,
+        ySupplier,
+        () -> {
+          Pose2d currentPose = getPose();
+          double currentX = currentPose.getX();
+          double currentY = currentPose.getY();
+
+          double angleToPoint = Math.atan((x - currentX) / (y - currentY));
+          if (currentX > x) {
+            angleToPoint = Math.PI - angleToPoint;
+          }
+
+          return angleToPoint;
+        });
+  }
+
+  private Command lockOnDrive(
+      ControlConstants controlConstants,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier desiredRotationSupplier) {
+    PIDController controller = new PIDController(1.0, 0.0, 0.0);
+    return Commands.runEnd(
+        () -> {
+          runVelocity(
+              createChassisSpeedsFromInputs(
+                  controlConstants,
+                  xSupplier,
+                  ySupplier,
+                  () -> {
+                    return controller.calculate(
+                        getRotation().getRadians(), desiredRotationSupplier.getAsDouble());
+                  }));
+        },
+        () -> {
+          controller.close();
+        },
+        this);
+  }
+
+  private ChassisSpeeds createChassisSpeedsFromInputs(
+      ControlConstants controlConstants,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier) {
+
+    // Apply deadband
+    double linearMagnitude =
+        MathUtil.applyDeadband(
+            Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+            controlConstants.stickDeadband());
+    Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+    double omega =
+        MathUtil.applyDeadband(omegaSupplier.getAsDouble(), controlConstants.stickDeadband());
+
+    // Square values
+    linearMagnitude = linearMagnitude * linearMagnitude;
+    omega = Math.copySign(omega * omega, omega);
+
+    // Calcaulate new linear velocity
+    Translation2d linearVelocity =
+        new Pose2d(new Translation2d(), linearDirection)
+            .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
+            .getTranslation();
+
+    return ChassisSpeeds.fromFieldRelativeSpeeds(
+        linearVelocity.getX() * driveConstants.maxLinearSpeed(),
+        linearVelocity.getY() * driveConstants.maxLinearSpeed(),
+        omega * maxAngularSpeedMetersPerSecond,
+        getRotation());
   }
 
   /**
@@ -261,33 +326,7 @@ public class Drive extends SubsystemBase {
       DoubleSupplier omegaSupplier) {
     return Commands.run(
         () -> {
-          // Apply deadband
-          double linearMagnitude =
-              MathUtil.applyDeadband(
-                  Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
-                  controlConstants.stickDeadband());
-          Rotation2d linearDirection =
-              new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-          double omega =
-              MathUtil.applyDeadband(omegaSupplier.getAsDouble(), controlConstants.stickDeadband());
-
-          // Square values
-          linearMagnitude = linearMagnitude * linearMagnitude;
-          omega = Math.copySign(omega * omega, omega);
-
-          // Calcaulate new linear velocity
-          Translation2d linearVelocity =
-              new Pose2d(new Translation2d(), linearDirection)
-                  .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
-                  .getTranslation();
-
-          // Convert to field relative speeds & send command
-          runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  linearVelocity.getX() * driveConstants.maxLinearSpeed(),
-                  linearVelocity.getY() * driveConstants.maxLinearSpeed(),
-                  omega * maxAngularSpeedMetersPerSecond,
-                  getRotation()));
+          runVelocity(createChassisSpeedsFromInputs(controlConstants, xSupplier, ySupplier, omegaSupplier));
         },
         this);
   }
