@@ -21,7 +21,9 @@ import com.cyberknights4911.robot2024.climb.ClimbIOSim;
 import com.cyberknights4911.robot2024.collect.Collect;
 import com.cyberknights4911.robot2024.collect.CollectIO;
 import com.cyberknights4911.robot2024.collect.CollectIOSim;
+import com.cyberknights4911.robot2024.control.ButtonActions;
 import com.cyberknights4911.robot2024.control.ControllerBinding;
+import com.cyberknights4911.robot2024.control.StickActions;
 import com.cyberknights4911.robot2024.drive.ModuleIOSparkFlex;
 import com.cyberknights4911.robot2024.shooter.Shooter;
 import com.cyberknights4911.robot2024.shooter.ShooterIO;
@@ -48,7 +50,15 @@ public final class Robot2024 implements RobotContainer {
     configureControls();
   }
 
-  private void configureControls() {}
+  private void configureControls() {
+    drive.setDefaultCommand(
+        drive.joystickDrive(
+            Robot2024Constants.CONTROL_CONSTANTS,
+            binding.supplierFor(StickActions.FORWARD),
+            binding.supplierFor(StickActions.STRAFE),
+            binding.supplierFor(StickActions.ROTATE)));
+    binding.triggersFor(ButtonActions.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
+  }
 
   @Override
   public void onRobotPeriodic(LoggedRobot robot) {}
