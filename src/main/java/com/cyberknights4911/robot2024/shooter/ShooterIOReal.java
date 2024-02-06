@@ -28,7 +28,7 @@ public class ShooterIOReal implements ShooterIO {
 
     aimer =
         new CANSparkFlex(
-            constants.motorId2(),
+            constants.motorId3(),
             MotorType
                 .kBrushless); // new motor for shooter, instead of piston, used to aim the shooter
     // at the specified angle
