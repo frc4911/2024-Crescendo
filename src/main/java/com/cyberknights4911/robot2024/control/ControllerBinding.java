@@ -11,11 +11,19 @@ import com.cyberknights4911.constants.ControlConstants;
 import com.cyberknights4911.control.ButtonBinding;
 import com.cyberknights4911.control.StickBinding;
 import com.cyberknights4911.control.Triggers;
+import com.cyberknights4911.logging.Alert;
+import com.cyberknights4911.logging.Alert.AlertType;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.function.DoubleSupplier;
 
 public final class ControllerBinding
     implements StickBinding<StickActions>, ButtonBinding<ButtonActions> {
+  private final Alert driverDisconnected =
+      new Alert("Driver controller disconnected (port 0).", AlertType.WARNING);
+  private final Alert operatorDisconnected =
+      new Alert("Operator controller disconnected (port 1).", AlertType.WARNING);
+
   private final CommandXboxController driver;
   private final CommandXboxController operator;
 
@@ -46,5 +54,14 @@ public final class ControllerBinding
       default:
         return new Triggers(ALWAYS_FALSE);
     }
+  }
+  
+  public void checkControllers() {
+    driverDisconnected.set(
+        !DriverStation.isJoystickConnected(driver.getHID().getPort())
+            || !DriverStation.getJoystickIsXbox(driver.getHID().getPort()));
+    operatorDisconnected.set(
+        !DriverStation.isJoystickConnected(operator.getHID().getPort())
+                || !DriverStation.getJoystickIsXbox(operator.getHID().getPort()));
   }
 }

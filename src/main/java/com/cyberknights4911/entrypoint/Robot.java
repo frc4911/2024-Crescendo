@@ -12,6 +12,8 @@ import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.logging.Alert;
 import com.cyberknights4911.logging.Alert.AlertType;
 import com.cyberknights4911.logging.RobotLogger;
+
+import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -41,11 +43,14 @@ public final class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
+    Threads.setCurrentThreadPriority(true, 99);
     scheduler.run();
     if (container != null) {
       container.onRobotPeriodic(this);
     }
+    robotLogger.robotPeriodic();
     autoCommandHandler.checkCurrentCommand();
+    Threads.setCurrentThreadPriority(true, 10);
   }
 
   @Override

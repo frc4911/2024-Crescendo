@@ -61,7 +61,9 @@ public final class Robot2024 implements RobotContainer {
   }
 
   @Override
-  public void onRobotPeriodic(LoggedRobot robot) {}
+  public void onRobotPeriodic(LoggedRobot robot) {
+    binding.checkControllers();
+  }
 
   @Override
   public void setupAutos(AutoCommandHandler handler) {
