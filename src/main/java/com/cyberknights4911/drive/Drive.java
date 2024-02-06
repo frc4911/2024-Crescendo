@@ -105,6 +105,8 @@ public class Drive extends SubsystemBase {
       Logger.recordOutput("SwerveStates/SetpointsOptimized", new SwerveModuleState[] {});
     }
 
+    getModuleStates();
+
     // Update odometry
     SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
     for (int i = 0; i < 4; i++) {
