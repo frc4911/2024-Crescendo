@@ -28,6 +28,7 @@ import com.cyberknights4911.robot2024.drive.ModuleIOSparkFlex;
 import com.cyberknights4911.robot2024.shooter.Shooter;
 import com.cyberknights4911.robot2024.shooter.ShooterIO;
 import com.cyberknights4911.robot2024.shooter.ShooterIOSim;
+import com.cyberknights4911.util.SparkBurnManager;
 import org.littletonrobotics.junction.LoggedRobot;
 
 /** The main class for the 2024 robot to be named at a future date. */
@@ -38,6 +39,7 @@ public final class Robot2024 implements RobotContainer {
   private final Drive drive;
   private final Constants constants;
   private final ControllerBinding binding;
+  private final SparkBurnManager burnManager;
 
   public Robot2024() {
     constants = Constants.get();
@@ -46,6 +48,7 @@ public final class Robot2024 implements RobotContainer {
     shooter = createShooter();
     drive = createDrive();
 
+    burnManager = new SparkBurnManager(constants);
     binding = new ControllerBinding(Robot2024Constants.CONTROL_CONSTANTS);
     configureControls();
   }
@@ -70,7 +73,9 @@ public final class Robot2024 implements RobotContainer {
   }
 
   @Override
-  public void onRobotPeriodic(LoggedRobot robot) {}
+  public void onRobotPeriodic(LoggedRobot robot) {
+    binding.checkControllers();
+  }
 
   @Override
   public void setupAutos(AutoCommandHandler handler) {
@@ -134,15 +139,21 @@ public final class Robot2024 implements RobotContainer {
             Robot2024Constants.DRIVE_CONSTANTS,
             new GyroIOPigeon2(),
             new ModuleIOSparkFlex(
-                Robot2024Constants.DRIVE_CONSTANTS, Robot2024Constants.DRIVE_CONSTANTS.frontLeft()),
+                Robot2024Constants.DRIVE_CONSTANTS,
+                Robot2024Constants.DRIVE_CONSTANTS.frontLeft(),
+                burnManager),
             new ModuleIOSparkFlex(
                 Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.frontRight()),
-            new ModuleIOSparkFlex(
-                Robot2024Constants.DRIVE_CONSTANTS, Robot2024Constants.DRIVE_CONSTANTS.backLeft()),
+                Robot2024Constants.DRIVE_CONSTANTS.frontRight(),
+                burnManager),
             new ModuleIOSparkFlex(
                 Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.backRight()));
+                Robot2024Constants.DRIVE_CONSTANTS.backLeft(),
+                burnManager),
+            new ModuleIOSparkFlex(
+                Robot2024Constants.DRIVE_CONSTANTS,
+                Robot2024Constants.DRIVE_CONSTANTS.backRight(),
+                burnManager));
       case REPLAY:
       default:
         return new Drive(

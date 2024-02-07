@@ -7,6 +7,8 @@
 
 package com.cyberknights4911.robot2024.collect;
 
+import com.cyberknights4911.util.SparkBurnManager;
+import com.cyberknights4911.util.SparkConfig;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
@@ -23,8 +25,10 @@ public class CollectIOReal implements CollectIO {
   private final SparkPIDController pidController;
   private final AnalogInput beamBreak;
   private final double gearRatio;
+  private final SparkBurnManager sparkBurnManager;
 
-  public CollectIOReal(CollectConstants collectConstants) {
+  public CollectIOReal(CollectConstants collectConstants, SparkBurnManager sparkBurnManager) {
+    this.sparkBurnManager = sparkBurnManager;
     collect = new CANSparkFlex(collectConstants.motorId(), MotorType.kBrushless);
     encoder = collect.getEncoder();
     pidController = collect.getPIDController();
@@ -73,15 +77,16 @@ public class CollectIOReal implements CollectIO {
   }
 
   private void configureDevices() {
-    collect.restoreFactoryDefaults();
+    sparkBurnManager.maybeBurnConfig(
+        () -> {
+          SparkConfig.configNotLeader(collect);
 
-    collect.setIdleMode(IdleMode.kBrake);
-    collect.setCANTimeout(250);
-    collect.setSmartCurrentLimit(25);
-    collect.enableVoltageCompensation(12.0);
-
-    collect.setCANTimeout(0);
-
-    collect.burnFlash();
+          collect.setIdleMode(IdleMode.kBrake);
+          collect.setSmartCurrentLimit(40);
+          collect.enableVoltageCompensation(12.0);
+          encoder.setMeasurementPeriod(10);
+          encoder.setAverageDepth(2);
+        },
+        collect);
   }
 }
