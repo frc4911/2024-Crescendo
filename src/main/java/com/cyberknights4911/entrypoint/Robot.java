@@ -12,7 +12,6 @@ import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.logging.Alert;
 import com.cyberknights4911.logging.Alert.AlertType;
 import com.cyberknights4911.logging.RobotLogger;
-
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.littletonrobotics.junction.LoggedRobot;

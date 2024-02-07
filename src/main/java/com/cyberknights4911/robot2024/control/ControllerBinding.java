@@ -55,13 +55,13 @@ public final class ControllerBinding
         return new Triggers(ALWAYS_FALSE);
     }
   }
-  
+
   public void checkControllers() {
     driverDisconnected.set(
         !DriverStation.isJoystickConnected(driver.getHID().getPort())
             || !DriverStation.getJoystickIsXbox(driver.getHID().getPort()));
     operatorDisconnected.set(
         !DriverStation.isJoystickConnected(operator.getHID().getPort())
-                || !DriverStation.getJoystickIsXbox(operator.getHID().getPort()));
+            || !DriverStation.getJoystickIsXbox(operator.getHID().getPort()));
   }
 }

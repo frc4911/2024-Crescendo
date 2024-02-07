@@ -13,6 +13,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.drive.ModuleIO;
+import com.cyberknights4911.util.SparkBurnManager;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -46,10 +47,14 @@ public class ModuleIOSparkFlex implements ModuleIO {
   private final boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
   private final DriveConstants driveConstants;
+  private final SparkBurnManager sparkBurnManager;
 
   public ModuleIOSparkFlex(
-      DriveConstants driveConstants, DriveConstants.ModuleConstants moduleConstants) {
+      DriveConstants driveConstants,
+      DriveConstants.ModuleConstants moduleConstants,
+      SparkBurnManager sparkBurnManager) {
     this.driveConstants = driveConstants;
+    this.sparkBurnManager = sparkBurnManager;
     driveSparkMax = new CANSparkFlex(moduleConstants.driveMotorId(), MotorType.kBrushless);
     turnSparkMax = new CANSparkFlex(moduleConstants.turnMotorId(), MotorType.kBrushless);
     cancoder = new CANcoder(moduleConstants.encoderId());
@@ -59,34 +64,27 @@ public class ModuleIOSparkFlex implements ModuleIO {
     turnAbsolutePosition = cancoder.getAbsolutePosition();
     BaseStatusSignal.setUpdateFrequencyForAll(50.0, turnAbsolutePosition);
 
-    driveSparkMax.restoreFactoryDefaults();
-    turnSparkMax.restoreFactoryDefaults();
-
-    driveSparkMax.setCANTimeout(250);
-    turnSparkMax.setCANTimeout(250);
-
     driveEncoder = driveSparkMax.getEncoder();
     turnRelativeEncoder = turnSparkMax.getEncoder();
 
-    turnSparkMax.setInverted(isTurnMotorInverted);
-    driveSparkMax.setSmartCurrentLimit(40);
-    turnSparkMax.setSmartCurrentLimit(30);
-    driveSparkMax.enableVoltageCompensation(12.0);
-    turnSparkMax.enableVoltageCompensation(12.0);
+    sparkBurnManager.maybeBurnConfig(
+        () -> {
+          turnSparkMax.setInverted(isTurnMotorInverted);
+          driveSparkMax.setSmartCurrentLimit(40);
+          turnSparkMax.setSmartCurrentLimit(30);
+          driveSparkMax.enableVoltageCompensation(12.0);
+          turnSparkMax.enableVoltageCompensation(12.0);
 
-    driveEncoder.setPosition(0.0);
-    driveEncoder.setMeasurementPeriod(10);
-    driveEncoder.setAverageDepth(2);
+          driveEncoder.setPosition(0.0);
+          driveEncoder.setMeasurementPeriod(10);
+          driveEncoder.setAverageDepth(2);
 
-    turnRelativeEncoder.setPosition(0.0);
-    turnRelativeEncoder.setMeasurementPeriod(10);
-    turnRelativeEncoder.setAverageDepth(2);
-
-    driveSparkMax.setCANTimeout(0);
-    turnSparkMax.setCANTimeout(0);
-
-    driveSparkMax.burnFlash();
-    turnSparkMax.burnFlash();
+          turnRelativeEncoder.setPosition(0.0);
+          turnRelativeEncoder.setMeasurementPeriod(10);
+          turnRelativeEncoder.setAverageDepth(2);
+        },
+        driveSparkMax,
+        turnSparkMax);
   }
 
   @Override
