@@ -10,6 +10,7 @@ package com.cyberknights4911.wham;
 import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.drive.Drive;
+import com.cyberknights4911.drive.DriveMode;
 import com.cyberknights4911.drive.GyroIO;
 import com.cyberknights4911.drive.GyroIOPigeon2;
 import com.cyberknights4911.drive.ModuleIO;
@@ -108,6 +109,21 @@ public final class Wham implements RobotContainer {
                           new Translation2d(
                               Units.inchesToMeters(602.73), Units.inchesToMeters(218.42)),
                           new Rotation2d(Units.degreesToRadians(180))));
+                },
+                drive));
+    binding
+        .triggersFor(WhamButtons.GoHome)
+        // .whileTrue(
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  if (Drive.driveMode == DriveMode.NORMAL) {
+                    Drive.driveMode = DriveMode.LOCKED_ON_TARGET;
+                    System.out.println("LOCKED ON");
+                  } else if (Drive.driveMode == DriveMode.LOCKED_ON_TARGET) {
+                    Drive.driveMode = DriveMode.NORMAL;
+                    System.out.println("NORMAL");
+                  }
                 },
                 drive));
   }

@@ -53,6 +53,8 @@ public final class WhamControllerBinding
         return new Triggers(driver.rightTrigger());
       case SetOrigin:
         return new Triggers(driver.b());
+      case GoHome:
+        return new Triggers(driver.a());
       default:
         return new Triggers(ALWAYS_FALSE);
     }

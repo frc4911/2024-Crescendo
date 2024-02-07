@@ -95,7 +95,7 @@ public final class Robot2024Constants {
                   .build())
           .build();
 
-  public static ArmConstants ARM_CONSTANTS = //todo: do we even have an arm anymore?
+  public static ArmConstants ARM_CONSTANTS = // todo: do we even have an arm anymore?
       ArmConstantsBuilder.builder()
           .motorId1(31)
           .motorId2(32)
@@ -128,7 +128,7 @@ public final class Robot2024Constants {
       ShooterConstantsBuilder.builder()
           .motorId1(21)
           .motorId2(22)
-          .motorId3(23)
+          //   .motorId3(23)
           .gearRatio(1.0) // todo: Find gear ratio for shooter
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))

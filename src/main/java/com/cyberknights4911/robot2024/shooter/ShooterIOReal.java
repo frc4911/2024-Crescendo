@@ -26,13 +26,17 @@ public class ShooterIOReal implements ShooterIO {
     left = new CANSparkFlex(constants.motorId1(), MotorType.kBrushless);
     right = new CANSparkFlex(constants.motorId2(), MotorType.kBrushless);
 
-    aimer = new CANSparkFlex(constants.motorId2(), MotorType.kBrushless); // new motor for shooter, instead of piston, used to aim the shooter at the specified angle
-
+    aimer =
+        new CANSparkFlex(
+            constants.motorId2(),
+            MotorType
+                .kBrushless); // new motor for shooter, instead of piston, used to aim the shooter
+    // at the specified angle
 
     encoder = right.getEncoder();
     pidController = right.getPIDController();
     gearRatio = constants.gearRatio();
-    //todo: aim encoder?
+    // todo: aim encoder?
 
     configureDevices();
   }
@@ -75,7 +79,7 @@ public class ShooterIOReal implements ShooterIO {
     left.setSmartCurrentLimit(25);
     right.setSmartCurrentLimit(25);
 
-    //todo: aim limits (if needed)
+    // todo: aim limits (if needed)
 
     left.enableVoltageCompensation(12.0);
     right.enableVoltageCompensation(12.0);

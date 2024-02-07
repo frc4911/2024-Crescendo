@@ -16,5 +16,6 @@ public enum WhamButtons implements ButtonAction {
   SimulateCollect,
   SimulateScore,
   ZeroGyro,
-  SetOrigin
+  SetOrigin,
+  GoHome
 }

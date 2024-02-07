@@ -47,6 +47,7 @@ public class Drive extends SubsystemBase {
   private final SwerveDrivePoseEstimator poseEstimator;
   private Pose2d pose = new Pose2d();
   private Rotation2d lastGyroRotation = new Rotation2d();
+  public static DriveMode driveMode = DriveMode.NORMAL;
 
   public Drive(
       Constants constants,
@@ -168,6 +169,9 @@ public class Drive extends SubsystemBase {
    * @param speeds Speeds in meters/sec
    */
   public void runVelocity(ChassisSpeeds speeds) {
+
+    // TODO (break): when locked to an angle, log setpointStates and optimizedSetpointStates
+
     // Calculate module setpoints
     ChassisSpeeds discreteSpeeds = ChassisSpeeds.discretize(speeds, 0.02);
     SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(discreteSpeeds);
@@ -299,12 +303,40 @@ public class Drive extends SubsystemBase {
                   .getTranslation();
 
           // Convert to field relative speeds & send command
-          runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  linearVelocity.getX() * driveConstants.maxLinearSpeed(),
-                  linearVelocity.getY() * driveConstants.maxLinearSpeed(),
-                  omega * maxAngularSpeedMetersPerSecond,
-                  getRotation()));
+
+          if (driveMode == DriveMode.NORMAL) {
+            runVelocity(
+                ChassisSpeeds.fromFieldRelativeSpeeds(
+                    linearVelocity.getX() * driveConstants.maxLinearSpeed(),
+                    linearVelocity.getY() * driveConstants.maxLinearSpeed(),
+                    omega * maxAngularSpeedMetersPerSecond,
+                    getRotation()));
+          } else if (driveMode == DriveMode.LOCKED_ON_TARGET) {
+            // Define the target angle in degrees
+            double targetAngleDegrees = 180.0;
+
+            // Get the current robot pose
+            Pose2d currentRobotPose = getPose();
+
+            // Calculate the difference in angles between the target and current poses
+            double deltaAngleDegrees =
+                targetAngleDegrees - currentRobotPose.getRotation().getDegrees();
+
+            // Ensure that the angle difference is within the maximum angular speed
+            double omegaDegrees =
+                MathUtil.clamp(
+                    deltaAngleDegrees,
+                    -maxAngularSpeedMetersPerSecond,
+                    maxAngularSpeedMetersPerSecond);
+
+            // Set the linear velocity to zero and the angular velocity to rotate the robot
+            ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0.0, 0.0, Math.toRadians(omegaDegrees));
+
+            // Run at the calculated chassis speeds
+            runVelocity(chassisSpeeds);
+
+            System.out.println("Target Angle Degrees: " + targetAngleDegrees);
+          }
         },
         this);
   }
@@ -317,5 +349,12 @@ public class Drive extends SubsystemBase {
       new Translation2d(-driveConstants.trackWidthX() / 2.0, driveConstants.trackWidthY() / 2.0),
       new Translation2d(-driveConstants.trackWidthX() / 2.0, -driveConstants.trackWidthY() / 2.0)
     };
+  }
+
+  public void rotateModules(Rotation2d targetAngle) {
+    // Rotation2d targetAngle = Rotation2d.fromDegrees(degrees);
+    for (Module module : modules) {
+      module.runSetpoint(new SwerveModuleState(0, targetAngle));
+    }
   }
 }
