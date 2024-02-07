@@ -10,6 +10,7 @@ package com.cyberknights4911.util;
 import com.cyberknights4911.BuildConstants;
 import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.logging.Mode;
+import com.revrobotics.CANSparkBase;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,7 +21,8 @@ import java.nio.file.Paths;
 /** Determines whether to burn Spark configs to flash. */
 public final class SparkBurnManager {
   public static final int CAN_TIMEOUT = 500;
-  public static final int CONFIG_ATTEMPT_COUNT = 4; // How many times to set the config on init
+  // How many times to set the config on init
+  public static final int CONFIG_ATTEMPT_COUNT = 4;
   private static final String BUILD_DATE_FILE = "/home/lvuser/build-date.txt";
 
   private final boolean shouldBurn;
@@ -67,5 +69,34 @@ public final class SparkBurnManager {
 
   public boolean shouldBurn() {
     return shouldBurn;
+  }
+
+  public void maybeBurnConfig(Runnable runnable, CANSparkBase... devices) {
+    if (shouldBurn) {
+      for (CANSparkBase device : devices) {
+        device.restoreFactoryDefaults();
+      }
+    }
+
+    // Make CAN messsages blocking for configuration
+    for (CANSparkBase device : devices) {
+      device.setCANTimeout(CAN_TIMEOUT);
+    }
+
+    // Attempt performing the config block a fixed number of times
+    for (int i = 0; i < CONFIG_ATTEMPT_COUNT; i++) {
+      runnable.run();
+    }
+
+    // Make CAN messsages async for normal operation
+    for (CANSparkBase device : devices) {
+      device.setCANTimeout(0);
+    }
+
+    if (shouldBurn) {
+      for (CANSparkBase device : devices) {
+        device.burnFlash();
+      }
+    }
   }
 }
