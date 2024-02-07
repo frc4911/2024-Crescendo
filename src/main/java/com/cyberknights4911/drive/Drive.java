@@ -43,7 +43,8 @@ public class Drive extends SubsystemBase {
   private final DriveConstants driveConstants;
   private final double maxAngularSpeedMetersPerSecond;
   private final SysIdRoutine sysId;
-  private final PIDController pointController = new PIDController(pointKp.get(), 0.0, pointKd.get());
+  private final PIDController pointController =
+      new PIDController(pointKp.get(), 0.0, pointKd.get());
 
   private SwerveDriveKinematics kinematics;
   private Pose2d pose = new Pose2d();
@@ -201,6 +202,7 @@ public class Drive extends SubsystemBase {
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
     Logger.recordOutput("Odometry/Robot", pose);
+    Logger.recordOutput("Odometry/Robot", pose);
     return pose;
   }
 
@@ -332,6 +334,7 @@ public class Drive extends SubsystemBase {
       DoubleSupplier omegaSupplier) {
     return Commands.run(
         () -> {
+          Logger.recordOutput("Drive/Joystick/Omega", omegaSupplier.getAsDouble());
           Logger.recordOutput("Drive/Joystick/Omega", omegaSupplier.getAsDouble());
           runVelocity(createChassisSpeeds(controlConstants, xSupplier, ySupplier, omegaSupplier));
         },
