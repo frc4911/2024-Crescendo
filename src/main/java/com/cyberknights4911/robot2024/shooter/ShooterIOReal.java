@@ -9,7 +9,6 @@ package com.cyberknights4911.robot2024.shooter;
 
 import com.cyberknights4911.util.SparkBurnManager;
 import com.cyberknights4911.util.SparkConfig;
-import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;

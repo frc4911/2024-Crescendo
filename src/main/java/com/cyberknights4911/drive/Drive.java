@@ -12,9 +12,7 @@ import static edu.wpi.first.units.Units.Volts;
 import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.constants.ControlConstants;
 import com.cyberknights4911.constants.DriveConstants;
-import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -34,8 +32,6 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
-  private static final LoggedTunableNumber pointKp = new LoggedTunableNumber("Drive/Point/kP", 5.0);
-  private static final LoggedTunableNumber pointKd = new LoggedTunableNumber("Drive/Point/kD", 0.0);
 
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -43,8 +39,6 @@ public class Drive extends SubsystemBase {
   private final DriveConstants driveConstants;
   private final double maxAngularSpeedMetersPerSecond;
   private final SysIdRoutine sysId;
-  private final PIDController pointController =
-      new PIDController(pointKp.get(), 0.0, pointKd.get());
 
   private SwerveDriveKinematics kinematics;
   private Pose2d pose = new Pose2d();
@@ -97,11 +91,6 @@ public class Drive extends SubsystemBase {
     Logger.processInputs("Drive/Gyro", gyroInputs);
     for (var module : modules) {
       module.periodic();
-    }
-
-    if (pointKp.hasChanged(hashCode()) || pointKd.hasChanged(hashCode())) {
-      pointController.setPID(pointKp.get(), 0.0, pointKd.get());
-      pointController.enableContinuousInput(0, Math.PI * 2);
     }
 
     // Stop moving when disabled
@@ -199,9 +188,7 @@ public class Drive extends SubsystemBase {
   }
 
   /** Returns the current odometry pose. */
-  @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
-    Logger.recordOutput("Odometry/Robot", pose);
     Logger.recordOutput("Odometry/Robot", pose);
     return pose;
   }
@@ -242,7 +229,7 @@ public class Drive extends SubsystemBase {
         .ignoringDisable(true);
   }
 
-  private ChassisSpeeds createChassisSpeeds(
+  ChassisSpeeds createChassisSpeeds(
       ControlConstants controlConstants,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
@@ -274,54 +261,23 @@ public class Drive extends SubsystemBase {
         getRotation());
   }
 
-  public Command pointToPointDrive(
+  public PointToAngleDrive pointToPointDrive(
       ControlConstants controlConstants,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       double x,
       double y) {
-    DoubleSupplier angleSupplier =
-        () -> {
-          double currentX = getPose().getTranslation().getX();
-          double currentY = getPose().getTranslation().getY();
-          // TODO calculate angle based on current position and desired point
-          // Must use trig!!!!!!!!!!!!
-          return 0.0;
-        };
-    return Commands.run(
-        () -> {
-          runVelocity(createChassisSpeeds(controlConstants, xSupplier, ySupplier, angleSupplier));
-        },
-        this);
+    return PointToAngleDrive.createDriveFacingPoint(
+        this, controlConstants, xSupplier, ySupplier, x, y);
   }
 
-  public Command pointToAngleDrive(
+  public PointToAngleDrive pointToAngleDrive(
       ControlConstants controlConstants,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      DoubleSupplier angleSupplier) {
-    return Commands.run(
-        () -> {
-          runVelocity(createChassisSpeeds(controlConstants, xSupplier, ySupplier, angleSupplier));
-        },
-        this);
-  }
-
-  public Command pointToAngleDrive(
-      ControlConstants controlConstants, DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
-    DoubleSupplier angleSupplier =
-        () -> {
-          double currentRotation =
-              MathUtil.inputModulus(getRotation().getRadians(), 0, Math.PI * 2);
-          double desired = Math.PI / 2;
-          double output = pointController.calculate(currentRotation, desired);
-          output = MathUtil.clamp(output, -1, 1);
-          Logger.recordOutput("Drive/PointAt/Current", currentRotation);
-          Logger.recordOutput("Drive/PointAt/Desired", desired);
-          Logger.recordOutput("Drive/PointAt/Output", output);
-          return output;
-        };
-    return pointToAngleDrive(controlConstants, xSupplier, ySupplier, angleSupplier);
+      double angleRadians) {
+    return PointToAngleDrive.createDriveFacingFixedAngle(
+        this, controlConstants, xSupplier, ySupplier, angleRadians);
   }
 
   /**
@@ -334,7 +290,6 @@ public class Drive extends SubsystemBase {
       DoubleSupplier omegaSupplier) {
     return Commands.run(
         () -> {
-          Logger.recordOutput("Drive/Joystick/Omega", omegaSupplier.getAsDouble());
           Logger.recordOutput("Drive/Joystick/Omega", omegaSupplier.getAsDouble());
           runVelocity(createChassisSpeeds(controlConstants, xSupplier, ySupplier, omegaSupplier));
         },

@@ -69,7 +69,10 @@ public final class Robot2024 implements RobotContainer {
             drive.pointToAngleDrive(
                 Robot2024Constants.CONTROL_CONSTANTS,
                 binding.supplierFor(StickActions.FORWARD),
-                binding.supplierFor(StickActions.STRAFE)));
+                binding.supplierFor(StickActions.STRAFE),
+                Math.PI / 2));
+
+    // TODO: bind speaker lock-on to something. Right trigger maybe?
   }
 
   @Override
