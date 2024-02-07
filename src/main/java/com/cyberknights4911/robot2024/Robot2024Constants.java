@@ -15,15 +15,12 @@ import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.constants.DriveConstantsBuilder;
 import com.cyberknights4911.constants.DriveConstantsModuleConstantsBuilder;
 import com.cyberknights4911.logging.Mode;
-import com.cyberknights4911.robot2024.arm.ArmConstants;
-import com.cyberknights4911.robot2024.arm.ArmConstantsBuilder;
 import com.cyberknights4911.robot2024.climb.ClimbConstants;
 import com.cyberknights4911.robot2024.climb.ClimbConstantsBuilder;
 import com.cyberknights4911.robot2024.collect.CollectConstants;
 import com.cyberknights4911.robot2024.collect.CollectConstantsBuilder;
 import com.cyberknights4911.robot2024.shooter.ShooterConstants;
 import com.cyberknights4911.robot2024.shooter.ShooterConstantsBuilder;
-import com.cyberknights4911.util.ArmFeedForwardValues;
 import com.cyberknights4911.util.FeedForwardValues;
 import com.cyberknights4911.util.PidValues;
 import edu.wpi.first.math.util.Units;
@@ -43,11 +40,7 @@ public final class Robot2024Constants {
           .build();
 
   public static final ControlConstants CONTROL_CONSTANTS =
-      ControlConstantsBuilder.builder()
-          .driverControllerPort(0) // todo: control constants
-          .operatorControllerPort(1)
-          .stickDeadband(.1)
-          .build();
+      ControlConstantsBuilder.builder().driverPort(0).operatorPort(1).stickDeadband(.1).build();
 
   public static final DriveConstants DRIVE_CONSTANTS =
       DriveConstantsBuilder.builder()
@@ -56,10 +49,10 @@ public final class Robot2024Constants {
           .trackWidthY(Units.inchesToMeters(22.75))
           .wheelRadius(Units.inchesToMeters(2))
           .turnGearRatio(DriveConstants.TURN_GEAR_RATIO)
-          .driveGearRatio(DriveConstants.L3_GEAR_RATIO)
+          .driveGearRatio(DriveConstants.L2_GEAR_RATIO)
           .pigeonId(0)
-          .turnFeedBackValues(new PidValues(0.0, 0.0, 0.0))
-          .driveFeedBackValues(new PidValues(0.0, 0.0, 0.0))
+          .turnFeedBackValues(new PidValues(7.0, 0.0, 0.0))
+          .driveFeedBackValues(new PidValues(0.05, 0.0, 0.0))
           .driveFeedForwardValues(new FeedForwardValues(0.0, 0.0))
           .frontLeft(
               DriveConstantsModuleConstantsBuilder.builder()
@@ -67,7 +60,7 @@ public final class Robot2024Constants {
                   .driveMotorId(1)
                   .turnMotorId(5)
                   .encoderId(1)
-                  .encoderOffset(0.0 - Math.PI)
+                  .encoderOffset(-2.276)
                   .build())
           .frontRight(
               DriveConstantsModuleConstantsBuilder.builder()
@@ -75,7 +68,7 @@ public final class Robot2024Constants {
                   .driveMotorId(2)
                   .turnMotorId(6)
                   .encoderId(2)
-                  .encoderOffset(0.0 - Math.PI)
+                  .encoderOffset(.561)
                   .build())
           .backLeft(
               DriveConstantsModuleConstantsBuilder.builder()
@@ -83,7 +76,7 @@ public final class Robot2024Constants {
                   .driveMotorId(3)
                   .turnMotorId(7)
                   .encoderId(3)
-                  .encoderOffset(0.0 - Math.PI)
+                  .encoderOffset(0.272)
                   .build())
           .backRight(
               DriveConstantsModuleConstantsBuilder.builder()
@@ -91,18 +84,8 @@ public final class Robot2024Constants {
                   .driveMotorId(4)
                   .turnMotorId(8)
                   .encoderId(4)
-                  .encoderOffset(0.0 - Math.PI)
+                  .encoderOffset(.572)
                   .build())
-          .build();
-
-  public static ArmConstants ARM_CONSTANTS = // todo: do we even have an arm anymore?
-      ArmConstantsBuilder.builder()
-          .motorId1(31)
-          .motorId2(32)
-          .solenoidId(33)
-          .gearRatio(1.0) // todo: Find gear ratio for arm
-          .feedBackValues(new PidValues(0, 0, 0))
-          .feedForwardValues(new ArmFeedForwardValues(0, 0, 0))
           .build();
 
   public static ClimbConstants CLIMB_CONSTANTS =
@@ -128,7 +111,7 @@ public final class Robot2024Constants {
       ShooterConstantsBuilder.builder()
           .motorId1(21)
           .motorId2(22)
-          //   .motorId3(23)
+          .motorId3(23)
           .gearRatio(1.0) // todo: Find gear ratio for shooter
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))

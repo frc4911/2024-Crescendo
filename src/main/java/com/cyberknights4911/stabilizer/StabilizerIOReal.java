@@ -5,9 +5,6 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package com.cyberknights4911.constants;
+package com.cyberknights4911.stabilizer;
 
-import io.soabase.recordbuilder.core.RecordBuilder;
-
-@RecordBuilder
-public record ControlConstants(int driverPort, int operatorPort, double stickDeadband) {}
+public class StabilizerIOReal {}

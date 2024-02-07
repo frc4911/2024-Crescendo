@@ -5,9 +5,6 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package com.cyberknights4911.robot2024.arm;
+package com.cyberknights4911.stabilizer;
 
-public enum CollectorAngle {
-  FORTY_FIVE,
-  EIGHTY
-}
+public class StabilizerConstants {}

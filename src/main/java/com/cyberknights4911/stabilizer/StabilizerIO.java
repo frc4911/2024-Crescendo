@@ -5,6 +5,6 @@
 // license that can be found in the LICENSE file at
 // the root directory of this project.
 
-package com.cyberknights4911.util;
+package com.cyberknights4911.stabilizer;
 
-public record ArmFeedForwardValues(double kS, double kG, double kV) {}
+public class StabilizerIO {}
