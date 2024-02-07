@@ -1,3 +1,10 @@
+// Copyright (c) 2023 FRC 4911
+// https://github.com/frc4911
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
 package edu.wpi.first.math.estimator;
 
 // Copyright (c) FIRST and other WPILib contributors.
@@ -25,13 +32,13 @@ import java.util.Optional;
  * measurements. Robot code should not use this directly- Instead, use the particular type for your
  * drivetrain (e.g., {@link DifferentialDrivePoseEstimator}). It is intended to be a drop-in
  * replacement for {@link Odometry}; in fact, if you never call {@link
- * PoseEstimatorExperimental#addVisionMeasurement} and only call {@link PoseEstimatorExperimental#update} then this will
- * behave exactly the same as Odometry.
+ * PoseEstimatorExperimental#addVisionMeasurement} and only call {@link
+ * PoseEstimatorExperimental#update} then this will behave exactly the same as Odometry.
  *
  * <p>{@link PoseEstimatorExperimental#update} should be called every robot loop.
  *
- * <p>{@link PoseEstimatorExperimental#addVisionMeasurement} can be called as infrequently as you want; if you
- * never call it then this class will behave exactly like regular encoder odometry.
+ * <p>{@link PoseEstimatorExperimental#addVisionMeasurement} can be called as infrequently as you
+ * want; if you never call it then this class will behave exactly like regular encoder odometry.
  */
 public class PoseEstimatorExperimental<T extends WheelPositions<T>> {
   private final Odometry<T> m_odometry;
@@ -146,9 +153,9 @@ public class PoseEstimatorExperimental<T extends WheelPositions<T>> {
    * @param visionRobotPoseMeters The pose of the robot as measured by the vision camera.
    * @param timestampSeconds The timestamp of the vision measurement in seconds. Note that if you
    *     don't use your own time source by calling {@link
-   *     PoseEstimatorExperimental#updateWithTime(double,Rotation2d,WheelPositions)} then you must use a
-   *     timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the same
-   *     epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you
+   *     PoseEstimatorExperimental#updateWithTime(double,Rotation2d,WheelPositions)} then you must
+   *     use a timestamp with an epoch since FPGA startup (i.e., the epoch of this timestamp is the
+   *     same epoch as {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()}.) This means that you
    *     should use {@link edu.wpi.first.wpilibj.Timer#getFPGATimestamp()} as your time source or
    *     sync the epochs.
    */

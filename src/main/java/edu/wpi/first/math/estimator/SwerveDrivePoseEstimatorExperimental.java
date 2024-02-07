@@ -1,6 +1,9 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Copyright (c) 2023 FRC 4911
+// https://github.com/frc4911
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
 
 package edu.wpi.first.math.estimator;
 
@@ -22,10 +25,12 @@ import edu.wpi.first.math.numbers.N3;
  *
  * <p>{@link SwerveDrivePoseEstimatorExperimental#update} should be called every robot loop.
  *
- * <p>{@link SwerveDrivePoseEstimatorExperimental#addVisionMeasurement} can be called as infrequently as you
- * want; if you never call it, then this class will behave as regular encoder odometry.
+ * <p>{@link SwerveDrivePoseEstimatorExperimental#addVisionMeasurement} can be called as
+ * infrequently as you want; if you never call it, then this class will behave as regular encoder
+ * odometry.
  */
-public class SwerveDrivePoseEstimatorExperimental extends PoseEstimatorExperimental<SwerveDriveWheelPositions> {
+public class SwerveDrivePoseEstimatorExperimental
+    extends PoseEstimatorExperimental<SwerveDriveWheelPositions> {
   private final int m_numModules;
 
   /**
