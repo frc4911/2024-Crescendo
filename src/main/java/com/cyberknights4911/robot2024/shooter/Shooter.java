@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
@@ -177,5 +178,16 @@ public class Shooter extends SubsystemBase {
         .andThen(Commands.waitSeconds(feedTime.get()))
         .andThen(this::stop, this)
         .andThen(collect::stop, collect);
+  }
+
+  /**
+   * Automatically and continuously sets the aiming angle for an arbitrary distance from the
+   * speaker. Note: this command never finishes on its own, so don't wait for it.
+   *
+   * @param distanceSupplier returns the current horizontal distance from the speaker opening (not
+   *     diagonal)
+   */
+  public Command aimContinuous(DoubleSupplier distanceSupplier) {
+    return new AimContinuousCommand(this, distanceSupplier);
   }
 }
