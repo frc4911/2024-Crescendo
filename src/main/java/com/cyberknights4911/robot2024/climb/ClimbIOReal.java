@@ -7,7 +7,10 @@
 
 package com.cyberknights4911.robot2024.climb;
 
+import com.cyberknights4911.util.SparkBurnManager;
+import com.cyberknights4911.util.SparkConfig;
 import com.revrobotics.CANSparkBase;
+import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
@@ -20,8 +23,10 @@ public class ClimbIOReal implements ClimbIO {
   private final RelativeEncoder encoder;
   private final SparkPIDController pidController;
   private final double gearRatio;
+  private final SparkBurnManager sparkBurnManager;
 
-  public ClimbIOReal(ClimbConstants constants) {
+  public ClimbIOReal(ClimbConstants constants, SparkBurnManager sparkBurnManager) {
+    this.sparkBurnManager = sparkBurnManager;
     left = new CANSparkFlex(constants.motorId1(), MotorType.kBrushless);
     right = new CANSparkFlex(constants.motorId2(), MotorType.kBrushless);
     encoder = right.getEncoder();
@@ -78,29 +83,26 @@ public class ClimbIOReal implements ClimbIO {
   }
 
   private void configureDevices() {
-    left.restoreFactoryDefaults();
-    right.restoreFactoryDefaults();
+    sparkBurnManager.maybeBurnConfig(
+        () -> {
+          SparkConfig.configLeaderFollower(left);
+          SparkConfig.configLeaderFollower(right);
 
-    // TODO: determine follow config
-    left.follow(right, false);
+          // TODO: determine follow config
+          left.follow(right, false);
 
-    left.setCANTimeout(250);
-    right.setCANTimeout(250);
+          left.setIdleMode(IdleMode.kBrake);
+          right.setIdleMode(IdleMode.kBrake);
+          left.setSmartCurrentLimit(40);
+          right.setSmartCurrentLimit(40);
+          left.enableVoltageCompensation(12);
+          right.enableVoltageCompensation(12);
 
-    left.setSmartCurrentLimit(25);
-    right.setSmartCurrentLimit(25);
-
-    left.enableVoltageCompensation(12.0);
-    right.enableVoltageCompensation(12.0);
-
-    encoder.setPosition(0.0);
-    encoder.setMeasurementPeriod(10);
-    encoder.setAverageDepth(2);
-
-    left.setCANTimeout(0);
-    right.setCANTimeout(0);
-
-    left.burnFlash();
-    right.burnFlash();
+          encoder.setPosition(0.0);
+          encoder.setMeasurementPeriod(10);
+          encoder.setAverageDepth(2);
+        },
+        left,
+        right);
   }
 }

@@ -277,6 +277,57 @@ public class Drive extends SubsystemBase {
         .ignoringDisable(true);
   }
 
+  ChassisSpeeds createChassisSpeeds(
+      ControlConstants controlConstants,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier) {
+    // Apply deadband
+    double linearMagnitude =
+        MathUtil.applyDeadband(
+            Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+            controlConstants.stickDeadband());
+    Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+    double omega =
+        MathUtil.applyDeadband(omegaSupplier.getAsDouble(), controlConstants.stickDeadband());
+
+    // Square values
+    linearMagnitude = linearMagnitude * linearMagnitude;
+    omega = Math.copySign(omega * omega, omega);
+
+    // Calcaulate new linear velocity
+    Translation2d linearVelocity =
+        new Pose2d(new Translation2d(), linearDirection)
+            .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
+            .getTranslation();
+
+    // Convert to field relative speeds & send command
+    return ChassisSpeeds.fromFieldRelativeSpeeds(
+        linearVelocity.getX() * driveConstants.maxLinearSpeed(),
+        linearVelocity.getY() * driveConstants.maxLinearSpeed(),
+        omega * maxAngularSpeedMetersPerSecond,
+        getRotation());
+  }
+
+  public PointToAngleDrive pointToPointDrive(
+      ControlConstants controlConstants,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      double x,
+      double y) {
+    return PointToAngleDrive.createDriveFacingPoint(
+        this, controlConstants, xSupplier, ySupplier, x, y);
+  }
+
+  public PointToAngleDrive pointToAngleDrive(
+      ControlConstants controlConstants,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      double angleRadians) {
+    return PointToAngleDrive.createDriveFacingFixedAngle(
+        this, controlConstants, xSupplier, ySupplier, angleRadians);
+  }
+
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
@@ -287,33 +338,8 @@ public class Drive extends SubsystemBase {
       DoubleSupplier omegaSupplier) {
     return Commands.run(
         () -> {
-          // Apply deadband
-          double linearMagnitude =
-              MathUtil.applyDeadband(
-                  Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
-                  controlConstants.stickDeadband());
-          Rotation2d linearDirection =
-              new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-          double omega =
-              MathUtil.applyDeadband(omegaSupplier.getAsDouble(), controlConstants.stickDeadband());
-
-          // Square values
-          linearMagnitude = linearMagnitude * linearMagnitude;
-          omega = Math.copySign(omega * omega, omega);
-
-          // Calcaulate new linear velocity
-          Translation2d linearVelocity =
-              new Pose2d(new Translation2d(), linearDirection)
-                  .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
-                  .getTranslation();
-
-          // Convert to field relative speeds & send command
-          runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  linearVelocity.getX() * driveConstants.maxLinearSpeed(),
-                  linearVelocity.getY() * driveConstants.maxLinearSpeed(),
-                  omega * maxAngularSpeedMetersPerSecond,
-                  getRotation()));
+          Logger.recordOutput("Drive/Joystick/Omega", omegaSupplier.getAsDouble());
+          runVelocity(createChassisSpeeds(controlConstants, xSupplier, ySupplier, omegaSupplier));
         },
         this);
   }

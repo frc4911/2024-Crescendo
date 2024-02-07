@@ -29,6 +29,7 @@ import com.cyberknights4911.robot2024.drive.SparkOdometryThread;
 import com.cyberknights4911.robot2024.shooter.Shooter;
 import com.cyberknights4911.robot2024.shooter.ShooterIO;
 import com.cyberknights4911.robot2024.shooter.ShooterIOSim;
+import com.cyberknights4911.util.SparkBurnManager;
 import org.littletonrobotics.junction.LoggedRobot;
 
 /** The main class for the 2024 robot to be named at a future date. */
@@ -39,6 +40,7 @@ public final class Robot2024 implements RobotContainer {
   private final Drive drive;
   private final Constants constants;
   private final ControllerBinding binding;
+  private final SparkBurnManager burnManager;
 
   public Robot2024() {
     constants = Constants.get();
@@ -47,6 +49,7 @@ public final class Robot2024 implements RobotContainer {
     shooter = createShooter();
     drive = createDrive();
 
+    burnManager = new SparkBurnManager(constants);
     binding = new ControllerBinding(Robot2024Constants.CONTROL_CONSTANTS);
     configureControls();
   }
@@ -58,11 +61,25 @@ public final class Robot2024 implements RobotContainer {
             binding.supplierFor(StickActions.FORWARD),
             binding.supplierFor(StickActions.STRAFE),
             binding.supplierFor(StickActions.ROTATE)));
+
     binding.triggersFor(ButtonActions.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
+
+    binding
+        .triggersFor(ButtonActions.AmpLockOn)
+        .whileTrue(
+            drive.pointToAngleDrive(
+                Robot2024Constants.CONTROL_CONSTANTS,
+                binding.supplierFor(StickActions.FORWARD),
+                binding.supplierFor(StickActions.STRAFE),
+                Math.PI / 2));
+
+    // TODO: bind speaker lock-on to something. Right trigger maybe?
   }
 
   @Override
-  public void onRobotPeriodic(LoggedRobot robot) {}
+  public void onRobotPeriodic(LoggedRobot robot) {
+    binding.checkControllers();
+  }
 
   @Override
   public void setupAutos(AutoCommandHandler handler) {
@@ -132,19 +149,23 @@ public final class Robot2024 implements RobotContainer {
             new ModuleIOSparkFlex(
                 odometryThread,
                 Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.frontLeft()),
+                Robot2024Constants.DRIVE_CONSTANTS.frontLeft(),
+                burnManager),
             new ModuleIOSparkFlex(
                 odometryThread,
                 Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.frontRight()),
+                Robot2024Constants.DRIVE_CONSTANTS.frontRight(),
+                burnManager),
             new ModuleIOSparkFlex(
                 odometryThread,
                 Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.backLeft()),
+                Robot2024Constants.DRIVE_CONSTANTS.backLeft(),
+                burnManager),
             new ModuleIOSparkFlex(
                 odometryThread,
                 Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.backRight()));
+                Robot2024Constants.DRIVE_CONSTANTS.backRight(),
+                burnManager));
       case REPLAY:
       default:
         return new Drive(

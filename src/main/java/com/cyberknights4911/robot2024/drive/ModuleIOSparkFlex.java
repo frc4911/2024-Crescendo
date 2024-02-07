@@ -13,6 +13,7 @@ import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.drive.ModuleIO;
+import com.cyberknights4911.util.SparkBurnManager;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -52,12 +53,15 @@ public class ModuleIOSparkFlex implements ModuleIO {
   private final boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
   private final DriveConstants driveConstants;
+  private final SparkBurnManager sparkBurnManager;
 
   public ModuleIOSparkFlex(
       SparkOdometryThread sparkOdometryThread,
       DriveConstants driveConstants,
-      DriveConstants.ModuleConstants moduleConstants) {
+      DriveConstants.ModuleConstants moduleConstants,
+      SparkBurnManager sparkBurnManager) {
     this.driveConstants = driveConstants;
+    this.sparkBurnManager = sparkBurnManager;
     driveMotor = new CANSparkFlex(moduleConstants.driveMotorId(), MotorType.kBrushless);
     turnMotor = new CANSparkFlex(moduleConstants.turnMotorId(), MotorType.kBrushless);
     cancoder = new CANcoder(moduleConstants.encoderId());
@@ -67,42 +71,36 @@ public class ModuleIOSparkFlex implements ModuleIO {
     turnAbsolutePosition = cancoder.getAbsolutePosition();
     BaseStatusSignal.setUpdateFrequencyForAll(50.0, turnAbsolutePosition);
 
-    driveMotor.restoreFactoryDefaults();
-    turnMotor.restoreFactoryDefaults();
-
-    driveMotor.setCANTimeout(250);
-    turnMotor.setCANTimeout(250);
-
     driveEncoder = driveMotor.getEncoder();
     turnRelativeEncoder = turnMotor.getEncoder();
 
-    turnMotor.setInverted(isTurnMotorInverted);
-    driveMotor.setSmartCurrentLimit(40);
-    turnMotor.setSmartCurrentLimit(30);
-    driveMotor.enableVoltageCompensation(12.0);
-    turnMotor.enableVoltageCompensation(12.0);
+    sparkBurnManager.maybeBurnConfig(
+        () -> {
+          driveMotor.setPeriodicFramePeriod(
+              PeriodicFrame.kStatus2, (int) (1000.0 / driveConstants.odometryFrequency()));
+          turnMotor.setPeriodicFramePeriod(
+              PeriodicFrame.kStatus2, (int) (1000.0 / driveConstants.odometryFrequency()));
 
-    driveEncoder.setPosition(0.0);
-    driveEncoder.setMeasurementPeriod(10);
-    driveEncoder.setAverageDepth(2);
+          turnMotor.setInverted(isTurnMotorInverted);
+          driveMotor.setSmartCurrentLimit(40);
+          turnMotor.setSmartCurrentLimit(30);
+          driveMotor.enableVoltageCompensation(12.0);
+          turnMotor.enableVoltageCompensation(12.0);
 
-    turnRelativeEncoder.setPosition(0.0);
-    turnRelativeEncoder.setMeasurementPeriod(10);
-    turnRelativeEncoder.setAverageDepth(2);
+          driveEncoder.setPosition(0.0);
+          driveEncoder.setMeasurementPeriod(10);
+          driveEncoder.setAverageDepth(2);
 
-    driveMotor.setCANTimeout(0);
-    turnMotor.setCANTimeout(0);
+          turnRelativeEncoder.setPosition(0.0);
+          turnRelativeEncoder.setMeasurementPeriod(10);
+          turnRelativeEncoder.setAverageDepth(2);
+        },
+        driveMotor,
+        turnMotor);
 
-    driveMotor.setPeriodicFramePeriod(
-        PeriodicFrame.kStatus2, (int) (1000.0 / driveConstants.odometryFrequency()));
-    turnMotor.setPeriodicFramePeriod(
-        PeriodicFrame.kStatus2, (int) (1000.0 / driveConstants.odometryFrequency()));
     timestampQueue = sparkOdometryThread.makeTimestampQueue();
     drivePositionQueue = sparkOdometryThread.registerSignal(driveEncoder::getPosition);
     turnPositionQueue = sparkOdometryThread.registerSignal(turnRelativeEncoder::getPosition);
-
-    driveMotor.burnFlash();
-    turnMotor.burnFlash();
   }
 
   @Override
