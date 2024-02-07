@@ -60,7 +60,19 @@ public final class Robot2024 implements RobotContainer {
             binding.supplierFor(StickActions.FORWARD),
             binding.supplierFor(StickActions.STRAFE),
             binding.supplierFor(StickActions.ROTATE)));
+
     binding.triggersFor(ButtonActions.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
+
+    binding
+        .triggersFor(ButtonActions.AmpLockOn)
+        .whileTrue(
+            drive.pointToAngleDrive(
+                Robot2024Constants.CONTROL_CONSTANTS,
+                binding.supplierFor(StickActions.FORWARD),
+                binding.supplierFor(StickActions.STRAFE),
+                Math.PI / 2));
+
+    // TODO: bind speaker lock-on to something. Right trigger maybe?
   }
 
   @Override
