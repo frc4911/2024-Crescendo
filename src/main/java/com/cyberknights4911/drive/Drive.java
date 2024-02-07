@@ -13,6 +13,7 @@ import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.constants.ControlConstants;
 import com.cyberknights4911.constants.DriveConstants;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -229,6 +230,63 @@ public class Drive extends SubsystemBase {
         .ignoringDisable(true);
   }
 
+  private ChassisSpeeds createChassisSpeeds(
+      ControlConstants controlConstants,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier) {
+    // Apply deadband
+    double linearMagnitude =
+        MathUtil.applyDeadband(
+            Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+            controlConstants.stickDeadband());
+    Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+    double omega =
+        MathUtil.applyDeadband(omegaSupplier.getAsDouble(), controlConstants.stickDeadband());
+
+    // Square values
+    linearMagnitude = linearMagnitude * linearMagnitude;
+    omega = Math.copySign(omega * omega, omega);
+
+    // Calcaulate new linear velocity
+    Translation2d linearVelocity =
+        new Pose2d(new Translation2d(), linearDirection)
+            .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
+            .getTranslation();
+
+    // Convert to field relative speeds & send command
+    return ChassisSpeeds.fromFieldRelativeSpeeds(
+        linearVelocity.getX() * driveConstants.maxLinearSpeed(),
+        linearVelocity.getY() * driveConstants.maxLinearSpeed(),
+        omega * maxAngularSpeedMetersPerSecond,
+        getRotation());
+  }
+
+  public Command pointToAngleDrive(
+      ControlConstants controlConstants, DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
+
+    PIDController turnController = new PIDController(1.5, 0.0, 0.0);
+    DoubleSupplier angleSupplier =
+        () -> {
+          double currentRotation = getRotation().getRadians();
+          double desired = Math.PI / 2;
+          double output = turnController.calculate(currentRotation, desired);
+          Logger.recordOutput("Drive/PointAt/Current", currentRotation);
+          Logger.recordOutput("Drive/PointAt/Desired", desired);
+          Logger.recordOutput("Drive/PointAt/Output", output);
+          return output;
+        };
+
+    return Commands.runEnd(
+        () -> {
+          runVelocity(createChassisSpeeds(controlConstants, xSupplier, ySupplier, angleSupplier));
+        },
+        () -> {
+          turnController.close();
+        },
+        this);
+  }
+
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
@@ -239,33 +297,7 @@ public class Drive extends SubsystemBase {
       DoubleSupplier omegaSupplier) {
     return Commands.run(
         () -> {
-          // Apply deadband
-          double linearMagnitude =
-              MathUtil.applyDeadband(
-                  Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
-                  controlConstants.stickDeadband());
-          Rotation2d linearDirection =
-              new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
-          double omega =
-              MathUtil.applyDeadband(omegaSupplier.getAsDouble(), controlConstants.stickDeadband());
-
-          // Square values
-          linearMagnitude = linearMagnitude * linearMagnitude;
-          omega = Math.copySign(omega * omega, omega);
-
-          // Calcaulate new linear velocity
-          Translation2d linearVelocity =
-              new Pose2d(new Translation2d(), linearDirection)
-                  .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
-                  .getTranslation();
-
-          // Convert to field relative speeds & send command
-          runVelocity(
-              ChassisSpeeds.fromFieldRelativeSpeeds(
-                  linearVelocity.getX() * driveConstants.maxLinearSpeed(),
-                  linearVelocity.getY() * driveConstants.maxLinearSpeed(),
-                  omega * maxAngularSpeedMetersPerSecond,
-                  getRotation()));
+          runVelocity(createChassisSpeeds(controlConstants, xSupplier, ySupplier, omegaSupplier));
         },
         this);
   }

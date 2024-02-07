@@ -43,6 +43,8 @@ public final class ControllerBinding
     switch (action) {
       case ZeroGyro:
         return new Triggers(driver.y());
+      case AmpLockOn:
+        return new Triggers(driver.leftTrigger());
       default:
         return new Triggers(ALWAYS_FALSE);
     }
