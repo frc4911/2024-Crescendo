@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.Volts;
 import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.constants.ControlConstants;
 import com.cyberknights4911.constants.DriveConstants;
+import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -191,6 +192,7 @@ public class Drive extends SubsystemBase {
   /** Returns the current odometry pose. */
   @AutoLogOutput(key = "Odometry/Robot")
   public Pose2d getPose() {
+    Logger.recordOutput("Odometry/Robot", pose);
     return pose;
   }
 
@@ -262,10 +264,14 @@ public class Drive extends SubsystemBase {
         getRotation());
   }
 
+  private static final LoggedTunableNumber sweetSpot =
+      new LoggedTunableNumber("Drive/Point/sweetSpot", 0.1);
+
   public Command pointToAngleDrive(
       ControlConstants controlConstants, DoubleSupplier xSupplier, DoubleSupplier ySupplier) {
 
-    PIDController turnController = new PIDController(1.5, 0.0, 0.0);
+    PIDController turnController = new PIDController(1.0, 0.0, 0.0);
+    turnController.enableContinuousInput(-1.0, 1.0);
     DoubleSupplier angleSupplier =
         () -> {
           double currentRotation = getRotation().getRadians();
@@ -274,7 +280,14 @@ public class Drive extends SubsystemBase {
           Logger.recordOutput("Drive/PointAt/Current", currentRotation);
           Logger.recordOutput("Drive/PointAt/Desired", desired);
           Logger.recordOutput("Drive/PointAt/Output", output);
-          return output;
+          // return output;
+          if (Math.abs(desired - currentRotation) < sweetSpot.get()) {
+            return 0;
+          } else if (desired < currentRotation) {
+            return -1;
+          } else {
+            return 1;
+          }
         };
 
     return Commands.runEnd(
@@ -297,6 +310,7 @@ public class Drive extends SubsystemBase {
       DoubleSupplier omegaSupplier) {
     return Commands.run(
         () -> {
+          Logger.recordOutput("Drive/Joystick/Omega", omegaSupplier.getAsDouble());
           runVelocity(createChassisSpeeds(controlConstants, xSupplier, ySupplier, omegaSupplier));
         },
         this);
