@@ -29,6 +29,11 @@ import com.cyberknights4911.robot2024.shooter.Shooter;
 import com.cyberknights4911.robot2024.shooter.ShooterIO;
 import com.cyberknights4911.robot2024.shooter.ShooterIOSim;
 import com.cyberknights4911.util.SparkBurnManager;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Commands;
 import org.littletonrobotics.junction.LoggedRobot;
 
 /** The main class for the 2024 robot to be named at a future date. */
@@ -43,12 +48,12 @@ public final class Robot2024 implements RobotContainer {
 
   public Robot2024() {
     constants = Constants.get();
+    burnManager = new SparkBurnManager(constants);
     climb = createClimb();
     collect = createCollect();
     shooter = createShooter();
     drive = createDrive();
 
-    burnManager = new SparkBurnManager(constants);
     binding = new ControllerBinding(Robot2024Constants.CONTROL_CONSTANTS);
     configureControls();
   }
@@ -64,6 +69,19 @@ public final class Robot2024 implements RobotContainer {
     binding.triggersFor(ButtonActions.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
 
     binding
+        .triggersFor(ButtonActions.ZeroSpeaker)
+        .onTrue(
+            Commands.runOnce(
+                () -> {
+                  drive.setPose(
+                      new Pose2d(
+                          new Translation2d(
+                              Units.inchesToMeters(652.73), Units.inchesToMeters(268.42)),
+                          new Rotation2d()));
+                },
+                drive));
+
+    binding
         .triggersFor(ButtonActions.AmpLockOn)
         .whileTrue(
             drive.pointToAngleDrive(
@@ -71,8 +89,17 @@ public final class Robot2024 implements RobotContainer {
                 binding.supplierFor(StickActions.FORWARD),
                 binding.supplierFor(StickActions.STRAFE),
                 Math.PI / 2));
+    binding
+        .triggersFor(ButtonActions.SpeakerLockOn)
+        .whileTrue(
+            drive.pointToPointDrive(
+                Robot2024Constants.CONTROL_CONSTANTS,
+                binding.supplierFor(StickActions.FORWARD),
+                binding.supplierFor(StickActions.STRAFE),
+                Units.inchesToMeters(602.73),
+                Units.inchesToMeters(268.42)));
 
-    // TODO: bind speaker lock-on to something. Right trigger maybe?
+    // TODO: bind speaker lock-on to something. Right trigger maybe? eheheheheh
   }
 
   @Override
@@ -170,3 +197,6 @@ public final class Robot2024 implements RobotContainer {
     }
   }
 }
+
+// TODO:
+// ehehehehehehehehehhehehehehehehehheehehhehehehehehehehehehehheehhehehehehehehehehehhehehehehehehehehehehehehe

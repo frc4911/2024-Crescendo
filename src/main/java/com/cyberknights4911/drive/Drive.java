@@ -105,6 +105,7 @@ public class Drive extends SubsystemBase {
     }
 
     getModuleStates();
+    getPose();
 
     // Update odometry
     SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
