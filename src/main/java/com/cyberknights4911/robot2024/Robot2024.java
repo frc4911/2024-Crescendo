@@ -44,12 +44,12 @@ public final class Robot2024 implements RobotContainer {
 
   public Robot2024() {
     constants = Constants.get();
+    burnManager = new SparkBurnManager(constants);
     climb = createClimb();
     collect = createCollect();
     shooter = createShooter();
     drive = createDrive();
 
-    burnManager = new SparkBurnManager(constants);
     binding = new ControllerBinding(Robot2024Constants.CONTROL_CONSTANTS);
     configureControls();
   }
