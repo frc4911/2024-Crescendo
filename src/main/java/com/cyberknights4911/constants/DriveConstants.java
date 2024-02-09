@@ -19,6 +19,7 @@ public record DriveConstants(
     double wheelRadius,
     double driveGearRatio,
     double turnGearRatio,
+    double odometryFrequency,
     PidValues turnFeedBackValues,
     PidValues driveFeedBackValues,
     FeedForwardValues driveFeedForwardValues,
