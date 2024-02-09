@@ -21,7 +21,6 @@ import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.drive.ModuleIO;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import java.util.Queue;
 
 /**
  * Module IO implementation for Talon FX drive motor controller, Talon FX turn motor controller, and
@@ -51,18 +50,12 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final StatusSignal<Double> turnAppliedVolts;
   private final StatusSignal<Double> turnCurrent;
 
-  private final Queue<Double> timestampQueue;
-  private final Queue<Double> drivePositionQueue;
-  private final Queue<Double> turnPositionQueue;
-
   private final boolean isTurnMotorInverted = true;
   private final Rotation2d absoluteEncoderOffset;
   private final DriveConstants driveConstants;
 
   public ModuleIOTalonFX(
-      PhoenixOdometryThread phoenixOdometryThread,
-      DriveConstants driveConstants,
-      DriveConstants.ModuleConstants moduleConstants) {
+      DriveConstants driveConstants, DriveConstants.ModuleConstants moduleConstants) {
     this.driveConstants = driveConstants;
     driveTalon = new TalonFX(moduleConstants.driveMotorId());
     turnTalon = new TalonFX(moduleConstants.turnMotorId());
@@ -95,7 +88,7 @@ public class ModuleIOTalonFX implements ModuleIO {
     turnCurrent = turnTalon.getStatorCurrent();
 
     BaseStatusSignal.setUpdateFrequencyForAll(
-        driveConstants.odometryFrequency(), drivePosition, turnPosition);
+        100.0, drivePosition, turnPosition); // Required for odometry, use faster rate
     BaseStatusSignal.setUpdateFrequencyForAll(
         50.0,
         driveVelocity,
@@ -107,10 +100,6 @@ public class ModuleIOTalonFX implements ModuleIO {
         turnCurrent);
     driveTalon.optimizeBusUtilization();
     turnTalon.optimizeBusUtilization();
-
-    timestampQueue = phoenixOdometryThread.makeTimestampQueue();
-    drivePositionQueue = phoenixOdometryThread.registerSignal(driveTalon, driveTalon.getPosition());
-    turnPositionQueue = phoenixOdometryThread.registerSignal(turnTalon, turnTalon.getPosition());
   }
 
   @Override
@@ -144,21 +133,6 @@ public class ModuleIOTalonFX implements ModuleIO {
         Units.rotationsToRadians(turnVelocity.getValueAsDouble()) / driveConstants.turnGearRatio();
     inputs.turnAppliedVolts = turnAppliedVolts.getValueAsDouble();
     inputs.turnCurrentAmps = new double[] {turnCurrent.getValueAsDouble()};
-
-    inputs.odometryTimestamps =
-        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryDrivePositionsRad =
-        drivePositionQueue.stream()
-            .mapToDouble(
-                (Double value) -> Units.rotationsToRadians(value) / driveConstants.driveGearRatio())
-            .toArray();
-    inputs.odometryTurnPositions =
-        turnPositionQueue.stream()
-            .map((Double value) -> Rotation2d.fromRotations(value / driveConstants.turnGearRatio()))
-            .toArray(Rotation2d[]::new);
-    timestampQueue.clear();
-    drivePositionQueue.clear();
-    turnPositionQueue.clear();
   }
 
   @Override
