@@ -15,6 +15,7 @@ import com.cyberknights4911.drive.GyroIOPigeon2;
 import com.cyberknights4911.drive.ModuleIO;
 import com.cyberknights4911.drive.ModuleIOSim;
 import com.cyberknights4911.entrypoint.RobotContainer;
+import com.cyberknights4911.robot2024.Robot2024Constants;
 import com.cyberknights4911.vision.CameraConfig;
 import com.cyberknights4911.vision.Vision;
 import com.cyberknights4911.vision.VisionIOInputsAutoLogged;
@@ -25,6 +26,11 @@ import com.cyberknights4911.wham.slurpp.Slurpp;
 import com.cyberknights4911.wham.slurpp.SlurppIO;
 import com.cyberknights4911.wham.slurpp.SlurppIOReal;
 import com.cyberknights4911.wham.slurpp.SlurppIOSim;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -68,34 +74,36 @@ public final class Wham implements RobotContainer {
     binding.triggersFor(WhamButtons.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
 
     binding
-        .triggersFor(WhamButtons.SimulateCollect)
+        .triggersFor(WhamButtons.ZeroSpeaker)
         .onTrue(
             Commands.runOnce(
                 () -> {
-                  slurpp.setVoltage(12 * -.1);
+                  drive.setPose(
+                      new Pose2d(
+                          new Translation2d(
+                              Units.inchesToMeters(602.73), Units.inchesToMeters(218.42)),
+                          new Rotation2d()));
                 },
-                slurpp))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  slurpp.setVoltage(0);
-                },
-                slurpp));
+                drive));
 
     binding
-        .triggersFor(WhamButtons.SimulateScore)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  slurpp.setVoltage(12 * .5);
-                },
-                slurpp))
-        .onFalse(
-            Commands.runOnce(
-                () -> {
-                  slurpp.setVoltage(0);
-                },
-                slurpp));
+        .triggersFor(WhamButtons.AmpLockOn)
+        .whileTrue(
+            drive.pointToAngleDrive(
+                Robot2024Constants.CONTROL_CONSTANTS,
+                binding.supplierFor(WhamSticks.FORWARD),
+                binding.supplierFor(WhamSticks.STRAFE),
+                Math.PI / 2));
+
+    binding
+        .triggersFor(WhamButtons.SpeakerLockOn)
+        .whileTrue(
+            drive.pointToPointDrive(
+                Robot2024Constants.CONTROL_CONSTANTS,
+                binding.supplierFor(WhamSticks.FORWARD),
+                binding.supplierFor(WhamSticks.STRAFE),
+                Units.inchesToMeters(652.73),
+                Units.inchesToMeters(218.42)));
   }
 
   private Drive createDrive() {
