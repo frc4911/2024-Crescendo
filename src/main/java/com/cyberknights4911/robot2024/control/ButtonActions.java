@@ -1,4 +1,4 @@
-// Copyright (c) 2023 FRC 4911
+// Copyright (c) 2024 FRC 4911
 // https://github.com/frc4911
 //
 // Use of this source code is governed by an MIT-style
@@ -12,5 +12,7 @@ import com.cyberknights4911.control.ButtonAction;
 /** An enumeration of actions for the 2024 robot that can be bound to button inputs. */
 public enum ButtonActions implements ButtonAction {
   ZeroGyro,
-  AmpLockOn
+  ZeroSpeaker,
+  AmpLockOn,
+  SpeakerLockOn
 }

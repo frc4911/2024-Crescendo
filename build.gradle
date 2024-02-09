@@ -156,6 +156,6 @@ spotless {
         removeUnusedImports()
         trimTrailingWhitespace()
         endWithNewline()
-        licenseHeader("// Copyright (c) 2023 FRC 4911\n// https://github.com/frc4911\n//\n// Use of this source code is governed by an MIT-style\n// license that can be found in the LICENSE file at\n// the root directory of this project.\n\n")
+        licenseHeader("// Copyright (c) 2024 FRC 4911\n// https://github.com/frc4911\n//\n// Use of this source code is governed by an MIT-style\n// license that can be found in the LICENSE file at\n// the root directory of this project.\n\n")
     }
 }

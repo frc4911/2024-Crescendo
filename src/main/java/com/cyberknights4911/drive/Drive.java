@@ -1,4 +1,4 @@
-// Copyright (c) 2023 FRC 4911
+// Copyright (c) 2024 FRC 4911
 // https://github.com/frc4911
 //
 // Use of this source code is governed by an MIT-style
@@ -106,6 +106,7 @@ public class Drive extends SubsystemBase {
     }
 
     getModuleStates();
+    getPose();
 
     // Update odometry
     SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];

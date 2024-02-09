@@ -1,4 +1,4 @@
-// Copyright (c) 2023 FRC 4911
+// Copyright (c) 2024 FRC 4911
 // https://github.com/frc4911
 //
 // Use of this source code is governed by an MIT-style
@@ -38,9 +38,12 @@ public final class PointToAngleDrive extends Command {
         () -> {
           double currentX = drive.getPose().getTranslation().getX();
           double currentY = drive.getPose().getTranslation().getY();
-          // TODO calculate angle based on current position and desired point
-          // Must use trig!!!!!!!!!!!!
-          return 0.0;
+          double desiredAngle = Math.atan((y - currentY) / (x - currentX));
+          if (currentX > x) {
+            desiredAngle += Math.PI;
+          }
+          Logger.recordOutput("Drive/PointAt/Desired", desiredAngle);
+          return desiredAngle;
         };
     return new PointToAngleDrive(drive, controlConstants, xSupplier, ySupplier, angleSupplier);
   }
