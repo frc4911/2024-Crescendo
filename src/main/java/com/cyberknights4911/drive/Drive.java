@@ -14,7 +14,6 @@ import com.cyberknights4911.constants.ControlConstants;
 import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.vision.VisionUpdate;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -41,8 +40,9 @@ public class Drive extends SubsystemBase {
   private final double maxAngularSpeedMetersPerSecond;
   private final SysIdRoutine sysId;
   private final OdometryThread odometryThread;
+  private final SwerveDriveKinematics kinematics;
+  private final CyberPoseEstimator poseEstimator;
 
-  private SwerveDriveKinematics kinematics;
   private Rotation2d rawGyroRotation = new Rotation2d();
   // for delta tracking
   private SwerveModulePosition[] lastModulePositions =
@@ -52,8 +52,6 @@ public class Drive extends SubsystemBase {
         new SwerveModulePosition(),
         new SwerveModulePosition()
       };
-  private SwerveDrivePoseEstimator poseEstimator =
-      new SwerveDrivePoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
 
   public Drive(
       OdometryThread odometryThread,
@@ -69,6 +67,8 @@ public class Drive extends SubsystemBase {
     this.gyroIO = gyroIO;
 
     kinematics = new SwerveDriveKinematics(getModuleTranslations(driveConstants));
+    poseEstimator =
+        new CyberPoseEstimator(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
     double driveBaseRadius =
         Math.hypot(driveConstants.trackWidthX() / 2.0, driveConstants.trackWidthY() / 2.0);
     maxAngularSpeedMetersPerSecond = driveConstants.maxLinearSpeed() / driveBaseRadius;
@@ -237,7 +237,6 @@ public class Drive extends SubsystemBase {
   /** Returns the current odometry pose. */
   public Pose2d getPose() {
     Pose2d pose = poseEstimator.getEstimatedPosition();
-    Logger.recordOutput("Odometry/Robot", pose);
     return pose;
   }
 
