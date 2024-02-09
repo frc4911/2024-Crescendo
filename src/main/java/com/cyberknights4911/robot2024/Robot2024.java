@@ -165,7 +165,7 @@ public final class Robot2024 implements RobotContainer {
         return new Drive(
             constants,
             Robot2024Constants.DRIVE_CONSTANTS,
-            new GyroIOPigeon2(),
+            new GyroIOPigeon2(Robot2024Constants.DRIVE_CONSTANTS),
             new ModuleIOSparkFlex(
                 Robot2024Constants.DRIVE_CONSTANTS,
                 Robot2024Constants.DRIVE_CONSTANTS.frontLeft(),
