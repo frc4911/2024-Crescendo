@@ -76,7 +76,7 @@ public final class Robot2024 implements RobotContainer {
                   drive.setPose(
                       new Pose2d(
                           new Translation2d(
-                              Units.inchesToMeters(652.73), Units.inchesToMeters(268.42)),
+                              Units.inchesToMeters(602.73), Units.inchesToMeters(218.42)),
                           new Rotation2d()));
                 },
                 drive));
@@ -96,8 +96,8 @@ public final class Robot2024 implements RobotContainer {
                 Robot2024Constants.CONTROL_CONSTANTS,
                 binding.supplierFor(StickActions.FORWARD),
                 binding.supplierFor(StickActions.STRAFE),
-                Units.inchesToMeters(602.73),
-                Units.inchesToMeters(268.42)));
+                Units.inchesToMeters(652.73),
+                Units.inchesToMeters(218.42)));
 
     // TODO: bind speaker lock-on to something. Right trigger maybe? eheheheheh
   }
