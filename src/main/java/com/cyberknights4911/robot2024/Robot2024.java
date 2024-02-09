@@ -25,7 +25,6 @@ import com.cyberknights4911.robot2024.control.ButtonActions;
 import com.cyberknights4911.robot2024.control.ControllerBinding;
 import com.cyberknights4911.robot2024.control.StickActions;
 import com.cyberknights4911.robot2024.drive.ModuleIOSparkFlex;
-import com.cyberknights4911.robot2024.drive.SparkOdometryThread;
 import com.cyberknights4911.robot2024.shooter.Shooter;
 import com.cyberknights4911.robot2024.shooter.ShooterIO;
 import com.cyberknights4911.robot2024.shooter.ShooterIOSim;
@@ -44,12 +43,12 @@ public final class Robot2024 implements RobotContainer {
 
   public Robot2024() {
     constants = Constants.get();
-    burnManager = new SparkBurnManager(constants);
     climb = createClimb();
     collect = createCollect();
     shooter = createShooter();
     drive = createDrive();
 
+    burnManager = new SparkBurnManager(constants);
     binding = new ControllerBinding(Robot2024Constants.CONTROL_CONSTANTS);
     configureControls();
   }
@@ -127,12 +126,9 @@ public final class Robot2024 implements RobotContainer {
   }
 
   private Drive createDrive() {
-    SparkOdometryThread odometryThread =
-        new SparkOdometryThread(Robot2024Constants.DRIVE_CONSTANTS);
     switch (constants.mode()) {
       case SIM:
         return new Drive(
-            odometryThread,
             constants,
             Robot2024Constants.DRIVE_CONSTANTS,
             new GyroIO() {},
@@ -142,34 +138,28 @@ public final class Robot2024 implements RobotContainer {
             new ModuleIOSim());
       case REAL:
         return new Drive(
-            odometryThread,
             constants,
             Robot2024Constants.DRIVE_CONSTANTS,
-            new GyroIOPigeon2(Robot2024Constants.DRIVE_CONSTANTS, odometryThread),
+            new GyroIOPigeon2(),
             new ModuleIOSparkFlex(
-                odometryThread,
                 Robot2024Constants.DRIVE_CONSTANTS,
                 Robot2024Constants.DRIVE_CONSTANTS.frontLeft(),
                 burnManager),
             new ModuleIOSparkFlex(
-                odometryThread,
                 Robot2024Constants.DRIVE_CONSTANTS,
                 Robot2024Constants.DRIVE_CONSTANTS.frontRight(),
                 burnManager),
             new ModuleIOSparkFlex(
-                odometryThread,
                 Robot2024Constants.DRIVE_CONSTANTS,
                 Robot2024Constants.DRIVE_CONSTANTS.backLeft(),
                 burnManager),
             new ModuleIOSparkFlex(
-                odometryThread,
                 Robot2024Constants.DRIVE_CONSTANTS,
                 Robot2024Constants.DRIVE_CONSTANTS.backRight(),
                 burnManager));
       case REPLAY:
       default:
         return new Drive(
-            odometryThread,
             constants,
             Robot2024Constants.DRIVE_CONSTANTS,
             new GyroIO() {},
