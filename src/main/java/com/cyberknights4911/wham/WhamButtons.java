@@ -15,5 +15,8 @@ public enum WhamButtons implements ButtonAction {
   DriveBackwardSlow,
   SimulateCollect,
   SimulateScore,
-  ZeroGyro
+  ZeroGyro,
+  ZeroSpeaker,
+  AmpLockOn,
+  SpeakerLockOn
 }
