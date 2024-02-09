@@ -1,4 +1,4 @@
-// Copyright (c) 2023 FRC 4911
+// Copyright (c) 2024 FRC 4911
 // https://github.com/frc4911
 //
 // Use of this source code is governed by an MIT-style
@@ -28,7 +28,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
