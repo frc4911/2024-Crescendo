@@ -1,4 +1,4 @@
-// Copyright (c) 2023 FRC 4911
+// Copyright (c) 2024 FRC 4911
 // https://github.com/frc4911
 //
 // Use of this source code is governed by an MIT-style
@@ -21,10 +21,10 @@ import org.littletonrobotics.junction.Logger;
 /**
  * Wraps three pose estimators for testing purposes. One pose estimator is base purely on odometry,
  * the second is based on odometry plus vision measurements. The third is also based on odometry and
- * vision, but is an experimental pose estimator.
- * See: https://github.com/wpilibsuite/allwpilib/pull/5473
- * 
- * This is probably really bad for performance, but it's good for comparison testing. Disable
+ * vision, but is an experimental pose estimator. See:
+ * https://github.com/wpilibsuite/allwpilib/pull/5473
+ *
+ * <p>This is probably really bad for performance, but it's good for comparison testing. Disable
  * pose estimators in this class to improve performance.
  */
 public class PoseTracker {
@@ -46,6 +46,14 @@ public class PoseTracker {
             kinematics, gyroAngle, modulePositions, initialPoseMeters);
   }
 
+  public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
+    Pose2d odometryPose = odometry.update(gyroAngle, modulePositions);
+    Pose2d visionPose = odometryPlusVision.update(gyroAngle, modulePositions);
+    Pose2d expPose = experimental.update(gyroAngle, modulePositions);
+
+    return expPose;
+  }
+
   public Pose2d updateWithTime(
       double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
     Pose2d odometryPose = odometry.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
@@ -54,6 +62,12 @@ public class PoseTracker {
     Pose2d expPose = experimental.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
 
     return expPose;
+  }
+
+  public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
+
+    odometryPlusVision.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
+    experimental.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
   }
 
   public void addVisionMeasurement(
