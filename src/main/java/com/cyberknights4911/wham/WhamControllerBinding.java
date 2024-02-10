@@ -47,9 +47,11 @@ public final class WhamControllerBinding
         return new Triggers(driver.povDown());
       case ZeroGyro:
         return new Triggers(driver.y());
-      case SimulateCollect:
-        return new Triggers(driver.rightBumper());
-      case SimulateScore:
+      case ZeroSpeaker:
+        return new Triggers(driver.start());
+      case AmpLockOn:
+        return new Triggers(driver.leftTrigger());
+      case SpeakerLockOn:
         return new Triggers(driver.rightTrigger());
       default:
         return new Triggers(ALWAYS_FALSE);

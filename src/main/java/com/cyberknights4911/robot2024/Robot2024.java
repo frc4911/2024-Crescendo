@@ -98,8 +98,6 @@ public final class Robot2024 implements RobotContainer {
                 binding.supplierFor(StickActions.STRAFE),
                 Units.inchesToMeters(652.73),
                 Units.inchesToMeters(218.42)));
-
-    // TODO: bind speaker lock-on to something. Right trigger maybe? eheheheheh
   }
 
   @Override
@@ -167,7 +165,7 @@ public final class Robot2024 implements RobotContainer {
         return new Drive(
             constants,
             Robot2024Constants.DRIVE_CONSTANTS,
-            new GyroIOPigeon2(),
+            new GyroIOPigeon2(Robot2024Constants.DRIVE_CONSTANTS),
             new ModuleIOSparkFlex(
                 Robot2024Constants.DRIVE_CONSTANTS,
                 Robot2024Constants.DRIVE_CONSTANTS.frontLeft(),
