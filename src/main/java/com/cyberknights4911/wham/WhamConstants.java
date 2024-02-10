@@ -115,15 +115,18 @@ public final class WhamConstants {
           .maxValidDistanceMeters(3.0)
           .build();
 
-  // 10 inches back of center, 36 inches from floor, 3 inches left of center
+  // Screw: 11.79 inches back of center, 6.5 inches from floor, 11.79 inches right of center
+  // Camera from screw: 0.62 inches back, 2.1 inches up, 0.86 inches left
   public static final CameraConstants CAMERA_CONSTANTS =
       CameraConstantsBuilder.builder()
-          .name("whamcam")
-          .photonCameraName("Arducam_OV2311_USB_Camera")
+          .name("photon4")
+          .photonCameraName("Camera_4")
           .robotToCamera(
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(-10), Units.inchesToMeters(3), Units.inchesToMeters(36)),
+                      Units.inchesToMeters(11.79 - .62),
+                      Units.inchesToMeters(-11.79 + .86),
+                      Units.inchesToMeters(6.5 + 2.1)),
                   new Rotation3d(0, 0, 0)))
           .build();
 }
