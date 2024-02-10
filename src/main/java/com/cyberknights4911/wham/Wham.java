@@ -26,7 +26,6 @@ import com.cyberknights4911.wham.slurpp.Slurpp;
 import com.cyberknights4911.wham.slurpp.SlurppIO;
 import com.cyberknights4911.wham.slurpp.SlurppIOReal;
 import com.cyberknights4911.wham.slurpp.SlurppIOSim;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -122,7 +121,7 @@ public final class Wham implements RobotContainer {
     return new Drive(
         constants,
         WhamConstants.DRIVE_CONSTANTS,
-        new GyroIOPigeon2(),
+        new GyroIOPigeon2(WhamConstants.DRIVE_CONSTANTS),
         new ModuleIOTalonFX(
             WhamConstants.DRIVE_CONSTANTS, WhamConstants.DRIVE_CONSTANTS.frontLeft()),
         new ModuleIOTalonFX(
