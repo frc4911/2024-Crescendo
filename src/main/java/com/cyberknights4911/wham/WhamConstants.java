@@ -117,6 +117,7 @@ public final class WhamConstants {
 
   // Screw: 11.79 inches back of center, 6.5 inches from floor, 11.79 inches right of center
   // Camera from screw: 0.62 inches back, 2.1 inches up, 0.86 inches left
+  // Camera pitch: -28.5 degrees, Camera yaw: -61
   public static final CameraConstants CAMERA_CONSTANTS =
       CameraConstantsBuilder.builder()
           .name("photon4")
@@ -127,6 +128,6 @@ public final class WhamConstants {
                       Units.inchesToMeters(11.79 - .62),
                       Units.inchesToMeters(-11.79 + .86),
                       Units.inchesToMeters(6.5 + 2.1)),
-                  new Rotation3d(0, 0, 0)))
+                  new Rotation3d(0, Units.degreesToRadians(-28.5), Units.degreesToRadians(-61))))
           .build();
 }
