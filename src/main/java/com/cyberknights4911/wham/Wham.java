@@ -16,11 +16,7 @@ import com.cyberknights4911.drive.ModuleIO;
 import com.cyberknights4911.drive.ModuleIOSim;
 import com.cyberknights4911.entrypoint.RobotContainer;
 import com.cyberknights4911.robot2024.Robot2024Constants;
-import com.cyberknights4911.vision.CameraConfig;
-import com.cyberknights4911.vision.Vision;
-import com.cyberknights4911.vision.VisionIOInputsAutoLogged;
-import com.cyberknights4911.vision.VisionIOPhoton;
-import com.cyberknights4911.vision.VisionUpdate;
+import com.cyberknights4911.vision.simple.VisionSimple;
 import com.cyberknights4911.wham.drive.ModuleIOTalonFX;
 import com.cyberknights4911.wham.slurpp.Slurpp;
 import com.cyberknights4911.wham.slurpp.SlurppIO;
@@ -36,7 +32,7 @@ import org.littletonrobotics.junction.LoggedRobot;
 public final class Wham implements RobotContainer {
   private final Drive drive;
   private final Slurpp slurpp;
-  private final Vision vision;
+  private final VisionSimple vision;
   private final WhamControllerBinding binding;
   private final Constants constants;
 
@@ -46,16 +42,10 @@ public final class Wham implements RobotContainer {
     drive = createDrive();
     slurpp = createSlurpp();
     vision =
-        new Vision(
+        new VisionSimple(
             WhamConstants.VISION_CONSTANTS,
-            drive::getPose,
-            (VisionUpdate update) -> {
-              System.out.println("Vision update at time: " + update.timestamp());
-            },
-            new CameraConfig(
-                WhamConstants.CAMERA_CONSTANTS,
-                new VisionIOPhoton(WhamConstants.VISION_CONSTANTS, WhamConstants.CAMERA_CONSTANTS),
-                new VisionIOInputsAutoLogged()));
+            drive::addVisionMeasurement,
+            WhamConstants.CAMERA_CONSTANTS);
 
     configureControls();
   }
