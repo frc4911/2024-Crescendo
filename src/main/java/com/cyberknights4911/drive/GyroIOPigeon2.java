@@ -12,16 +12,21 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
+import com.cyberknights4911.constants.DriveConstants;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 /** IO implementation for Pigeon2 */
 public class GyroIOPigeon2 implements GyroIO {
-  private final Pigeon2 pigeon = new Pigeon2(0);
-  private final StatusSignal<Double> yaw = pigeon.getYaw();
-  private final StatusSignal<Double> yawVelocity = pigeon.getAngularVelocityZWorld();
+  private final Pigeon2 pigeon;
+  private final StatusSignal<Double> yaw;
+  private final StatusSignal<Double> yawVelocity;
 
-  public GyroIOPigeon2() {
+  public GyroIOPigeon2(DriveConstants constants) {
+    pigeon = new Pigeon2(constants.pigeonId());
+    yaw = pigeon.getYaw();
+    yawVelocity = pigeon.getAngularVelocityZWorld();
+
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
     pigeon.getConfigurator().setYaw(0.0);
     yaw.setUpdateFrequency(100.0);

@@ -40,9 +40,17 @@ public class Drive extends SubsystemBase {
   private final double maxAngularSpeedMetersPerSecond;
   private final SysIdRoutine sysId;
 
-  private SwerveDriveKinematics kinematics;
-  private Pose2d pose = new Pose2d();
-  private Rotation2d lastGyroRotation = new Rotation2d();
+  private final SwerveDriveKinematics kinematics;
+  private Rotation2d rawGyroRotation = new Rotation2d();
+  // For delta tracking
+  private final SwerveModulePosition[] lastModulePositions =
+      new SwerveModulePosition[] {
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition(),
+        new SwerveModulePosition()
+      };
+  private final PoseTracker poseEstimator;
 
   public Drive(
       Constants constants,
@@ -56,6 +64,8 @@ public class Drive extends SubsystemBase {
     this.gyroIO = gyroIO;
 
     kinematics = new SwerveDriveKinematics(getModuleTranslations(driveConstants));
+    poseEstimator = new PoseTracker(kinematics, rawGyroRotation, lastModulePositions, new Pose2d());
+
     double driveBaseRadius =
         Math.hypot(driveConstants.trackWidthX() / 2.0, driveConstants.trackWidthY() / 2.0);
     maxAngularSpeedMetersPerSecond = driveConstants.maxLinearSpeed() / driveBaseRadius;
@@ -108,25 +118,29 @@ public class Drive extends SubsystemBase {
     getModuleStates();
     getPose();
 
-    // Update odometry
-    SwerveModulePosition[] wheelDeltas = new SwerveModulePosition[4];
-    for (int i = 0; i < 4; i++) {
-      wheelDeltas[i] = modules[i].getPositionDelta();
+    // Read wheel positions and deltas from each module
+    SwerveModulePosition[] modulePositions = getModulePositions();
+    SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
+    for (int moduleIndex = 0; moduleIndex < 4; moduleIndex++) {
+      moduleDeltas[moduleIndex] =
+          new SwerveModulePosition(
+              modulePositions[moduleIndex].distanceMeters
+                  - lastModulePositions[moduleIndex].distanceMeters,
+              modulePositions[moduleIndex].angle);
+      lastModulePositions[moduleIndex] = modulePositions[moduleIndex];
     }
-    // The twist represents the motion of the robot since the last
-    // loop cycle in x, y, and theta based only on the modules,
-    // without the gyro. The gyro is always disconnected in simulation.
-    var twist = kinematics.toTwist2d(wheelDeltas);
-    if (gyroInputs.connected) {
-      // If the gyro is connected, replace the theta component of the twist
-      // with the change in angle since the last loop cycle.
-      twist =
-          new Twist2d(
-              twist.dx, twist.dy, gyroInputs.yawPosition.minus(lastGyroRotation).getRadians());
-      lastGyroRotation = gyroInputs.yawPosition;
+
+    // Update gyro angle
+    if (gyroInputs.connected) { // Use the real gyro angle
+      rawGyroRotation = gyroInputs.yawPosition;
+    } else {
+      // Use the angle delta from the kinematics and module deltas
+      Twist2d twist = kinematics.toTwist2d(moduleDeltas);
+      rawGyroRotation = rawGyroRotation.plus(new Rotation2d(twist.dtheta));
     }
-    // Apply the twist (change since last loop cycle) to the current pose
-    pose = pose.exp(twist);
+
+    // Apply odometry update
+    poseEstimator.update(rawGyroRotation, modulePositions);
   }
 
   /** Returns SysId routine for characterization. */
@@ -188,20 +202,39 @@ public class Drive extends SubsystemBase {
     return states;
   }
 
+  /** Returns the module positions (turn angles and drive velocities) for all of the modules. */
+  private SwerveModulePosition[] getModulePositions() {
+    SwerveModulePosition[] states = new SwerveModulePosition[4];
+    for (int i = 0; i < 4; i++) {
+      states[i] = modules[i].getPosition();
+    }
+    Logger.recordOutput("SwerveStates/Measured", states);
+    return states;
+  }
+
   /** Returns the current odometry pose. */
   public Pose2d getPose() {
-    Logger.recordOutput("Odometry/Robot", pose);
-    return pose;
+    return poseEstimator.getEstimatedPosition();
   }
 
   /** Returns the current odometry rotation. */
   public Rotation2d getRotation() {
-    return pose.getRotation();
+    return getPose().getRotation();
   }
 
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
-    this.pose = pose;
+    poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
+  }
+
+  /**
+   * Adds a vision measurement to the pose estimator.
+   *
+   * @param visionPose The pose of the robot as measured by the vision camera.
+   * @param timestamp The timestamp of the vision measurement in seconds.
+   */
+  public void addVisionMeasurement(Pose2d visionPose, double timestamp) {
+    poseEstimator.addVisionMeasurement(visionPose, timestamp);
   }
 
   /**

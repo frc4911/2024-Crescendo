@@ -43,7 +43,6 @@ public class Module {
   private Rotation2d angleSetpoint = null; // Setpoint for closed loop control, null for open loop
   private Double speedSetpoint = null; // Setpoint for closed loop control, null for open loop
   private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
-  private double lastPositionMeters = 0.0; // Used for delta calculation
 
   public Module(
       Constants constants,
@@ -176,13 +175,6 @@ public class Module {
   /** Returns the module position (turn angle and drive position). */
   public SwerveModulePosition getPosition() {
     return new SwerveModulePosition(getPositionMeters(), getAngle());
-  }
-
-  /** Returns the module position delta since the last call to this method. */
-  public SwerveModulePosition getPositionDelta() {
-    var delta = new SwerveModulePosition(getPositionMeters() - lastPositionMeters, getAngle());
-    lastPositionMeters = getPositionMeters();
-    return delta;
   }
 
   /** Returns the module state (turn angle and drive velocity). */
