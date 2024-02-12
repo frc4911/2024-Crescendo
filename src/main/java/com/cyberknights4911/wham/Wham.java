@@ -53,8 +53,9 @@ public final class Wham implements RobotContainer {
               System.out.println("Vision update at time: " + update.timestamp());
             },
             new CameraConfig(
-                WhamConstants.CAMERA_CONSTANTS,
-                new VisionIOPhoton(WhamConstants.VISION_CONSTANTS, WhamConstants.CAMERA_CONSTANTS),
+                WhamConstants.CAMERA_CONSTANTS_FRONT_RIGHT,
+                new VisionIOPhoton(
+                    WhamConstants.VISION_CONSTANTS, WhamConstants.CAMERA_CONSTANTS_FRONT_RIGHT),
                 new VisionIOInputsAutoLogged()));
 
     configureControls();
