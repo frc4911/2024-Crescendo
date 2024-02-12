@@ -9,7 +9,7 @@ package com.cyberknights4911.wham;
 
 import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.constants.DriveConstants;
-import com.cyberknights4911.drive.Drive;
+import com.cyberknights4911.drive.advanced.Drive;
 import com.cyberknights4911.util.LocalADStarAK;
 import com.cyberknights4911.wham.slurpp.Slurpp;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -28,11 +28,9 @@ import org.littletonrobotics.junction.Logger;
 
 final class Autos {
 
-  private final Drive drive;
   private final Slurpp slurpp;
 
   public Autos(DriveConstants driveConstants, Drive drive, Slurpp slurpp) {
-    this.drive = drive;
     this.slurpp = slurpp;
 
     double driveBaseRadius =
