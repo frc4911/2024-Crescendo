@@ -9,6 +9,8 @@ package com.cyberknights4911.wham;
 
 import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.constants.Constants;
+import com.cyberknights4911.control.ButtonAction;
+import com.cyberknights4911.control.StickAction;
 import com.cyberknights4911.drive.Drive;
 import com.cyberknights4911.drive.GyroIO;
 import com.cyberknights4911.drive.GyroIOPigeon2;
@@ -16,6 +18,7 @@ import com.cyberknights4911.drive.ModuleIO;
 import com.cyberknights4911.drive.ModuleIOSim;
 import com.cyberknights4911.entrypoint.RobotContainer;
 import com.cyberknights4911.robot2024.Robot2024Constants;
+import com.cyberknights4911.util.GameAlerts;
 import com.cyberknights4911.vision.CameraConfig;
 import com.cyberknights4911.vision.Vision;
 import com.cyberknights4911.vision.VisionIOInputsAutoLogged;
@@ -64,16 +67,16 @@ public final class Wham implements RobotContainer {
     drive.setDefaultCommand(
         drive.joystickDrive(
             WhamConstants.CONTROL_CONSTANTS,
-            binding.supplierFor(WhamSticks.FORWARD),
-            binding.supplierFor(WhamSticks.STRAFE),
-            binding.supplierFor(WhamSticks.ROTATE)));
+            binding.supplierFor(StickAction.FORWARD),
+            binding.supplierFor(StickAction.STRAFE),
+            binding.supplierFor(StickAction.ROTATE)));
 
-    binding.triggersFor(WhamButtons.Brake).whileTrue(drive.stopWithX());
+    binding.triggersFor(ButtonAction.Brake).whileTrue(drive.stopWithX());
 
-    binding.triggersFor(WhamButtons.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
+    binding.triggersFor(ButtonAction.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
 
     binding
-        .triggersFor(WhamButtons.ZeroSpeaker)
+        .triggersFor(ButtonAction.ZeroSpeaker)
         .onTrue(
             Commands.runOnce(
                 () -> {
@@ -86,23 +89,41 @@ public final class Wham implements RobotContainer {
                 drive));
 
     binding
-        .triggersFor(WhamButtons.AmpLockOn)
+        .triggersFor(ButtonAction.AmpLockOn)
         .whileTrue(
             drive.pointToAngleDrive(
                 Robot2024Constants.CONTROL_CONSTANTS,
-                binding.supplierFor(WhamSticks.FORWARD),
-                binding.supplierFor(WhamSticks.STRAFE),
+                binding.supplierFor(StickAction.FORWARD),
+                binding.supplierFor(StickAction.STRAFE),
                 Math.PI / 2));
 
     binding
-        .triggersFor(WhamButtons.SpeakerLockOn)
+        .triggersFor(ButtonAction.SpeakerLockOn)
         .whileTrue(
             drive.pointToPointDrive(
                 Robot2024Constants.CONTROL_CONSTANTS,
-                binding.supplierFor(WhamSticks.FORWARD),
-                binding.supplierFor(WhamSticks.STRAFE),
+                binding.supplierFor(StickAction.FORWARD),
+                binding.supplierFor(StickAction.STRAFE),
                 Units.inchesToMeters(652.73),
                 Units.inchesToMeters(218.42)));
+
+    GameAlerts.triggerFor(GameAlerts.Endgame1)
+        .onFalse(
+            Commands.runOnce(() -> binding.setDriverRumble(true))
+                .withTimeout(1.5)
+                .andThen(() -> binding.setDriverRumble(false))
+                .withTimeout(1.0));
+
+    GameAlerts.triggerFor(GameAlerts.Endgame2)
+        .onFalse(
+            Commands.runOnce(() -> binding.setDriverRumble(true))
+                .withTimeout(1.0)
+                .andThen(() -> binding.setDriverRumble(false))
+                .withTimeout(0.5)
+                .andThen(() -> binding.setDriverRumble(true))
+                .withTimeout(1.0)
+                .andThen(() -> binding.setDriverRumble(false))
+                .withTimeout(0.5));
   }
 
   private Drive createDrive() {

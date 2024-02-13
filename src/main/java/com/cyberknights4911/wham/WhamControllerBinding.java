@@ -7,14 +7,15 @@
 
 package com.cyberknights4911.wham;
 
+import com.cyberknights4911.control.ButtonAction;
 import com.cyberknights4911.control.ButtonBinding;
+import com.cyberknights4911.control.StickAction;
 import com.cyberknights4911.control.StickBinding;
 import com.cyberknights4911.control.Triggers;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.function.DoubleSupplier;
 
-public final class WhamControllerBinding
-    implements StickBinding<WhamSticks>, ButtonBinding<WhamButtons> {
+public final class WhamControllerBinding implements StickBinding, ButtonBinding {
   private static final int DRIVER_CONTROLLER_PORT = 0;
   private final CommandXboxController driver;
 
@@ -23,7 +24,7 @@ public final class WhamControllerBinding
   }
 
   @Override
-  public DoubleSupplier supplierFor(WhamSticks action) {
+  public DoubleSupplier supplierFor(StickAction action) {
     switch (action) {
       case FORWARD:
         return () -> -driver.getLeftY();
@@ -37,14 +38,10 @@ public final class WhamControllerBinding
   }
 
   @Override
-  public Triggers triggersFor(WhamButtons action) {
+  public Triggers triggersFor(ButtonAction action) {
     switch (action) {
       case Brake:
         return new Triggers(driver.x());
-      case DriveForwardSlow:
-        return new Triggers(driver.povUp());
-      case DriveBackwardSlow:
-        return new Triggers(driver.povDown());
       case ZeroGyro:
         return new Triggers(driver.y());
       case ZeroSpeaker:
@@ -56,5 +53,13 @@ public final class WhamControllerBinding
       default:
         return new Triggers(ALWAYS_FALSE);
     }
+  }
+
+  public void setDriverRumble(boolean enabled) {
+    // TODO: turn rumble on or off for the driver controller
+  }
+
+  public void setOperatorRumble(boolean enabled) {
+    // TODO: turn rumble on or off for the operator controller
   }
 }
