@@ -53,7 +53,7 @@ public final class WhamConstants {
           .maxLinearSpeed(4.5)
           .trackWidthX(Units.inchesToMeters(22.75))
           .trackWidthY(Units.inchesToMeters(22.75))
-          .wheelRadius(Units.inchesToMeters(2))
+          .wheelRadius(Units.inchesToMeters(1.941349158748698))
           .turnGearRatio(DriveConstants.TURN_GEAR_RATIO)
           .driveGearRatio(DriveConstants.L1_GEAR_RATIO)
           .pigeonId(0)
