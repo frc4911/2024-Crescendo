@@ -127,8 +127,8 @@ public final class WhamConstants {
 
   public static final CameraConstants CAMERA_CONSTANTS_FRONT_RIGHT =
       CameraConstantsBuilder.builder()
-          .name("photon2")
-          .photonCameraName("Camera_2")
+          .name("photon4")
+          .photonCameraName("Camera_4")
           .robotToCamera(
               new Transform3d(
                   new Translation3d(

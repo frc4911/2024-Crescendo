@@ -168,8 +168,8 @@ public final class Robot2024Constants {
 
   public static final CameraConstants CAMERA_CONSTANTS_BACK_RIGHT =
       CameraConstantsBuilder.builder()
-          .name("photon3")
-          .photonCameraName("Camera_3")
+          .name("photon4")
+          .photonCameraName("Camera_4")
           .robotToCamera(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)))
           .build();
 }
