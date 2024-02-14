@@ -8,12 +8,24 @@
 package com.cyberknights4911.robot2024;
 
 import com.cyberknights4911.auto.AutoCommandHandler;
+import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.drive.Drive;
 import com.cyberknights4911.robot2024.climb.Climb;
 import com.cyberknights4911.robot2024.collect.Collect;
 import com.cyberknights4911.robot2024.shooter.Shooter;
+import com.cyberknights4911.util.LocalADStarAK;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.pathfinding.Pathfinding;
+import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.pathplanner.lib.util.PathPlannerLogging;
+import com.pathplanner.lib.util.ReplanningConfig;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import java.util.function.BooleanSupplier;
+import org.littletonrobotics.junction.Logger;
 
 public final class Autos {
   private final Climb climb;
@@ -21,15 +33,50 @@ public final class Autos {
   private final Shooter shooter;
   private final Drive drive;
 
-  public Autos(Climb climb, Collect collect, Shooter shooter, Drive drive) {
+  public Autos(
+      DriveConstants driveConstants, Climb climb, Collect collect, Shooter shooter, Drive drive) {
     this.climb = climb;
     this.collect = collect;
     this.shooter = shooter;
     this.drive = drive;
+
+    double driveBaseRadius =
+        Math.hypot(driveConstants.trackWidthX() / 2.0, driveConstants.trackWidthY() / 2.0);
+
+    BooleanSupplier shouldFlipPath =
+        () -> {
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        };
+
+    AutoBuilder.configureHolonomic(
+        drive::getPose,
+        drive::setPose,
+        drive::getChassisSpeeds,
+        drive::runVelocity,
+        new HolonomicPathFollowerConfig(
+            driveConstants.maxLinearSpeed(), driveBaseRadius, new ReplanningConfig()),
+        shouldFlipPath,
+        drive);
+    Pathfinding.setPathfinder(new LocalADStarAK());
+    PathPlannerLogging.setLogActivePathCallback(
+        (activePath) -> {
+          Logger.recordOutput(
+              "Odometry/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+        });
+    PathPlannerLogging.setLogTargetPoseCallback(
+        (targetPose) -> {
+          Logger.recordOutput("Odometry/TrajectorySetpoint", targetPose);
+        });
   }
 
   public void addAllAutos(AutoCommandHandler handler) {
     handler.addDefaultOption("Nothing", Commands.none());
+    handler.addOption("Translate Test", new PathPlannerAuto("TranslationTest"));
+
     addCharacterization("Climb", climb.getSysId(), handler);
     addCharacterization("Collector", collect.getSysId(), handler);
     addCharacterization("Shooter", shooter.getSysId(), handler);

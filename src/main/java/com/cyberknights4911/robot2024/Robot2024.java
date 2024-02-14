@@ -107,7 +107,7 @@ public final class Robot2024 implements RobotContainer {
 
   @Override
   public void setupAutos(AutoCommandHandler handler) {
-    Autos autos = new Autos(climb, collect, shooter, drive);
+    Autos autos = new Autos(Robot2024Constants.DRIVE_CONSTANTS, climb, collect, shooter, drive);
     autos.addAllAutos(handler);
   }
 
