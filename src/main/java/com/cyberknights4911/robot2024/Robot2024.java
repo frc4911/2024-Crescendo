@@ -28,11 +28,13 @@ import com.cyberknights4911.robot2024.drive.ModuleIOSparkFlex;
 import com.cyberknights4911.robot2024.shooter.Shooter;
 import com.cyberknights4911.robot2024.shooter.ShooterIO;
 import com.cyberknights4911.robot2024.shooter.ShooterIOSim;
+import com.cyberknights4911.util.GameAlerts;
 import com.cyberknights4911.util.SparkBurnManager;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -103,6 +105,28 @@ public final class Robot2024 implements RobotContainer {
   @Override
   public void onRobotPeriodic(LoggedRobot robot) {
     binding.checkControllers();
+
+    if (GameAlerts.shouldAlert(GameAlerts.Endgame1)) {
+      CommandScheduler.getInstance()
+          .schedule(
+              Commands.runOnce(() -> binding.setDriverRumble(true))
+                  .withTimeout(1.5)
+                  .andThen(() -> binding.setDriverRumble(false))
+                  .withTimeout(1.0));
+    }
+
+    if (GameAlerts.shouldAlert(GameAlerts.Endgame2)) {
+      CommandScheduler.getInstance()
+          .schedule(
+              Commands.runOnce(() -> binding.setDriverRumble(true))
+                  .withTimeout(1.0)
+                  .andThen(() -> binding.setDriverRumble(false))
+                  .withTimeout(0.5)
+                  .andThen(() -> binding.setDriverRumble(true))
+                  .withTimeout(1.0)
+                  .andThen(() -> binding.setDriverRumble(false))
+                  .withTimeout(0.5));
+    }
   }
 
   @Override
