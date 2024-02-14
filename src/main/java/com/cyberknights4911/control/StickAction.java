@@ -8,4 +8,8 @@
 package com.cyberknights4911.control;
 
 /** Robot actions that can be bound to stick inputs. */
-public interface StickAction {}
+public enum StickAction {
+  FORWARD,
+  STRAFE,
+  ROTATE
+}
