@@ -15,7 +15,6 @@ import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
-import com.revrobotics.SparkPIDController.ArbFFUnits;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
@@ -42,16 +41,16 @@ public class CollectIOReal implements CollectIO {
     this.sparkBurnManager = sparkBurnManager;
     collectGearRatio = constants.collectGearRatio();
 
-    collect = new CANSparkFlex(constants.motorId(), MotorType.kBrushless);
+    collect = new CANSparkFlex(constants.motorCollectId(), MotorType.kBrushless);
     collectEncoder = collect.getEncoder();
     collectPidController = collect.getPIDController();
 
-    guide = new CANSparkFlex(constants.motorIdguide(), MotorType.kBrushless);
+    guide = new CANSparkFlex(constants.motorGuideId(), MotorType.kBrushless);
     guideEncoder = guide.getEncoder();
     guidePidController = guide.getPIDController();
 
-    left = new Solenoid(PneumaticsModuleType.REVPH, constants.forwardId());
-    right = new Solenoid(PneumaticsModuleType.REVPH, constants.reverseId());
+    left = new Solenoid(PneumaticsModuleType.REVPH, constants.solenoidLeftId());
+    right = new Solenoid(PneumaticsModuleType.REVPH, constants.solenoidRightId());
 
     beamBreak = new AnalogInput(constants.sensorId());
 
@@ -85,13 +84,10 @@ public class CollectIOReal implements CollectIO {
   }
 
   @Override
-  public void setCollectVelocity(double velocityRadPerSec, double ffVolts) {
+  public void setCollectVelocity(double velocityRadPerSec) {
     collectPidController.setReference(
         Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec) * collectGearRatio,
-        ControlType.kVelocity,
-        0,
-        ffVolts,
-        ArbFFUnits.kVoltage);
+        ControlType.kVelocity);
   }
 
   @Override
@@ -106,11 +102,24 @@ public class CollectIOReal implements CollectIO {
   }
 
   @Override
-  public void configurePID(double kP, double kI, double kD) {
+  public void stopGuide() {
+    guide.stopMotor();
+  }
+
+  @Override
+  public void configureCollectPID(double kP, double kI, double kD) {
     collectPidController.setP(kP, 0);
     collectPidController.setI(kI, 0);
     collectPidController.setD(kD, 0);
     collectPidController.setFF(0, 0);
+  }
+
+  @Override
+  public void configureGuidePID(double kP, double kI, double kD) {
+    guidePidController.setP(kP, 0);
+    guidePidController.setI(kI, 0);
+    guidePidController.setD(kD, 0);
+    guidePidController.setFF(0, 0);
   }
 
   private void configureDevices() {

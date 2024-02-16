@@ -54,10 +54,9 @@ public final class CollectIOSim implements CollectIO {
   }
 
   @Override
-  public void setCollectVelocity(double velocityRadPerSec, double ffVolts) {
+  public void setCollectVelocity(double velocityRadPerSec) {
     closedLoop = true;
     pid.setSetpoint(velocityRadPerSec);
-    this.ffVolts = ffVolts;
   }
 
   @Override
@@ -66,7 +65,7 @@ public final class CollectIOSim implements CollectIO {
   }
 
   @Override
-  public void configurePID(double kP, double kI, double kD) {
+  public void configureCollectPID(double kP, double kI, double kD) {
     pid.setPID(kP, kI, kD);
   }
 }

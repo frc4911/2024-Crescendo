@@ -9,6 +9,7 @@ package com.cyberknights4911.robot2024.shooter;
 
 import com.cyberknights4911.util.SparkBurnManager;
 import com.cyberknights4911.util.SparkConfig;
+import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
@@ -145,6 +146,14 @@ public class ShooterIOReal implements ShooterIO {
     shooterPidController.setI(kI, 0);
     shooterPidController.setD(kD, 0);
     shooterPidController.setFF(0, 0);
+  }
+
+  @Override
+  public void configureLimits(double forwardLimit, double backwardLimit) {
+    aimer.enableSoftLimit(CANSparkBase.SoftLimitDirection.kForward, true);
+    aimer.enableSoftLimit(CANSparkBase.SoftLimitDirection.kReverse, true);
+    aimer.setSoftLimit(CANSparkBase.SoftLimitDirection.kForward, (float) forwardLimit);
+    aimer.setSoftLimit(CANSparkBase.SoftLimitDirection.kReverse, (float) backwardLimit);
   }
 
   private void configureDevices() {

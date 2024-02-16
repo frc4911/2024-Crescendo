@@ -59,4 +59,6 @@ public interface ShooterIO {
 
   /** Set velocity PID constants. */
   public default void configureShooterPID(double kP, double kI, double kD) {}
+
+  public default void configureLimits(double forwardLimit, double backwardLimit) {}
 }
