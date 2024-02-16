@@ -24,6 +24,8 @@ import io.soabase.recordbuilder.core.RecordBuilder;
 public record CollectConstants(
     int motorId,
     int sensorId,
+    int forwardId,
+    int reverseId,
     double gearRatio,
     double ejectTime,
     double ejectSpeed,
