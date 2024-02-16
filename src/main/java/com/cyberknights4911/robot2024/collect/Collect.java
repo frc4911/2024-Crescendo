@@ -60,24 +60,33 @@ public class Collect extends SubsystemBase {
                 null,
                 null,
                 (state) -> Logger.recordOutput("Collect/SysIdState", state.toString())),
-            new SysIdRoutine.Mechanism((voltage) -> runVolts(voltage.in(Volts)), null, this));
+            new SysIdRoutine.Mechanism(
+                (voltage) -> runCollectVolts(voltage.in(Volts)), null, this));
   }
 
   public boolean isBeamBreakBlocked() {
     return inputs.beamBreakVoltage > beamThreshold.get();
   }
 
-  /** Run open loop at the specified voltage. */
-  public void runVolts(double volts) {
-    collectIO.setVoltage(volts);
+  /** Run collector open loop at the specified voltage. */
+  public void runCollectVolts(double volts) {
+    collectIO.setCollectVoltage(volts);
   }
 
-  /** Run closed loop at the specified velocity. */
-  public void runVelocity(double velocityRpm) {
+  /** Run collector closed loop at the specified velocity. */
+  public void runCollectVelocity(double velocityRpm) {
     var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRpm);
-    collectIO.setVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
+    collectIO.setCollectVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
 
     Logger.recordOutput("Collect/SetpointRPM", velocityRpm);
+  }
+
+  /** Run guide closed loop at the specified velocity. */
+  public void runGuideVelocity(double velocityRpm) {
+    var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRpm);
+    collectIO.setGuideVelocity(velocityRadPerSec);
+
+    Logger.recordOutput("Collect/GuideSetpointRPM", velocityRpm);
   }
 
   @Override
@@ -104,24 +113,25 @@ public class Collect extends SubsystemBase {
 
   /** Returns the current velocity in RPM. */
   public double getVelocityRpm() {
-    double velocityRpm = Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec);
+    double velocityRpm =
+        Units.radiansPerSecondToRotationsPerMinute(inputs.collectVelocityRadPerSec);
     Logger.recordOutput("Collect/VelocityRPM", velocityRpm);
     return velocityRpm;
   }
 
   /** Runs forwards at the commanded voltage. */
   public void runCharacterizationVolts(double volts) {
-    collectIO.setVoltage(volts);
+    collectIO.setCollectVoltage(volts);
   }
 
   /** Returns the average velocity in radians/sec. */
   public double getCharacterizationVelocity() {
-    return inputs.velocityRadPerSec;
+    return inputs.collectVelocityRadPerSec;
   }
 
   /** Stops the collector. */
   public void stop() {
-    collectIO.stop();
+    collectIO.stopCollector();
   }
 
   /**
@@ -131,7 +141,7 @@ public class Collect extends SubsystemBase {
   private Command collectAtSpeed(LoggedTunableNumber desiredSpeed) {
     return Commands.runOnce(
         () -> {
-          runVelocity(desiredSpeed.get());
+          runCollectVelocity(desiredSpeed.get());
         },
         this);
   }

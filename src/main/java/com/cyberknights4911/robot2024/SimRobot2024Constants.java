@@ -101,7 +101,7 @@ public final class SimRobot2024Constants {
       CollectConstantsBuilder.builder()
           .motorId(0)
           .sensorId(0)
-          .gearRatio(1.0)
+          .collectGearRatio(1.0)
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
           .build();

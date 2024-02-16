@@ -107,7 +107,7 @@ public final class Robot2024Constants {
           .motorId(11)
           .sensorId(
               12) // todo: Beam break sensor, if not dependanat on physical port on the roborio.
-          .gearRatio(1.0) // todo: Find gear ratio for collector
+          .collectGearRatio(24.0 / 18.0)
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
           .build();
@@ -117,7 +117,7 @@ public final class Robot2024Constants {
           .shooterMotorTopId(21)
           .shooterMotorBottomId(22)
           .aimerMotorId(23)
-          .aimerGearRatio(1.0) // todo: Find gear ratio for shooter
+          .aimerGearRatio(84.0 / 14.0)
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
           .build();

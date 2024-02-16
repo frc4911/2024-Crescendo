@@ -82,7 +82,7 @@ public class ShooterIOReal implements ShooterIO {
   @Override
   public void setAimerPosition(double positionRadians, double ffVolts) {
     aimerPidController.setReference(
-        Units.radiansToDegrees(positionRadians),
+        Units.radiansToDegrees(positionRadians) * aimerGearRatio,
         ControlType.kSmartMotion,
         0,
         ffVolts,

@@ -22,6 +22,8 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
+  private static final LoggedTunableNumber beamThreshold =
+      new LoggedTunableNumber("Shooter/beamThreshold");
   private static final LoggedTunableNumber kP = new LoggedTunableNumber("Shooter/kP");
   private static final LoggedTunableNumber kD = new LoggedTunableNumber("Shooter/kD");
   private static final LoggedTunableNumber kS = new LoggedTunableNumber("Shooter/kS");
@@ -67,17 +69,25 @@ public class Shooter extends SubsystemBase {
                 (voltage) -> runShooterVolts(voltage.in(Volts)), null, this));
   }
 
-  /** Run open loop at the specified voltage. */
+  /** Run shooter open loop at the specified voltage. */
   public void runShooterVolts(double volts) {
     shooterIO.setShooterVoltage(volts);
   }
 
-  /** Run closed loop at the specified velocity. */
+  /** Run shooter closed loop at the specified velocity. */
   public void runShooterVelocity(double velocityRPM) {
     var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
     shooterIO.setShooterVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
 
     Logger.recordOutput("Shooter/SetpointRPM", velocityRPM);
+  }
+
+  /** Run aimer closed loop to the specified position. */
+  public void setAimerPostion(double positionDegrees) {
+    var positionRadians = Units.degreesToRadians(positionDegrees);
+    shooterIO.setAimerPosition(positionRadians, 0.0);
+
+    Logger.recordOutput("Shooter/AimerSetpointDegrees", positionDegrees);
   }
 
   @Override
@@ -113,6 +123,10 @@ public class Shooter extends SubsystemBase {
   /** Stops the shooter. */
   public void stop() {
     shooterIO.stopShooter();
+  }
+
+  public boolean isBeamBreakBlocked() {
+    return inputs.beamBreakVoltage > beamThreshold.get();
   }
 
   /**
