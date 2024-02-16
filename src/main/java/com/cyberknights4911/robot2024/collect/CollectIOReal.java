@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
 public class CollectIOReal implements CollectIO {
   private final CANSparkFlex collect;
+  private final CANSparkFlex guideRoller;
   private final DoubleSolenoid extend;
   private final RelativeEncoder encoder;
   private final SparkPIDController pidController;
@@ -30,14 +31,17 @@ public class CollectIOReal implements CollectIO {
   private final double gearRatio;
   private final SparkBurnManager sparkBurnManager;
 
-  public CollectIOReal(CollectConstants collectConstants, SparkBurnManager sparkBurnManager) {
+  public CollectIOReal(CollectConstants constants, SparkBurnManager sparkBurnManager) {
     this.sparkBurnManager = sparkBurnManager;
-    collect = new CANSparkFlex(collectConstants.motorId(), MotorType.kBrushless);
-    extend = new DoubleSolenoid(PneumaticsModuleType.REVPH, collectConstants.forwardId(), collectConstants.reverseId());
+    collect = new CANSparkFlex(constants.motorId(), MotorType.kBrushless);
+    guideRoller = new CANSparkFlex(constants.motorIdguide(), MotorType.kBrushless);
+    extend =
+        new DoubleSolenoid(
+            PneumaticsModuleType.REVPH, constants.forwardId(), constants.reverseId());
     encoder = collect.getEncoder();
     pidController = collect.getPIDController();
-    gearRatio = collectConstants.gearRatio();
-    beamBreak = new AnalogInput(collectConstants.sensorId());
+    gearRatio = constants.gearRatio();
+    beamBreak = new AnalogInput(constants.sensorId());
 
     configureDevices();
   }

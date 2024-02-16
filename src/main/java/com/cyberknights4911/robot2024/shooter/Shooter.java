@@ -54,7 +54,7 @@ public class Shooter extends SubsystemBase {
     shootSlowSpeed.initDefault(constants.slowVelocityRpm());
     shooterRpmError.initDefault(constants.errorVelocityRpm());
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
-    shooterIO.configurePID(kP.get(), 0.0, kD.get());
+    shooterIO.configureShooterPID(kP.get(), 0.0, kD.get());
 
     sysId =
         new SysIdRoutine(
@@ -63,18 +63,19 @@ public class Shooter extends SubsystemBase {
                 null,
                 null,
                 (state) -> Logger.recordOutput("Shooter/SysIdState", state.toString())),
-            new SysIdRoutine.Mechanism((voltage) -> runVolts(voltage.in(Volts)), null, this));
+            new SysIdRoutine.Mechanism(
+                (voltage) -> runShooterVolts(voltage.in(Volts)), null, this));
   }
 
   /** Run open loop at the specified voltage. */
-  public void runVolts(double volts) {
-    shooterIO.setVoltage(volts);
+  public void runShooterVolts(double volts) {
+    shooterIO.setShooterVoltage(volts);
   }
 
   /** Run closed loop at the specified velocity. */
-  public void runVelocity(double velocityRPM) {
+  public void runShooterVelocity(double velocityRPM) {
     var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
-    shooterIO.setVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
+    shooterIO.setShooterVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
 
     Logger.recordOutput("Shooter/SetpointRPM", velocityRPM);
   }
@@ -85,7 +86,7 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs("Shooter", inputs);
 
     if (kP.hasChanged(hashCode()) || kD.hasChanged(hashCode())) {
-      shooterIO.configurePID(kP.get(), 0.0, kD.get());
+      shooterIO.configureShooterPID(kP.get(), 0.0, kD.get());
     }
     if (kS.hasChanged(hashCode()) || kV.hasChanged(hashCode())) {
       feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
@@ -103,14 +104,15 @@ public class Shooter extends SubsystemBase {
 
   /** Returns the current velocity in RPM. */
   public double getVelocityRpm() {
-    double velocityRpm = Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec);
+    double velocityRpm =
+        Units.radiansPerSecondToRotationsPerMinute(inputs.shooterTopVelocityRadPerSec);
     Logger.recordOutput("Shooter/VelocityRPM", velocityRpm);
     return velocityRpm;
   }
 
   /** Stops the shooter. */
   public void stop() {
-    shooterIO.stop();
+    shooterIO.stopShooter();
   }
 
   /**
@@ -122,13 +124,13 @@ public class Shooter extends SubsystemBase {
     return Commands.sequence(
         Commands.runOnce(
             () -> {
-              runVelocity(desiredSpeed.get());
+              runShooterVelocity(desiredSpeed.get());
             },
             this),
         Commands.waitUntil(
             () -> {
               return Math.abs(
-                      Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec)
+                      Units.radiansPerSecondToRotationsPerMinute(inputs.shooterTopVelocityRadPerSec)
                           - desiredSpeed.get())
                   < shooterRpmError.get();
             }));

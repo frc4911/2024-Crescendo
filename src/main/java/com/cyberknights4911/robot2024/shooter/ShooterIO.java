@@ -12,24 +12,51 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ShooterIO {
   @AutoLog
   public static class ShooterIOInputs {
-    public double positionRad = 0.0;
-    public double velocityRadPerSec = 0.0;
+    public double shooterTopPositionRad = 0.0;
+    public double shooterTopVelocityRadPerSec = 0.0;
+    public double shooterBottomPositionRad = 0.0;
+    public double shooterBottomVelocityRadPerSec = 0.0;
+    public double aimerPositionRad = 0.0;
+    public double aimerVelocityRadPerSec = 0.0;
+    public double indexerPositionRad = 0.0;
+    public double indexerVelocityRadPerSec = 0.0;
 
-    public double appliedVolts = 0.0;
-    public double[] currentAmps = new double[] {};
+    public double shooterTopAppliedVolts = 0.0;
+    public double shooterTopCurrentAmps = 0.0;
+    public double shooterBottomAppliedVolts = 0.0;
+    public double shooterBottomCurrentAmps = 0.0;
+    public double aimerAppliedVolts = 0.0;
+    public double aimerCurrentAmps = 0.0;
+    public double indexerAppliedVolts = 0.0;
+    public double indexerCurrentAmps = 0.0;
+
+    public double beamBreakVoltage = 0.0;
   }
+
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ShooterIOInputs inputs) {}
 
-  /** Run the motor at the specified voltage. */
-  public default void setVoltage(double volts) {}
+  /** Run the shooter at the specified voltage. */
+  public default void setShooterVoltage(double volts) {}
 
-  /** Run closed loop at the specified velocity. */
-  public default void setVelocity(double velocityRadPerSec, double ffVolts) {}
+  /** Run shooter in closed loop at the specified velocity. */
+  public default void setShooterVelocity(double velocityRadPerSec, double ffVolts) {}
 
-  /** Stop in open loop. */
-  public default void stop() {}
+  /** Stop shooter in open loop. */
+  public default void stopShooter() {}
+
+  /** Run closed loop to the specified position. */
+  public default void setAimerPosition(double position, double ffVolts) {}
+
+  /** Run indexer in closed loop at the specified velocity. */
+  public default void setIndexerVelocity(double velocityRadPerSec) {}
+
+  /** Stop aimer in open loop. */
+  public default void stopAimer() {}
+
+  /** Stop indexer in open loop. */
+  public default void stopIndexer() {}
 
   /** Set velocity PID constants. */
-  public default void configurePID(double kP, double kI, double kD) {}
+  public default void configureShooterPID(double kP, double kI, double kD) {}
 }

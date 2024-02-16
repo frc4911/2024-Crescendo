@@ -108,9 +108,9 @@ public final class SimRobot2024Constants {
 
   public static ShooterConstants SHOOTER_CONSTANTS =
       ShooterConstantsBuilder.builder()
-          .motorId1(0)
-          .motorId2(0)
-          .gearRatio(1.0)
+          .shooterMotorTopId(0)
+          .shooterMotorBottomId(0)
+          .aimerGearRatio(1.0)
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
           .build();

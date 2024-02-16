@@ -114,10 +114,10 @@ public final class Robot2024Constants {
 
   public static ShooterConstants SHOOTER_CONSTANTS =
       ShooterConstantsBuilder.builder()
-          .motorId1(21)
-          .motorId2(22)
-          .motorId3(23)
-          .gearRatio(1.0) // todo: Find gear ratio for shooter
+          .shooterMotorTopId(21)
+          .shooterMotorBottomId(22)
+          .aimerMotorId(23)
+          .aimerGearRatio(1.0) // todo: Find gear ratio for shooter
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
           .build();

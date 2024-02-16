@@ -23,6 +23,7 @@ import io.soabase.recordbuilder.core.RecordBuilder;
 @RecordBuilder
 public record CollectConstants(
     int motorId,
+    int motorIdguide,
     int sensorId,
     int forwardId,
     int reverseId,

@@ -19,7 +19,7 @@ public final class ShooterIOSim implements ShooterIO {
 
   public ShooterIOSim(ShooterConstants constants) {
     // TODO: determine moment of inertia
-    sim = new DCMotorSim(DCMotor.getNeoVortex(2), constants.gearRatio(), 0.004);
+    sim = new DCMotorSim(DCMotor.getNeoVortex(2), constants.aimerGearRatio(), 0.004);
     pid = new PIDController(0.0, 0.0, 0.0);
   }
 
@@ -27,25 +27,25 @@ public final class ShooterIOSim implements ShooterIO {
   public void updateInputs(ShooterIOInputs inputs) {
     sim.update(0.02);
 
-    inputs.positionRad = 0.0;
-    inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
-    inputs.appliedVolts = appliedVolts;
-    inputs.currentAmps = new double[] {sim.getCurrentDrawAmps()};
+    inputs.shooterTopPositionRad = 0.0;
+    inputs.shooterTopVelocityRadPerSec = sim.getAngularVelocityRadPerSec();
+    inputs.shooterTopAppliedVolts = appliedVolts;
+    inputs.shooterTopCurrentAmps = sim.getCurrentDrawAmps();
   }
 
   @Override
-  public void setVoltage(double volts) {
+  public void setShooterVoltage(double volts) {
     appliedVolts = 0.0;
     sim.setInputVoltage(volts);
   }
 
   @Override
-  public void stop() {
-    setVoltage(0.0);
+  public void stopShooter() {
+    setShooterVoltage(0.0);
   }
 
   @Override
-  public void configurePID(double kP, double kI, double kD) {
+  public void configureShooterPID(double kP, double kI, double kD) {
     pid.setPID(kP, kI, kD);
   }
 }
