@@ -10,7 +10,6 @@ package com.cyberknights4911.robot2024.shooter;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.cyberknights4911.logging.LoggedTunableNumber;
-import com.cyberknights4911.robot2024.collect.Collect;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -22,19 +21,31 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public class Shooter extends SubsystemBase {
+  private static final LoggedTunableNumber beamThreshold =
+      new LoggedTunableNumber("Shooter/beamThreshold");
   private static final LoggedTunableNumber kP = new LoggedTunableNumber("Shooter/kP");
   private static final LoggedTunableNumber kD = new LoggedTunableNumber("Shooter/kD");
   private static final LoggedTunableNumber kS = new LoggedTunableNumber("Shooter/kS");
   private static final LoggedTunableNumber kV = new LoggedTunableNumber("Shooter/kV");
   private static final LoggedTunableNumber feedTime = new LoggedTunableNumber("Shooter/feedTime");
-  private static final LoggedTunableNumber shootFastSpeed =
-      new LoggedTunableNumber("Shooter/FastVelocityRPM");
-  private static final LoggedTunableNumber shootMediumSpeed =
-      new LoggedTunableNumber("Shooter/MediumVelocityRPM");
-  private static final LoggedTunableNumber shootSlowSpeed =
-      new LoggedTunableNumber("Shooter/SlowVelocityRPM");
+  private static final LoggedTunableNumber speakerFireVelocityRPM =
+      new LoggedTunableNumber("Shooter/SpeakerFireVelocityRPM");
+  private static final LoggedTunableNumber speakerWarmUpVelocityRpm =
+      new LoggedTunableNumber("Shooter/SpeakerWarmUpVelocityRpm");
   private static final LoggedTunableNumber shooterRpmError =
       new LoggedTunableNumber("Shooter/ErrorRPM");
+  private static final LoggedTunableNumber shooterStowPosition =
+      new LoggedTunableNumber("Shooter/StowPosition");
+  private static final LoggedTunableNumber shooterPositionError =
+      new LoggedTunableNumber("Shooter/PositionErrorDegrees");
+  private static final LoggedTunableNumber indexVelocityRpm =
+      new LoggedTunableNumber("Shooter/IndexVelocityRPM");
+  private static final LoggedTunableNumber feedVelocityRpm =
+      new LoggedTunableNumber("Shooter/FeedVelocityRPM");
+  private static final LoggedTunableNumber forwardLimit =
+      new LoggedTunableNumber("Shooter/forwardLimit");
+  private static final LoggedTunableNumber backwardLimit =
+      new LoggedTunableNumber("Shooter/backwardLimit");
 
   private final ShooterIO shooterIO;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
@@ -49,12 +60,16 @@ public class Shooter extends SubsystemBase {
     kP.initDefault(constants.feedBackValues().kP());
     kD.initDefault(constants.feedBackValues().kD());
     feedTime.initDefault(constants.feedTime());
-    shootFastSpeed.initDefault(constants.fastVelocityRpm());
-    shootMediumSpeed.initDefault(constants.mediumVelocityRpm());
-    shootSlowSpeed.initDefault(constants.slowVelocityRpm());
+    speakerFireVelocityRPM.initDefault(constants.speakerFireVelocityRpm());
+    speakerWarmUpVelocityRpm.initDefault(constants.speakerWarmUpVelocityRpm());
     shooterRpmError.initDefault(constants.errorVelocityRpm());
+    forwardLimit.initDefault(constants.aimerForwardLimit());
+    backwardLimit.initDefault(constants.aimerBackwardLimit());
+    indexVelocityRpm.initDefault(constants.indexVelocityRpm());
+    feedVelocityRpm.initDefault(constants.feedVelocityRpm());
+
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
-    shooterIO.configurePID(kP.get(), 0.0, kD.get());
+    shooterIO.configureShooterPID(kP.get(), 0.0, kD.get());
 
     sysId =
         new SysIdRoutine(
@@ -63,20 +78,58 @@ public class Shooter extends SubsystemBase {
                 null,
                 null,
                 (state) -> Logger.recordOutput("Shooter/SysIdState", state.toString())),
-            new SysIdRoutine.Mechanism((voltage) -> runVolts(voltage.in(Volts)), null, this));
+            new SysIdRoutine.Mechanism(
+                (voltage) -> runShooterVolts(voltage.in(Volts)), null, this));
   }
 
-  /** Run open loop at the specified voltage. */
-  public void runVolts(double volts) {
-    shooterIO.setVoltage(volts);
+  /** Run shooter open loop at the specified voltage. */
+  public void runShooterVolts(double volts) {
+    shooterIO.setShooterVoltage(volts);
   }
 
-  /** Run closed loop at the specified velocity. */
-  public void runVelocity(double velocityRPM) {
+  /** Run shooter closed loop at the specified velocity. */
+  public void runShooterVelocity(double velocityRPM) {
     var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
-    shooterIO.setVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
+    shooterIO.setShooterVelocity(velocityRadPerSec, feedforward.calculate(velocityRadPerSec));
 
-    Logger.recordOutput("Shooter/SetpointRPM", velocityRPM);
+    Logger.recordOutput("Shooter/ShooterSetpointRPM", velocityRPM);
+  }
+
+  /** Returns the current velocity in RPM. */
+  public double getShooterVelocityRpm() {
+    double velocityRpm =
+        Units.radiansPerSecondToRotationsPerMinute(inputs.shooterTopVelocityRadPerSec);
+    Logger.recordOutput("Shooter/ShooterVelocityRPM", velocityRpm);
+    return velocityRpm;
+  }
+
+  /** Stops the shooter. */
+  public void stopShooter() {
+    shooterIO.stopShooter();
+  }
+
+  /** Run aimer closed loop to the specified position. */
+  public void setAimerPostion(double positionDegrees) {
+    var positionRadians = Units.degreesToRadians(positionDegrees);
+    shooterIO.setAimerPosition(positionRadians, 0.0);
+
+    Logger.recordOutput("Shooter/AimerSetpointDegrees", positionDegrees);
+  }
+
+  /** Run indexer closed loop at the specified velocity. */
+  public void runIndexerVelocity(double velocityRPM) {
+    var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
+    shooterIO.setIndexerVelocity(velocityRadPerSec);
+
+    Logger.recordOutput("Shooter/IndexerSetpointRPM", velocityRPM);
+  }
+
+  public void stopIndexer() {
+    shooterIO.stopIndexer();
+  }
+
+  public boolean isBeamBreakBlocked() {
+    return inputs.beamBreakVoltage > beamThreshold.get();
   }
 
   @Override
@@ -85,32 +138,24 @@ public class Shooter extends SubsystemBase {
     Logger.processInputs("Shooter", inputs);
 
     if (kP.hasChanged(hashCode()) || kD.hasChanged(hashCode())) {
-      shooterIO.configurePID(kP.get(), 0.0, kD.get());
+      shooterIO.configureShooterPID(kP.get(), 0.0, kD.get());
     }
     if (kS.hasChanged(hashCode()) || kV.hasChanged(hashCode())) {
       feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     }
+    if (forwardLimit.hasChanged(hashCode()) || backwardLimit.hasChanged(hashCode())) {
+      shooterIO.configureLimits(forwardLimit.get(), backwardLimit.get());
+    }
 
     if (DriverStation.isDisabled()) {
-      stop();
+      stopShooter();
+      stopIndexer();
     }
   }
 
   /** Returns SysId routine for characterization. */
   public SysIdRoutine getSysId() {
     return sysId;
-  }
-
-  /** Returns the current velocity in RPM. */
-  public double getVelocityRpm() {
-    double velocityRpm = Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec);
-    Logger.recordOutput("Shooter/VelocityRPM", velocityRpm);
-    return velocityRpm;
-  }
-
-  /** Stops the shooter. */
-  public void stop() {
-    shooterIO.stop();
   }
 
   /**
@@ -122,13 +167,13 @@ public class Shooter extends SubsystemBase {
     return Commands.sequence(
         Commands.runOnce(
             () -> {
-              runVelocity(desiredSpeed.get());
+              runShooterVelocity(desiredSpeed.get());
             },
             this),
         Commands.waitUntil(
             () -> {
               return Math.abs(
-                      Units.radiansPerSecondToRotationsPerMinute(inputs.velocityRadPerSec)
+                      Units.radiansPerSecondToRotationsPerMinute(inputs.shooterTopVelocityRadPerSec)
                           - desiredSpeed.get())
                   < shooterRpmError.get();
             }));
@@ -139,8 +184,8 @@ public class Shooter extends SubsystemBase {
    * actual shooter RPM falls within a configurable margin of error. When this command ends, the
    * shooter will stay spinning at the set velocity.
    */
-  public Command spinFast() {
-    return spinAtSpeed(shootFastSpeed);
+  public Command firingSpeed() {
+    return spinAtSpeed(speakerFireVelocityRPM);
   }
 
   /**
@@ -148,36 +193,22 @@ public class Shooter extends SubsystemBase {
    * the actual shooter RPM falls within a configurable margin of error. When this command ends, the
    * shooter will stay spinning at the set velocity.
    */
-  public Command spinMedium() {
-    return spinAtSpeed(shootMediumSpeed);
+  public Command warmUpShooter() {
+    return spinAtSpeed(speakerWarmUpVelocityRpm);
   }
 
-  /**
-   * Creates a command that spins the shooter at the slow speed. This command will not end until the
-   * actual shooter RPM falls within a configurable margin of error. When this command ends, the
-   * shooter will stay spinning at the set velocity.
-   */
-  public Command spinSlow() {
-    return spinAtSpeed(shootSlowSpeed);
-  }
-
-  /**
-   * Creates a complete command for firing a note
-   *
-   * @param collect the collector subsystem
-   */
-  public Command fireNote(Collect collect) {
+  /** Creates a complete command for firing a note */
+  public Command fireNote() {
     // sequence:
-    // 1. spin shooter
+    // 1. spin shooter at firing speed
     // 2. feed gamepiece
     // 3. wait fixed delay
-    // 4. stop shooter and collector
+    // 4. stop shooter
 
-    return spinFast()
-        .andThen(collect.feedGamePieceToShooter())
+    return firingSpeed()
+        .andThen(() -> runIndexerVelocity(feedVelocityRpm.get()))
         .andThen(Commands.waitSeconds(feedTime.get()))
-        .andThen(this::stop, this)
-        .andThen(collect::stop, collect);
+        .andThen(this::stopShooter, this);
   }
 
   /**
@@ -189,5 +220,35 @@ public class Shooter extends SubsystemBase {
    */
   public Command aimContinuous(DoubleSupplier distanceSupplier) {
     return new AimContinuousCommand(this, distanceSupplier);
+  }
+
+  /**
+   * Creates a command that sets the aimer to a given angle. This command will not end until the
+   * actual aimer position falls within a configurable margin of error. When this command ends, the
+   * aimer will maintain the set angle.
+   */
+  public Command setAimerAngle(LoggedTunableNumber angleDegrees) {
+    return Commands.runOnce(() -> setAimerPostion(angleDegrees.get()), this)
+        .andThen(
+            Commands.waitUntil(
+                () -> {
+                  return Math.abs(
+                          Units.radiansToDegrees(inputs.indexerPositionRad) - angleDegrees.get())
+                      < shooterPositionError.get();
+                }));
+  }
+
+  public Command stowShooter() {
+    return setAimerAngle(shooterStowPosition);
+  }
+
+  /**
+   * Creates a command for "indexing" a note. This runs the indexer at a fixed speed until the beam
+   * break detects the note.
+   */
+  public Command indexNote() {
+    return Commands.runOnce(() -> runIndexerVelocity(indexVelocityRpm.get()))
+        .andThen(Commands.waitUntil(() -> isBeamBreakBlocked()))
+        .andThen(() -> stopIndexer());
   }
 }

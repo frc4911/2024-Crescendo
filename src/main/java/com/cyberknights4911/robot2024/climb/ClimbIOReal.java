@@ -27,8 +27,8 @@ public class ClimbIOReal implements ClimbIO {
 
   public ClimbIOReal(ClimbConstants constants, SparkBurnManager sparkBurnManager) {
     this.sparkBurnManager = sparkBurnManager;
-    left = new CANSparkFlex(constants.motorId1(), MotorType.kBrushless);
-    right = new CANSparkFlex(constants.motorId2(), MotorType.kBrushless);
+    left = new CANSparkFlex(constants.leftMotorId(), MotorType.kBrushless);
+    right = new CANSparkFlex(constants.rightMotorId(), MotorType.kBrushless);
     encoder = right.getEncoder();
     pidController = right.getPIDController();
     gearRatio = constants.gearRatio();

@@ -13,5 +13,10 @@ public enum ButtonAction {
   ZeroGyro,
   ZeroSpeaker,
   AmpLockOn,
-  SpeakerLockOn
+  SpeakerLockOn,
+  StowShooter,
+  CollectNote,
+  FireNote,
+  StowClimber,
+  ExtendClimber
 }
