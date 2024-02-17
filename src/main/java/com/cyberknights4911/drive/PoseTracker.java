@@ -74,6 +74,7 @@ public class PoseTracker {
       Pose2d visionRobotPoseMeters,
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
+    Logger.recordOutput("Odometry/VisionUpdate", visionRobotPoseMeters);
     odometryPlusVision.addVisionMeasurement(
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     experimental.addVisionMeasurement(
