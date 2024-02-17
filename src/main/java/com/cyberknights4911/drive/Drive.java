@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.Volts;
 import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.constants.ControlConstants;
 import com.cyberknights4911.constants.DriveConstants;
+import com.cyberknights4911.vision.VisionUpdate;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -226,14 +227,9 @@ public class Drive extends SubsystemBase {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);
   }
 
-  /**
-   * Adds a vision measurement to the pose estimator.
-   *
-   * @param visionPose The pose of the robot as measured by the vision camera.
-   * @param timestamp The timestamp of the vision measurement in seconds.
-   */
-  public void addVisionMeasurement(Pose2d visionPose, double timestamp) {
-    poseEstimator.addVisionMeasurement(visionPose, timestamp);
+  /** Adds a vision measurement to the pose estimator. */
+  public void addVisionMeasurement(VisionUpdate update) {
+    poseEstimator.addVisionMeasurement(update.pose(), update.timestamp(), update.stdDevs());
   }
 
   /**

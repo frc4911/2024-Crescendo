@@ -40,7 +40,7 @@ public final class WhamConstants {
           .name("Wham")
           .loopPeriodSecs(0.02)
           .tuningMode(true)
-          .logPath(null)
+          .logPath("/media/sda1/logs")
           .mode(Mode.REAL)
           .supplier(Wham::new)
           .build();
@@ -97,10 +97,10 @@ public final class WhamConstants {
   private static Alert noAprilTagLayoutAlert =
       new Alert("No AprilTag layout file found. Update VisionConstants.", AlertType.WARNING);
 
-  private static AprilTagFieldLayout getLayout() {
+  private static AprilTagFieldLayout getFieldLayout() {
     try {
       noAprilTagLayoutAlert.set(false);
-      return AprilTagFields.k2023ChargedUp.loadAprilTagLayoutField();
+      return AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
     } catch (UncheckedIOException e) {
       noAprilTagLayoutAlert.set(true);
       return new AprilTagFieldLayout(
@@ -110,7 +110,7 @@ public final class WhamConstants {
 
   public static final VisionConstants VISION_CONSTANTS =
       VisionConstantsBuilder.builder()
-          .layout(getLayout())
+          .layout(getFieldLayout())
           .maxAmbiguity(0.03)
           .maxValidDistanceMeters(3.0)
           .build();
@@ -122,7 +122,7 @@ public final class WhamConstants {
   private static final double SWERVE_MOUNTED_CAMERA_OFFSET_X = Units.inchesToMeters(11.79 - .82);
   private static final double SWERVE_MOUNTED_CAMERA_OFFSET_Y = Units.inchesToMeters(11.79 - 1.06);
   private static final double SWERVE_MOUNTED_CAMERA_OFFSET_Z = Units.inchesToMeters(6.0 + 2.24);
-  private static final double SWERVE_MOUNTED_CAMERA_PITCH = Units.degreesToRadians(-28.125);
+  private static final double SWERVE_MOUNTED_CAMERA_PITCH = Units.degreesToRadians(28.125);
   private static final double SWERVE_MOUNTED_CAMERA_YAW = Units.degreesToRadians(60);
 
   public static final CameraConstants CAMERA_CONSTANTS_FRONT_RIGHT =
@@ -135,6 +135,6 @@ public final class WhamConstants {
                       SWERVE_MOUNTED_CAMERA_OFFSET_X,
                       -SWERVE_MOUNTED_CAMERA_OFFSET_Y,
                       SWERVE_MOUNTED_CAMERA_OFFSET_Z),
-                  new Rotation3d(0, SWERVE_MOUNTED_CAMERA_PITCH, -SWERVE_MOUNTED_CAMERA_YAW)))
+                  new Rotation3d(0, -SWERVE_MOUNTED_CAMERA_PITCH, -SWERVE_MOUNTED_CAMERA_YAW)))
           .build();
 }
