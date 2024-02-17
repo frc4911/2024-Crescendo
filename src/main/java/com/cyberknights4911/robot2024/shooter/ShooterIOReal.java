@@ -14,13 +14,17 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.AnalogInput;
 
 public class ShooterIOReal implements ShooterIO {
   private final CANSparkFlex left;
   private final CANSparkFlex right;
+  private final CANSparkFlex guideRoller;
   private final CANSparkFlex aimer;
+  private final CANSparkFlex indexer;
 
   private final RelativeEncoder encoder;
+  private final AnalogInput beamBreak;
   private final SparkPIDController pidController;
   private final double gearRatio;
   private final SparkBurnManager sparkBurnManager;
@@ -29,14 +33,19 @@ public class ShooterIOReal implements ShooterIO {
     this.sparkBurnManager = sparkBurnManager;
     left = new CANSparkFlex(constants.motorId1(), MotorType.kBrushless);
     right = new CANSparkFlex(constants.motorId2(), MotorType.kBrushless);
+    guideRoller = new CANSparkFlex(constants.motorIdguide(), MotorType.kBrushless);
+    beamBreak = new AnalogInput(constants.sensorId());
 
     // new motor for shooter, instead of piston, used to aim the shooter at the specified angle
     aimer = new CANSparkFlex(constants.motorId3(), MotorType.kBrushless);
 
+    // motor for the indexer and moving notes to the shooter to shoot
+    indexer = new CANSparkFlex(constants.motorIdindex(), MotorType.kBrushless);
+
     encoder = right.getEncoder();
     pidController = right.getPIDController();
     gearRatio = constants.gearRatio();
-    // todo: aim encoder?
+    // TODO: aim encoder?
 
     configureDevices();
   }
