@@ -7,19 +7,19 @@
 
 package com.cyberknights4911.robot2024.climb;
 
-import com.cyberknights4911.util.FeedForwardValues;
 import com.cyberknights4911.util.PidValues;
 import io.soabase.recordbuilder.core.RecordBuilder;
 
 @RecordBuilder
 public record ClimbConstants(
-    int motorId1,
-    int motorId2, // Is there more than one motor for climb?
+    int leftMotorId,
+    int rightMotorId,
+    int solenoidLeftId,
+    int solenoidRightId,
     double forwardLimit,
     double backwardLimit,
     double extendPosition,
     double retractPosition,
     double gearRatio,
     double lockToggleTime,
-    PidValues feedBackValues,
-    FeedForwardValues feedForwardValues) {}
+    PidValues feedBackValues) {}

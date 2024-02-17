@@ -100,6 +100,21 @@ public final class Robot2024 implements RobotContainer {
                 binding.supplierFor(StickAction.STRAFE),
                 Units.inchesToMeters(652.73),
                 Units.inchesToMeters(218.42)));
+    
+    binding.triggersFor(ButtonAction.StowShooter)
+        .onTrue(Commands.none());
+
+    binding.triggersFor(ButtonAction.CollectNote)
+        .onTrue(Commands.none());
+
+    binding.triggersFor(ButtonAction.FireNote)
+        .onTrue(Commands.none());
+
+    binding.triggersFor(ButtonAction.StowClimber)
+        .onTrue(Commands.none());
+
+    binding.triggersFor(ButtonAction.ExtendClimber)
+        .onTrue(Commands.none());
   }
 
   @Override
@@ -131,7 +146,7 @@ public final class Robot2024 implements RobotContainer {
 
   @Override
   public void setupAutos(AutoCommandHandler handler) {
-    Autos autos = new Autos(climb, collect, shooter, drive);
+    Autos autos = new Autos(Robot2024Constants.DRIVE_CONSTANTS, climb, collect, shooter, drive);
     autos.addAllAutos(handler);
   }
 

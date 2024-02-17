@@ -13,14 +13,19 @@ import io.soabase.recordbuilder.core.RecordBuilder;
 
 @RecordBuilder
 public record ShooterConstants(
-    int motorId1,
-    int motorId2,
-    int motorId3, // new motor for shooter, instead of piston
-    double gearRatio,
+    int shooterMotorTopId,
+    int shooterMotorBottomId,
+    int aimerMotorId,
+    int indexerMotorId,
+    int sensorId,
+    double aimerGearRatio,
+    double aimerForwardLimit,
+    double aimerBackwardLimit,
     double feedTime,
-    double fastVelocityRpm,
-    double mediumVelocityRpm,
-    double slowVelocityRpm,
+    double speakerFireVelocityRpm,
+    double speakerWarmUpVelocityRpm,
+    double indexVelocityRpm,
+    double feedVelocityRpm,
     double errorVelocityRpm,
     PidValues feedBackValues,
     FeedForwardValues feedForwardValues) {}

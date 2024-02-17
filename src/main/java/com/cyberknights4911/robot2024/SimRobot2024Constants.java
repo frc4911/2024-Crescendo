@@ -90,27 +90,29 @@ public final class SimRobot2024Constants {
 
   public static ClimbConstants CLIMB_CONSTANTS =
       ClimbConstantsBuilder.builder()
-          .motorId1(0)
-          .motorId2(0)
+          .leftMotorId(0)
+          .rightMotorId(0)
           .gearRatio(1.0)
           .feedBackValues(new PidValues(0, 0, 0))
-          .feedForwardValues(new FeedForwardValues(0, 0))
           .build();
 
   public static CollectConstants COLLECT_CONSTANTS =
       CollectConstantsBuilder.builder()
-          .motorId(0)
+          .motorCollectId(11)
+          .motorGuideId(12)
           .sensorId(0)
-          .gearRatio(1.0)
-          .feedBackValues(new PidValues(0, 0, 0))
-          .feedForwardValues(new FeedForwardValues(0, 0))
+          .solenoidLeftId(0)
+          .solenoidRightId(0)
+          .collectGearRatio(24.0 / 18.0)
+          .collectFeedBackValues(new PidValues(0, 0, 0))
+          .guideFeedBackValues(new PidValues(0, 0, 0))
           .build();
 
   public static ShooterConstants SHOOTER_CONSTANTS =
       ShooterConstantsBuilder.builder()
-          .motorId1(0)
-          .motorId2(0)
-          .gearRatio(1.0)
+          .shooterMotorTopId(0)
+          .shooterMotorBottomId(0)
+          .aimerGearRatio(1.0)
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
           .build();

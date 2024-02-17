@@ -14,6 +14,8 @@ import com.cyberknights4911.constants.ControlConstantsBuilder;
 import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.constants.DriveConstantsBuilder;
 import com.cyberknights4911.constants.DriveConstantsModuleConstantsBuilder;
+import com.cyberknights4911.logging.Alert;
+import com.cyberknights4911.logging.Alert.AlertType;
 import com.cyberknights4911.logging.Mode;
 import com.cyberknights4911.robot2024.climb.ClimbConstants;
 import com.cyberknights4911.robot2024.climb.ClimbConstantsBuilder;
@@ -23,9 +25,22 @@ import com.cyberknights4911.robot2024.shooter.ShooterConstants;
 import com.cyberknights4911.robot2024.shooter.ShooterConstantsBuilder;
 import com.cyberknights4911.util.FeedForwardValues;
 import com.cyberknights4911.util.PidValues;
+import com.cyberknights4911.vision.CameraConstants;
+import com.cyberknights4911.vision.CameraConstantsBuilder;
+import com.cyberknights4911.vision.VisionConstants;
+import com.cyberknights4911.vision.VisionConstantsBuilder;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
+import java.io.UncheckedIOException;
+import java.util.ArrayList;
 
 public final class Robot2024Constants {
+  private static Alert noAprilTagLayoutAlert =
+      new Alert("No AprilTag layout file found. Update VisionConstants.", AlertType.WARNING);
 
   private Robot2024Constants() {}
 
@@ -44,16 +59,16 @@ public final class Robot2024Constants {
 
   public static final DriveConstants DRIVE_CONSTANTS =
       DriveConstantsBuilder.builder()
-          .maxLinearSpeed(4.5)
+          .maxLinearSpeed(Units.feetToMeters(17.6))
           .trackWidthX(Units.inchesToMeters(22.75))
           .trackWidthY(Units.inchesToMeters(22.75))
-          .wheelRadius(Units.inchesToMeters(2))
+          .wheelRadius(Units.inchesToMeters(1.957237517086368))
           .turnGearRatio(DriveConstants.TURN_GEAR_RATIO)
           .driveGearRatio(DriveConstants.L2_GEAR_RATIO)
           .pigeonId(0)
           .turnFeedBackValues(new PidValues(7.0, 0.0, 0.0))
           .driveFeedBackValues(new PidValues(0.05, 0.0, 0.0))
-          .driveFeedForwardValues(new FeedForwardValues(0.0, 0.0))
+          .driveFeedForwardValues(new FeedForwardValues(0.1, 0.13))
           .frontLeft(
               DriveConstantsModuleConstantsBuilder.builder()
                   .name("FrontLeft")
@@ -90,30 +105,100 @@ public final class Robot2024Constants {
 
   public static ClimbConstants CLIMB_CONSTANTS =
       ClimbConstantsBuilder.builder()
-          .motorId1(41)
-          .motorId2(42)
+          .leftMotorId(41)
+          .rightMotorId(42)
           .gearRatio(1.0) // todo: Find gear ratio for climber, and possible climb hold thing.
           .feedBackValues(new PidValues(0, 0, 0))
-          .feedForwardValues(new FeedForwardValues(0, 0))
           .build();
 
   public static CollectConstants COLLECT_CONSTANTS =
       CollectConstantsBuilder.builder()
-          .motorId(11)
-          .sensorId(
-              12) // todo: Beam break sensor, if not dependanat on physical port on the roborio.
-          .gearRatio(1.0) // todo: Find gear ratio for collector
-          .feedBackValues(new PidValues(0, 0, 0))
-          .feedForwardValues(new FeedForwardValues(0, 0))
+          .motorCollectId(11)
+          .motorGuideId(12)
+          .sensorId(0)
+          .solenoidLeftId(0)
+          .solenoidRightId(0)
+          .collectGearRatio(24.0 / 18.0)
+          .collectFeedBackValues(new PidValues(0, 0, 0))
+          .guideFeedBackValues(new PidValues(0, 0, 0))
           .build();
 
   public static ShooterConstants SHOOTER_CONSTANTS =
       ShooterConstantsBuilder.builder()
-          .motorId1(21)
-          .motorId2(22)
-          .motorId3(23)
-          .gearRatio(1.0) // todo: Find gear ratio for shooter
+          .shooterMotorTopId(21)
+          .shooterMotorBottomId(22)
+          .aimerMotorId(23)
+          .aimerGearRatio(84.0 / 14.0)
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
+          .build();
+
+  // Note: these measurements are for the front right swerve-mounted camera
+  // Screw: 11.79 inches back of center, ~6.0 inches from floor, 11.79 inches right of center
+  // Camera from screw: 0.82 inches back, 2.24 inches up, 1.06 inches left
+  // Camera pitch: -28.125 degrees, Camera yaw: -60
+  private static final double SWERVE_MOUNTED_CAMERA_OFFSET_X = Units.inchesToMeters(11.79 - .82);
+  private static final double SWERVE_MOUNTED_CAMERA_OFFSET_Y = Units.inchesToMeters(11.79 - 1.06);
+  private static final double SWERVE_MOUNTED_CAMERA_OFFSET_Z = Units.inchesToMeters(6.0 + 2.24);
+  private static final double SWERVE_MOUNTED_CAMERA_PITCH = Units.degreesToRadians(-28.125);
+  private static final double SWERVE_MOUNTED_CAMERA_YAW = Units.degreesToRadians(60);
+
+  public static final CameraConstants CAMERA_CONSTANTS_FRONT_LEFT =
+      CameraConstantsBuilder.builder()
+          .name("photon1")
+          .photonCameraName("Camera_1")
+          .robotToCamera(
+              new Transform3d(
+                  new Translation3d(
+                      SWERVE_MOUNTED_CAMERA_OFFSET_X,
+                      SWERVE_MOUNTED_CAMERA_OFFSET_Y,
+                      SWERVE_MOUNTED_CAMERA_OFFSET_Z),
+                  new Rotation3d(0, SWERVE_MOUNTED_CAMERA_PITCH, SWERVE_MOUNTED_CAMERA_YAW)))
+          .build();
+
+  private static AprilTagFieldLayout getFieldLayout() {
+    try {
+      noAprilTagLayoutAlert.set(false);
+      return AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+    } catch (UncheckedIOException e) {
+      noAprilTagLayoutAlert.set(true);
+      return new AprilTagFieldLayout(
+          new ArrayList<>(), Units.feetToMeters(12), Units.feetToMeters(12));
+    }
+  }
+
+  public static final VisionConstants VISION_CONSTANTS =
+      VisionConstantsBuilder.builder()
+          .layout(getFieldLayout())
+          .maxAmbiguity(0.03)
+          .maxValidDistanceMeters(3.0)
+          .build();
+
+  public static final CameraConstants CAMERA_CONSTANTS_FRONT_RIGHT =
+      CameraConstantsBuilder.builder()
+          .name("photon2")
+          .photonCameraName("Camera_2")
+          .robotToCamera(
+              new Transform3d(
+                  new Translation3d(
+                      SWERVE_MOUNTED_CAMERA_OFFSET_X,
+                      -SWERVE_MOUNTED_CAMERA_OFFSET_Y,
+                      SWERVE_MOUNTED_CAMERA_OFFSET_Z),
+                  new Rotation3d(0, SWERVE_MOUNTED_CAMERA_PITCH, -SWERVE_MOUNTED_CAMERA_YAW)))
+          .build();
+
+  // TODO: set the transforms for the back cameras once the mounts have been determined.
+  public static final CameraConstants CAMERA_CONSTANTS_BACK_LEFT =
+      CameraConstantsBuilder.builder()
+          .name("photon3")
+          .photonCameraName("Camera_3")
+          .robotToCamera(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)))
+          .build();
+
+  public static final CameraConstants CAMERA_CONSTANTS_BACK_RIGHT =
+      CameraConstantsBuilder.builder()
+          .name("photon4")
+          .photonCameraName("Camera_4")
+          .robotToCamera(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)))
           .build();
 }

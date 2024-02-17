@@ -7,27 +7,29 @@
 
 package com.cyberknights4911.robot2024.collect;
 
-import com.cyberknights4911.util.FeedForwardValues;
 import com.cyberknights4911.util.PidValues;
 import io.soabase.recordbuilder.core.RecordBuilder;
 
 /**
  * Constants related to the collector.
  *
- * @param motorId id of the collector motor
+ * @param motorCollectId id of the collector motor
  * @param sensorId id of the beam break sensor
- * @param gearRatio total gear ratio of the motor input to the collector output
- * @param feedBackValues values to use in the collector PID controller
+ * @param collectGearRatio total gear ratio of the motor input to the collector output
+ * @param collectFeedBackValues values to use in the collector PID controller
  * @param feedForwardValues values to use in the collector feed-forward controller
  */
 @RecordBuilder
 public record CollectConstants(
-    int motorId,
+    int motorCollectId,
+    int motorGuideId,
     int sensorId,
-    double gearRatio,
+    int solenoidLeftId,
+    int solenoidRightId,
+    double collectGearRatio,
     double ejectTime,
     double ejectSpeed,
     double collectSpeed,
     double feedShooterSpeed,
-    PidValues feedBackValues,
-    FeedForwardValues feedForwardValues) {}
+    PidValues collectFeedBackValues,
+    PidValues guideFeedBackValues) {}
