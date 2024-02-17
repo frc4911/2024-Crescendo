@@ -40,6 +40,9 @@ public final class Wham implements RobotContainer {
   private final WhamControllerBinding binding;
   private final Constants constants;
 
+  private boolean firstAlertHasRun = false;
+  private boolean secondAlertHasRun = false;
+
   public Wham() {
     constants = WhamConstants.WHAM;
     binding = new WhamControllerBinding();
@@ -175,7 +178,8 @@ public final class Wham implements RobotContainer {
 
   @Override
   public void onRobotPeriodic(LoggedRobot robot) {
-    if (GameAlerts.shouldAlert(GameAlerts.Endgame1)) {
+    if (!firstAlertHasRun && GameAlerts.shouldAlert(GameAlerts.Endgame1)) {
+      firstAlertHasRun = true;
       CommandScheduler.getInstance()
           .schedule(
               Commands.runOnce(() -> binding.setDriverRumble(true))
@@ -184,7 +188,8 @@ public final class Wham implements RobotContainer {
                   .withTimeout(1.0));
     }
 
-    if (GameAlerts.shouldAlert(GameAlerts.Endgame2)) {
+    if (!secondAlertHasRun && GameAlerts.shouldAlert(GameAlerts.Endgame2)) {
+      secondAlertHasRun = true;
       CommandScheduler.getInstance()
           .schedule(
               Commands.runOnce(() -> binding.setDriverRumble(true))
