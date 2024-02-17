@@ -29,6 +29,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.littletonrobotics.junction.LoggedRobot;
 
@@ -38,6 +39,9 @@ public final class Wham implements RobotContainer {
   private final VisionSimple vision;
   private final WhamControllerBinding binding;
   private final Constants constants;
+
+  private boolean firstAlertHasRun = false;
+  private boolean secondAlertHasRun = false;
 
   public Wham() {
     constants = WhamConstants.WHAM;
@@ -96,24 +100,6 @@ public final class Wham implements RobotContainer {
                 binding.supplierFor(StickAction.STRAFE),
                 Units.inchesToMeters(652.73),
                 Units.inchesToMeters(218.42)));
-
-    GameAlerts.triggerFor(GameAlerts.Endgame1)
-        .onFalse(
-            Commands.runOnce(() -> binding.setDriverRumble(true))
-                .withTimeout(1.5)
-                .andThen(() -> binding.setDriverRumble(false))
-                .withTimeout(1.0));
-
-    GameAlerts.triggerFor(GameAlerts.Endgame2)
-        .onFalse(
-            Commands.runOnce(() -> binding.setDriverRumble(true))
-                .withTimeout(1.0)
-                .andThen(() -> binding.setDriverRumble(false))
-                .withTimeout(0.5)
-                .andThen(() -> binding.setDriverRumble(true))
-                .withTimeout(1.0)
-                .andThen(() -> binding.setDriverRumble(false))
-                .withTimeout(0.5));
   }
 
   private Drive createDrive() {
@@ -191,7 +177,31 @@ public final class Wham implements RobotContainer {
   }
 
   @Override
-  public void onRobotPeriodic(LoggedRobot robot) {}
+  public void onRobotPeriodic(LoggedRobot robot) {
+    if (!firstAlertHasRun && GameAlerts.shouldAlert(GameAlerts.Endgame1)) {
+      firstAlertHasRun = true;
+      CommandScheduler.getInstance()
+          .schedule(
+              Commands.runOnce(() -> binding.setDriverRumble(true))
+                  .withTimeout(1.5)
+                  .andThen(() -> binding.setDriverRumble(false))
+                  .withTimeout(1.0));
+    }
+
+    if (!secondAlertHasRun && GameAlerts.shouldAlert(GameAlerts.Endgame2)) {
+      secondAlertHasRun = true;
+      CommandScheduler.getInstance()
+          .schedule(
+              Commands.runOnce(() -> binding.setDriverRumble(true))
+                  .withTimeout(1.0)
+                  .andThen(() -> binding.setDriverRumble(false))
+                  .withTimeout(0.5)
+                  .andThen(() -> binding.setDriverRumble(true))
+                  .withTimeout(1.0)
+                  .andThen(() -> binding.setDriverRumble(false))
+                  .withTimeout(0.5));
+    }
+  }
 
   @Override
   public void setupAutos(AutoCommandHandler handler) {
