@@ -53,7 +53,7 @@ public final class WhamConstants {
           .maxLinearSpeed(4.5)
           .trackWidthX(Units.inchesToMeters(22.75))
           .trackWidthY(Units.inchesToMeters(22.75))
-          .wheelRadius(Units.inchesToMeters(2))
+          .wheelRadius(Units.inchesToMeters(1.941349158748698))
           .turnGearRatio(DriveConstants.TURN_GEAR_RATIO)
           .driveGearRatio(DriveConstants.L1_GEAR_RATIO)
           .pigeonId(0)
@@ -115,19 +115,26 @@ public final class WhamConstants {
           .maxValidDistanceMeters(3.0)
           .build();
 
-  // Screw: 11.79 inches back of center, 6.5 inches from floor, 11.79 inches right of center
-  // Camera from screw: 0.62 inches back, 2.1 inches up, 0.86 inches left
-  // Camera pitch: -28.5 degrees, Camera yaw: -61
-  public static final CameraConstants CAMERA_CONSTANTS =
+  // Note: these measurements are for the front right swerve-mounted camera
+  // Screw: 11.79 inches back of center, ~6.0 inches from floor, 11.79 inches right of center
+  // Camera from screw: 0.82 inches back, 2.24 inches up, 1.06 inches left
+  // Camera pitch: -28.125 degrees, Camera yaw: -60
+  private static final double SWERVE_MOUNTED_CAMERA_OFFSET_X = Units.inchesToMeters(11.79 - .82);
+  private static final double SWERVE_MOUNTED_CAMERA_OFFSET_Y = Units.inchesToMeters(11.79 - 1.06);
+  private static final double SWERVE_MOUNTED_CAMERA_OFFSET_Z = Units.inchesToMeters(6.0 + 2.24);
+  private static final double SWERVE_MOUNTED_CAMERA_PITCH = Units.degreesToRadians(-28.125);
+  private static final double SWERVE_MOUNTED_CAMERA_YAW = Units.degreesToRadians(60);
+
+  public static final CameraConstants CAMERA_CONSTANTS_FRONT_RIGHT =
       CameraConstantsBuilder.builder()
           .name("photon4")
           .photonCameraName("Camera_4")
           .robotToCamera(
               new Transform3d(
                   new Translation3d(
-                      Units.inchesToMeters(11.79 - .62),
-                      Units.inchesToMeters(-11.79 + .86),
-                      Units.inchesToMeters(6.5 + 2.1)),
-                  new Rotation3d(0, Units.degreesToRadians(-28.5), Units.degreesToRadians(-61))))
+                      SWERVE_MOUNTED_CAMERA_OFFSET_X,
+                      -SWERVE_MOUNTED_CAMERA_OFFSET_Y,
+                      SWERVE_MOUNTED_CAMERA_OFFSET_Z),
+                  new Rotation3d(0, SWERVE_MOUNTED_CAMERA_PITCH, -SWERVE_MOUNTED_CAMERA_YAW)))
           .build();
 }

@@ -8,7 +8,9 @@
 package com.cyberknights4911.robot2024.control;
 
 import com.cyberknights4911.constants.ControlConstants;
+import com.cyberknights4911.control.ButtonAction;
 import com.cyberknights4911.control.ButtonBinding;
+import com.cyberknights4911.control.StickAction;
 import com.cyberknights4911.control.StickBinding;
 import com.cyberknights4911.control.Triggers;
 import com.cyberknights4911.logging.Alert;
@@ -17,8 +19,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.function.DoubleSupplier;
 
-public final class ControllerBinding
-    implements StickBinding<StickActions>, ButtonBinding<ButtonActions> {
+public final class ControllerBinding implements StickBinding, ButtonBinding {
   private final Alert driverDisconnected =
       new Alert("Driver controller disconnected (port 0).", AlertType.WARNING);
   private final Alert operatorDisconnected =
@@ -33,7 +34,7 @@ public final class ControllerBinding
   }
 
   @Override
-  public DoubleSupplier supplierFor(StickActions action) {
+  public DoubleSupplier supplierFor(StickAction action) {
     switch (action) {
       case FORWARD:
         return () -> -driver.getLeftY();
@@ -47,7 +48,7 @@ public final class ControllerBinding
   }
 
   @Override
-  public Triggers triggersFor(ButtonActions action) {
+  public Triggers triggersFor(ButtonAction action) {
     switch (action) {
       case ZeroGyro:
         return new Triggers(driver.y());
@@ -69,5 +70,13 @@ public final class ControllerBinding
     operatorDisconnected.set(
         !DriverStation.isJoystickConnected(operator.getHID().getPort())
             || !DriverStation.getJoystickIsXbox(operator.getHID().getPort()));
+  }
+
+  public void setDriverRumble(boolean enabled) {
+    // TODO: turn rumble on or off for the driver controller
+  }
+
+  public void setOperatorRumble(boolean enabled) {
+    // TODO: turn rumble on or off for the operator controller
   }
 }

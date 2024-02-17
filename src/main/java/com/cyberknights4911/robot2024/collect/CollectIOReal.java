@@ -18,9 +18,12 @@ import com.revrobotics.SparkPIDController;
 import com.revrobotics.SparkPIDController.ArbFFUnits;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 
 public class CollectIOReal implements CollectIO {
   private final CANSparkFlex collect;
+  private final DoubleSolenoid extend;
   private final RelativeEncoder encoder;
   private final SparkPIDController pidController;
   private final AnalogInput beamBreak;
@@ -30,6 +33,7 @@ public class CollectIOReal implements CollectIO {
   public CollectIOReal(CollectConstants collectConstants, SparkBurnManager sparkBurnManager) {
     this.sparkBurnManager = sparkBurnManager;
     collect = new CANSparkFlex(collectConstants.motorId(), MotorType.kBrushless);
+    extend = new DoubleSolenoid(PneumaticsModuleType.REVPH, collectConstants.forwardId(), collectConstants.reverseId());
     encoder = collect.getEncoder();
     pidController = collect.getPIDController();
     gearRatio = collectConstants.gearRatio();

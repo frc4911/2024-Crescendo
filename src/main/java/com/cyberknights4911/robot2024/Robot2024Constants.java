@@ -23,6 +23,11 @@ import com.cyberknights4911.robot2024.shooter.ShooterConstants;
 import com.cyberknights4911.robot2024.shooter.ShooterConstantsBuilder;
 import com.cyberknights4911.util.FeedForwardValues;
 import com.cyberknights4911.util.PidValues;
+import com.cyberknights4911.vision.CameraConstants;
+import com.cyberknights4911.vision.CameraConstantsBuilder;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 
 public final class Robot2024Constants {
@@ -44,16 +49,16 @@ public final class Robot2024Constants {
 
   public static final DriveConstants DRIVE_CONSTANTS =
       DriveConstantsBuilder.builder()
-          .maxLinearSpeed(4.5)
+          .maxLinearSpeed(Units.feetToMeters(17.6))
           .trackWidthX(Units.inchesToMeters(22.75))
           .trackWidthY(Units.inchesToMeters(22.75))
-          .wheelRadius(Units.inchesToMeters(2))
+          .wheelRadius(Units.inchesToMeters(1.957237517086368))
           .turnGearRatio(DriveConstants.TURN_GEAR_RATIO)
           .driveGearRatio(DriveConstants.L2_GEAR_RATIO)
           .pigeonId(0)
           .turnFeedBackValues(new PidValues(7.0, 0.0, 0.0))
           .driveFeedBackValues(new PidValues(0.05, 0.0, 0.0))
-          .driveFeedForwardValues(new FeedForwardValues(0.0, 0.0))
+          .driveFeedForwardValues(new FeedForwardValues(0.1, 0.13))
           .frontLeft(
               DriveConstantsModuleConstantsBuilder.builder()
                   .name("FrontLeft")
@@ -115,5 +120,56 @@ public final class Robot2024Constants {
           .gearRatio(1.0) // todo: Find gear ratio for shooter
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
+          .build();
+
+  // Note: these measurements are for the front right swerve-mounted camera
+  // Screw: 11.79 inches back of center, ~6.0 inches from floor, 11.79 inches right of center
+  // Camera from screw: 0.82 inches back, 2.24 inches up, 1.06 inches left
+  // Camera pitch: -28.125 degrees, Camera yaw: -60
+  private static final double SWERVE_MOUNTED_CAMERA_OFFSET_X = Units.inchesToMeters(11.79 - .82);
+  private static final double SWERVE_MOUNTED_CAMERA_OFFSET_Y = Units.inchesToMeters(11.79 - 1.06);
+  private static final double SWERVE_MOUNTED_CAMERA_OFFSET_Z = Units.inchesToMeters(6.0 + 2.24);
+  private static final double SWERVE_MOUNTED_CAMERA_PITCH = Units.degreesToRadians(-28.125);
+  private static final double SWERVE_MOUNTED_CAMERA_YAW = Units.degreesToRadians(60);
+
+  public static final CameraConstants CAMERA_CONSTANTS_FRONT_LEFT =
+      CameraConstantsBuilder.builder()
+          .name("photon1")
+          .photonCameraName("Camera_1")
+          .robotToCamera(
+              new Transform3d(
+                  new Translation3d(
+                      SWERVE_MOUNTED_CAMERA_OFFSET_X,
+                      SWERVE_MOUNTED_CAMERA_OFFSET_Y,
+                      SWERVE_MOUNTED_CAMERA_OFFSET_Z),
+                  new Rotation3d(0, SWERVE_MOUNTED_CAMERA_PITCH, SWERVE_MOUNTED_CAMERA_YAW)))
+          .build();
+
+  public static final CameraConstants CAMERA_CONSTANTS_FRONT_RIGHT =
+      CameraConstantsBuilder.builder()
+          .name("photon2")
+          .photonCameraName("Camera_2")
+          .robotToCamera(
+              new Transform3d(
+                  new Translation3d(
+                      SWERVE_MOUNTED_CAMERA_OFFSET_X,
+                      -SWERVE_MOUNTED_CAMERA_OFFSET_Y,
+                      SWERVE_MOUNTED_CAMERA_OFFSET_Z),
+                  new Rotation3d(0, SWERVE_MOUNTED_CAMERA_PITCH, -SWERVE_MOUNTED_CAMERA_YAW)))
+          .build();
+
+  // TODO: set the transforms for the back cameras once the mounts have been determined.
+  public static final CameraConstants CAMERA_CONSTANTS_BACK_LEFT =
+      CameraConstantsBuilder.builder()
+          .name("photon3")
+          .photonCameraName("Camera_3")
+          .robotToCamera(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)))
+          .build();
+
+  public static final CameraConstants CAMERA_CONSTANTS_BACK_RIGHT =
+      CameraConstantsBuilder.builder()
+          .name("photon4")
+          .photonCameraName("Camera_4")
+          .robotToCamera(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)))
           .build();
 }
