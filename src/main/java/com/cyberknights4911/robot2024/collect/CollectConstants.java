@@ -14,7 +14,7 @@ import io.soabase.recordbuilder.core.RecordBuilder;
 /**
  * Constants related to the collector.
  *
- * @param motorId id of the collector motor
+ * @param motorId11 id of the collector motor
  * @param sensorId id of the beam break sensor
  * @param gearRatio total gear ratio of the motor input to the collector output
  * @param feedBackValues values to use in the collector PID controller
