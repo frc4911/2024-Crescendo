@@ -24,7 +24,7 @@ public final class CollectIOSim implements CollectIO {
 
   public CollectIOSim(CollectConstants constants) {
     // TODO: determine moment of inertia
-    sim = new DCMotorSim(DCMotor.getNeoVortex(1), constants.gearRatio(), 0.004);
+    sim = new DCMotorSim(DCMotor.getNeoVortex(1), constants.collectGearRatio(), 0.004);
     pid = new PIDController(0.0, 0.0, 0.0);
     beamBreakSim = new AnalogInputSim(0);
   }
@@ -40,33 +40,32 @@ public final class CollectIOSim implements CollectIO {
     sim.update(0.02);
 
     inputs.beamBreakVoltage = beamBreakSim.getVoltage();
-    inputs.positionRad = sim.getAngularPositionRad();
-    inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
-    inputs.appliedVolts = appliedVolts;
-    inputs.currentAmps = sim.getCurrentDrawAmps();
+    inputs.collectPositionRad = sim.getAngularPositionRad();
+    inputs.collectVelocityRadPerSec = sim.getAngularVelocityRadPerSec();
+    inputs.collectAppliedVolts = appliedVolts;
+    inputs.collectCurrentAmps = sim.getCurrentDrawAmps();
   }
 
   @Override
-  public void setVoltage(double volts) {
+  public void setCollectVoltage(double volts) {
     closedLoop = false;
     appliedVolts = 0.0;
     sim.setInputVoltage(volts);
   }
 
   @Override
-  public void setVelocity(double velocityRadPerSec, double ffVolts) {
+  public void setCollectVelocity(double velocityRadPerSec) {
     closedLoop = true;
     pid.setSetpoint(velocityRadPerSec);
-    this.ffVolts = ffVolts;
   }
 
   @Override
-  public void stop() {
-    setVoltage(0.0);
+  public void stopCollector() {
+    setCollectVoltage(0.0);
   }
 
   @Override
-  public void configurePID(double kP, double kI, double kD) {
+  public void configureCollectPID(double kP, double kI, double kD) {
     pid.setPID(kP, kI, kD);
   }
 }

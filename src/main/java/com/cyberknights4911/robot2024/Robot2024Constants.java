@@ -105,29 +105,30 @@ public final class Robot2024Constants {
 
   public static ClimbConstants CLIMB_CONSTANTS =
       ClimbConstantsBuilder.builder()
-          .motorId1(41)
-          .motorId2(42)
+          .leftMotorId(41)
+          .rightMotorId(42)
           .gearRatio(1.0) // todo: Find gear ratio for climber, and possible climb hold thing.
           .feedBackValues(new PidValues(0, 0, 0))
-          .feedForwardValues(new FeedForwardValues(0, 0))
           .build();
 
   public static CollectConstants COLLECT_CONSTANTS =
       CollectConstantsBuilder.builder()
-          .motorId(11)
-          .sensorId(
-              12) // todo: Beam break sensor, if not dependanat on physical port on the roborio.
-          .gearRatio(1.0) // todo: Find gear ratio for collector
-          .feedBackValues(new PidValues(0, 0, 0))
-          .feedForwardValues(new FeedForwardValues(0, 0))
+          .motorCollectId(11)
+          .motorGuideId(12)
+          .sensorId(0)
+          .solenoidLeftId(0)
+          .solenoidRightId(0)
+          .collectGearRatio(24.0 / 18.0)
+          .collectFeedBackValues(new PidValues(0, 0, 0))
+          .guideFeedBackValues(new PidValues(0, 0, 0))
           .build();
 
   public static ShooterConstants SHOOTER_CONSTANTS =
       ShooterConstantsBuilder.builder()
-          .motorId1(21)
-          .motorId2(22)
-          .motorId3(23)
-          .gearRatio(1.0) // todo: Find gear ratio for shooter
+          .shooterMotorTopId(21)
+          .shooterMotorBottomId(22)
+          .aimerMotorId(23)
+          .aimerGearRatio(84.0 / 14.0)
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
           .build();

@@ -56,10 +56,12 @@ public final class WhamControllerBinding implements StickBinding, ButtonBinding 
   }
 
   public void setDriverRumble(boolean enabled) {
+    System.out.println("RUMBLE: " + enabled);
     // TODO: turn rumble on or off for the driver controller
   }
 
   public void setOperatorRumble(boolean enabled) {
+    System.out.println("RUMBLE: " + enabled);
     // TODO: turn rumble on or off for the operator controller
   }
 }
