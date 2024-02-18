@@ -27,10 +27,10 @@ public final class ClimbIOSim implements ClimbIO {
   public void updateInputs(ClimbIOInputs inputs) {
     sim.update(0.02);
 
-    inputs.positionRad = 0.0;
-    inputs.velocityRadPerSec = sim.getAngularVelocityRadPerSec();
-    inputs.appliedVolts = appliedVolts;
-    inputs.currentAmps = new double[] {sim.getCurrentDrawAmps()};
+    inputs.rightPositionRad = 0.0;
+    inputs.rightVelocityRadPerSec = sim.getAngularVelocityRadPerSec();
+    inputs.leftAppliedVolts = appliedVolts;
+    inputs.leftCurrentAmps = sim.getCurrentDrawAmps();
   }
 
   @Override

@@ -9,6 +9,7 @@ package com.cyberknights4911.robot2024.climb;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import com.cyberknights4911.drive.Drive;
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
@@ -95,6 +96,30 @@ public class Climb extends SubsystemBase {
     climbIO.stop();
   }
 
+  boolean isClimbComplete() {
+    // TODO: Check both left and right climbers against "retractPosition"
+    return false;
+  }
+
+  void setClimbMode(Mode mode) {
+    switch (mode) {
+      case Right:
+        // hold left, climb right
+        break;
+      case Left:
+        // hold right, climb left
+        break;
+      case Both:
+        // climb left and right
+        break;
+      case Hold:
+        // hold left and right
+        break;
+      default:
+        break;
+    }
+  }
+
   private void setupClimberMechanism(Mechanism2d mechanism2) {
     // Where the climber is attached
     MechanismRoot2d root = mechanism.getRoot("climber", 1.5, 0);
@@ -113,32 +138,26 @@ public class Climb extends SubsystemBase {
         .andThen(Commands.waitSeconds(lockToggleTime.get()));
   }
 
-  /** Extends the climbers to climbing height. */
+  /** Extends both climbers to extended height. */
   public Command extendClimber() {
     return setClimbLock(false)
         .andThen(
-            Commands.runOnce(
-                () -> {
-                  climbIO.setPosition(extendPosition.get());
-                },
-                this))
-        .until(
-            () -> {
-              return inputs.positionLinear >= extendPosition.get();
-            });
+            Commands.runOnce(() -> climbIO.setPositionLeft(extendPosition.get()))
+                .until(() -> inputs.leftPositionRad >= extendPosition.get())
+                .alongWith(
+                    Commands.runOnce(() -> climbIO.setPositionRight(extendPosition.get()))
+                        .until(() -> inputs.rightPositionRad >= extendPosition.get())));
   }
 
-  /** Retracts the climbers to the climbed height. */
-  public Command climb() {
-    return Commands.runOnce(
-            () -> {
-              climbIO.setPosition(retractPosition.get());
-            },
-            this)
-        .until(
-            () -> {
-              return inputs.positionLinear <= retractPosition.get();
-            })
-        .andThen(setClimbLock(true));
+  /** Perform a climb. */
+  public Command climb(Drive drive) {
+    return new ClimbCommand(drive, this).andThen(setClimbLock(true));
+  }
+
+  public static enum Mode {
+    Left,
+    Right,
+    Both,
+    Hold
   }
 }
