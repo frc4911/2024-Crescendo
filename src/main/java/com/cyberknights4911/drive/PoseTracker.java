@@ -8,7 +8,6 @@
 package com.cyberknights4911.drive;
 
 import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimatorExperimental;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -28,7 +28,10 @@ import org.littletonrobotics.junction.Logger;
  * pose estimators in this class to improve performance.
  */
 public class PoseTracker {
-  private final SwerveDrivePoseEstimator odometry;
+  private static final boolean ENABLE_BASE_ESTIMATOR = true;
+
+  // Use for demo purposes only. This should be disabled in real usage
+  private final Optional<SwerveDrivePoseEstimatorExperimental> odometry;
   private final SwerveDrivePoseEstimatorExperimental experimental;
 
   public PoseTracker(
@@ -36,26 +39,29 @@ public class PoseTracker {
       Rotation2d gyroAngle,
       SwerveModulePosition[] modulePositions,
       Pose2d initialPoseMeters) {
-    odometry =
-        new SwerveDrivePoseEstimator(kinematics, gyroAngle, modulePositions, initialPoseMeters);
+    if (ENABLE_BASE_ESTIMATOR) {
+      odometry =
+          Optional.of(
+              new SwerveDrivePoseEstimatorExperimental(
+                  kinematics, gyroAngle, modulePositions, initialPoseMeters));
+    } else {
+      odometry = Optional.empty();
+    }
     experimental =
         new SwerveDrivePoseEstimatorExperimental(
             kinematics, gyroAngle, modulePositions, initialPoseMeters);
   }
 
   public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    Pose2d odometryPose = odometry.update(gyroAngle, modulePositions);
-    Pose2d expPose = experimental.update(gyroAngle, modulePositions);
-
-    return expPose;
+    odometry.ifPresent(estimator -> estimator.update(gyroAngle, modulePositions));
+    return experimental.update(gyroAngle, modulePositions);
   }
 
   public Pose2d updateWithTime(
       double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
-    Pose2d odometryPose = odometry.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
-    Pose2d expPose = experimental.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
-
-    return expPose;
+    odometry.ifPresent(
+        estimator -> estimator.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions));
+    return experimental.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
   }
 
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
@@ -72,18 +78,21 @@ public class PoseTracker {
   }
 
   public Pose2d getEstimatedPosition() {
-    Pose2d odometryPose = odometry.getEstimatedPosition();
+    odometry.ifPresent(
+        estimator -> {
+          Pose2d odometryPose = estimator.getEstimatedPosition();
+          Logger.recordOutput("Odometry/Basic", odometryPose);
+        });
+
     Pose2d expPose = experimental.getEstimatedPosition();
-
-    Logger.recordOutput("Odometry/Basic", odometryPose);
     Logger.recordOutput("Odometry/Experimental", expPose);
-
     return expPose;
   }
 
   public void resetPosition(
       Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d poseMeters) {
-    odometry.resetPosition(gyroAngle, modulePositions, poseMeters);
+    odometry.ifPresent(
+        estimator -> estimator.resetPosition(gyroAngle, modulePositions, poseMeters));
     experimental.resetPosition(gyroAngle, modulePositions, poseMeters);
   }
 }
