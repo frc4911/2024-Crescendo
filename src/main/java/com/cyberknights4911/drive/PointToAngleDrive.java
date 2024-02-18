@@ -77,7 +77,7 @@ public final class PointToAngleDrive extends Command {
           output = MathUtil.clamp(output, -1, 1);
           Logger.recordOutput("Drive/PointAt/Current", currentRotation);
           Logger.recordOutput("Drive/PointAt/Desired", desiredAngle);
-          Logger.recordOutput("Drive/PointAt/Output", output);
+          Logger.recordOutput("Drive/PointAt/OmegaOutput", output);
           return output;
         };
 
@@ -96,7 +96,7 @@ public final class PointToAngleDrive extends Command {
       pointController.setPID(pointKp.get(), 0.0, pointKd.get());
     }
     drive.runVelocity(
-        drive.createChassisSpeeds(controlConstants, xSupplier, ySupplier, omegaSupplier));
+        drive.createChassisSpeeds(controlConstants, xSupplier, ySupplier, omegaSupplier, false));
   }
 
   @Override
