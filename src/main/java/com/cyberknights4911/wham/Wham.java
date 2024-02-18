@@ -9,6 +9,8 @@ package com.cyberknights4911.wham;
 
 import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.constants.Constants;
+import com.cyberknights4911.control.ButtonAction;
+import com.cyberknights4911.control.StickAction;
 import com.cyberknights4911.drive.Drive;
 import com.cyberknights4911.drive.GyroIO;
 import com.cyberknights4911.drive.GyroIOPigeon2;
@@ -16,11 +18,8 @@ import com.cyberknights4911.drive.ModuleIO;
 import com.cyberknights4911.drive.ModuleIOSim;
 import com.cyberknights4911.entrypoint.RobotContainer;
 import com.cyberknights4911.robot2024.Robot2024Constants;
-import com.cyberknights4911.vision.CameraConfig;
-import com.cyberknights4911.vision.Vision;
-import com.cyberknights4911.vision.VisionIOInputsAutoLogged;
-import com.cyberknights4911.vision.VisionIOPhoton;
-import com.cyberknights4911.vision.VisionUpdate;
+import com.cyberknights4911.util.GameAlerts;
+import com.cyberknights4911.vision.simple.VisionSimple;
 import com.cyberknights4911.wham.drive.ModuleIOTalonFX;
 import com.cyberknights4911.wham.slurpp.Slurpp;
 import com.cyberknights4911.wham.slurpp.SlurppIO;
@@ -30,15 +29,19 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.littletonrobotics.junction.LoggedRobot;
 
 public final class Wham implements RobotContainer {
   private final Drive drive;
   private final Slurpp slurpp;
-  private final Vision vision;
+  private final VisionSimple vision;
   private final WhamControllerBinding binding;
   private final Constants constants;
+
+  private boolean firstAlertHasRun = false;
+  private boolean secondAlertHasRun = false;
 
   public Wham() {
     constants = WhamConstants.WHAM;
@@ -46,16 +49,10 @@ public final class Wham implements RobotContainer {
     drive = createDrive();
     slurpp = createSlurpp();
     vision =
-        new Vision(
+        new VisionSimple(
             WhamConstants.VISION_CONSTANTS,
-            drive::getPose,
-            (VisionUpdate update) -> {
-              System.out.println("Vision update at time: " + update.timestamp());
-            },
-            new CameraConfig(
-                WhamConstants.CAMERA_CONSTANTS,
-                new VisionIOPhoton(WhamConstants.VISION_CONSTANTS, WhamConstants.CAMERA_CONSTANTS),
-                new VisionIOInputsAutoLogged()));
+            drive::addVisionMeasurement,
+            WhamConstants.CAMERA_CONSTANTS_FRONT_RIGHT);
 
     configureControls();
   }
@@ -64,16 +61,16 @@ public final class Wham implements RobotContainer {
     drive.setDefaultCommand(
         drive.joystickDrive(
             WhamConstants.CONTROL_CONSTANTS,
-            binding.supplierFor(WhamSticks.FORWARD),
-            binding.supplierFor(WhamSticks.STRAFE),
-            binding.supplierFor(WhamSticks.ROTATE)));
+            binding.supplierFor(StickAction.FORWARD),
+            binding.supplierFor(StickAction.STRAFE),
+            binding.supplierFor(StickAction.ROTATE)));
 
-    binding.triggersFor(WhamButtons.Brake).whileTrue(drive.stopWithX());
+    binding.triggersFor(ButtonAction.Brake).whileTrue(drive.stopWithX());
 
-    binding.triggersFor(WhamButtons.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
+    binding.triggersFor(ButtonAction.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
 
     binding
-        .triggersFor(WhamButtons.ZeroSpeaker)
+        .triggersFor(ButtonAction.ZeroSpeaker)
         .onTrue(
             Commands.runOnce(
                 () -> {
@@ -86,21 +83,21 @@ public final class Wham implements RobotContainer {
                 drive));
 
     binding
-        .triggersFor(WhamButtons.AmpLockOn)
+        .triggersFor(ButtonAction.AmpLockOn)
         .whileTrue(
             drive.pointToAngleDrive(
                 Robot2024Constants.CONTROL_CONSTANTS,
-                binding.supplierFor(WhamSticks.FORWARD),
-                binding.supplierFor(WhamSticks.STRAFE),
+                binding.supplierFor(StickAction.FORWARD),
+                binding.supplierFor(StickAction.STRAFE),
                 Math.PI / 2));
 
     binding
-        .triggersFor(WhamButtons.SpeakerLockOn)
+        .triggersFor(ButtonAction.SpeakerLockOn)
         .whileTrue(
             drive.pointToPointDrive(
                 Robot2024Constants.CONTROL_CONSTANTS,
-                binding.supplierFor(WhamSticks.FORWARD),
-                binding.supplierFor(WhamSticks.STRAFE),
+                binding.supplierFor(StickAction.FORWARD),
+                binding.supplierFor(StickAction.STRAFE),
                 Units.inchesToMeters(652.73),
                 Units.inchesToMeters(218.42)));
   }
@@ -180,7 +177,31 @@ public final class Wham implements RobotContainer {
   }
 
   @Override
-  public void onRobotPeriodic(LoggedRobot robot) {}
+  public void onRobotPeriodic(LoggedRobot robot) {
+    if (!firstAlertHasRun && GameAlerts.shouldAlert(GameAlerts.Endgame1)) {
+      firstAlertHasRun = true;
+      CommandScheduler.getInstance()
+          .schedule(
+              Commands.runOnce(() -> binding.setDriverRumble(true))
+                  .withTimeout(1.5)
+                  .andThen(() -> binding.setDriverRumble(false))
+                  .withTimeout(1.0));
+    }
+
+    if (!secondAlertHasRun && GameAlerts.shouldAlert(GameAlerts.Endgame2)) {
+      secondAlertHasRun = true;
+      CommandScheduler.getInstance()
+          .schedule(
+              Commands.runOnce(() -> binding.setDriverRumble(true))
+                  .withTimeout(1.0)
+                  .andThen(() -> binding.setDriverRumble(false))
+                  .withTimeout(0.5)
+                  .andThen(() -> binding.setDriverRumble(true))
+                  .withTimeout(1.0)
+                  .andThen(() -> binding.setDriverRumble(false))
+                  .withTimeout(0.5));
+    }
+  }
 
   @Override
   public void setupAutos(AutoCommandHandler handler) {

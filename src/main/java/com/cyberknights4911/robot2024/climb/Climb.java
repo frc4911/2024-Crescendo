@@ -10,7 +10,6 @@ package com.cyberknights4911.robot2024.climb;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.cyberknights4911.logging.LoggedTunableNumber;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -24,8 +23,6 @@ import org.littletonrobotics.junction.Logger;
 public class Climb extends SubsystemBase {
   private static final LoggedTunableNumber kP = new LoggedTunableNumber("Climb/kP");
   private static final LoggedTunableNumber kD = new LoggedTunableNumber("Climb/kD");
-  private static final LoggedTunableNumber kS = new LoggedTunableNumber("Climb/kS");
-  private static final LoggedTunableNumber kV = new LoggedTunableNumber("Climb/kV");
   private static final LoggedTunableNumber lockToggleTime =
       new LoggedTunableNumber("Climb/LockToggleTime");
   private static final LoggedTunableNumber extendPosition =
@@ -40,14 +37,11 @@ public class Climb extends SubsystemBase {
   private final ClimbIO climbIO;
   private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
   private final Mechanism2d mechanism = new Mechanism2d(3, 3);
-  private SimpleMotorFeedforward feedforward;
   private final SysIdRoutine sysId;
 
   public Climb(ClimbConstants constants, ClimbIO climbIO) {
     super();
     this.climbIO = climbIO;
-    kS.initDefault(constants.feedForwardValues().kS());
-    kV.initDefault(constants.feedForwardValues().kV());
     kP.initDefault(constants.feedBackValues().kP());
     kD.initDefault(constants.feedBackValues().kD());
     forwardLimit.initDefault(constants.forwardLimit());
@@ -55,7 +49,6 @@ public class Climb extends SubsystemBase {
     extendPosition.initDefault(constants.extendPosition());
     retractPosition.initDefault(constants.retractPosition());
     lockToggleTime.initDefault(constants.lockToggleTime());
-    feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     climbIO.configurePID(kP.get(), 0.0, kD.get());
 
     setupClimberMechanism(mechanism);
@@ -82,9 +75,6 @@ public class Climb extends SubsystemBase {
 
     if (kP.hasChanged(hashCode()) || kD.hasChanged(hashCode())) {
       climbIO.configurePID(kP.get(), 0.0, kD.get());
-    }
-    if (kS.hasChanged(hashCode()) || kV.hasChanged(hashCode())) {
-      feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     }
     if (forwardLimit.hasChanged(hashCode()) || backwardLimit.hasChanged(hashCode())) {
       climbIO.configureLimits(forwardLimit.get(), backwardLimit.get());
