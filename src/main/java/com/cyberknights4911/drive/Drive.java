@@ -268,7 +268,8 @@ public class Drive extends SubsystemBase {
       ControlConstants controlConstants,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier) {
+      DoubleSupplier omegaSupplier,
+      boolean applyOmegaDeadbandAndScaling) {
     // Apply deadband
     double linearMagnitude =
         MathUtil.applyDeadband(
@@ -276,11 +277,13 @@ public class Drive extends SubsystemBase {
             controlConstants.stickDeadband());
     Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
     double omega =
-        MathUtil.applyDeadband(omegaSupplier.getAsDouble(), controlConstants.stickDeadband());
+        applyOmegaDeadbandAndScaling
+            ? MathUtil.applyDeadband(omegaSupplier.getAsDouble(), controlConstants.stickDeadband())
+            : omegaSupplier.getAsDouble();
 
     // Square values
     linearMagnitude = linearMagnitude * linearMagnitude;
-    omega = Math.copySign(omega * omega, omega);
+    omega = applyOmegaDeadbandAndScaling ? Math.copySign(omega * omega, omega) : omega;
 
     // Calcaulate new linear velocity
     Translation2d linearVelocity =
@@ -294,6 +297,14 @@ public class Drive extends SubsystemBase {
         linearVelocity.getY() * driveConstants.maxLinearSpeed(),
         omega * maxAngularSpeedMetersPerSecond,
         getRotation());
+  }
+
+  private ChassisSpeeds createChassisSpeeds(
+      ControlConstants controlConstants,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier omegaSupplier) {
+    return createChassisSpeeds(controlConstants, xSupplier, ySupplier, omegaSupplier, true);
   }
 
   public PointToAngleDrive pointToPointDrive(
@@ -325,7 +336,6 @@ public class Drive extends SubsystemBase {
       DoubleSupplier omegaSupplier) {
     return Commands.run(
         () -> {
-          Logger.recordOutput("Drive/Joystick/Omega", omegaSupplier.getAsDouble());
           runVelocity(createChassisSpeeds(controlConstants, xSupplier, ySupplier, omegaSupplier));
         },
         this);
