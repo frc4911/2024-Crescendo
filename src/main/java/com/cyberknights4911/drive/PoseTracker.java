@@ -29,7 +29,6 @@ import org.littletonrobotics.junction.Logger;
  */
 public class PoseTracker {
   private final SwerveDrivePoseEstimator odometry;
-  private final SwerveDrivePoseEstimator odometryPlusVision;
   private final SwerveDrivePoseEstimatorExperimental experimental;
 
   public PoseTracker(
@@ -39,8 +38,6 @@ public class PoseTracker {
       Pose2d initialPoseMeters) {
     odometry =
         new SwerveDrivePoseEstimator(kinematics, gyroAngle, modulePositions, initialPoseMeters);
-    odometryPlusVision =
-        new SwerveDrivePoseEstimator(kinematics, gyroAngle, modulePositions, initialPoseMeters);
     experimental =
         new SwerveDrivePoseEstimatorExperimental(
             kinematics, gyroAngle, modulePositions, initialPoseMeters);
@@ -48,7 +45,6 @@ public class PoseTracker {
 
   public Pose2d update(Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
     Pose2d odometryPose = odometry.update(gyroAngle, modulePositions);
-    Pose2d visionPose = odometryPlusVision.update(gyroAngle, modulePositions);
     Pose2d expPose = experimental.update(gyroAngle, modulePositions);
 
     return expPose;
@@ -57,16 +53,12 @@ public class PoseTracker {
   public Pose2d updateWithTime(
       double currentTimeSeconds, Rotation2d gyroAngle, SwerveModulePosition[] modulePositions) {
     Pose2d odometryPose = odometry.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
-    Pose2d visionPose =
-        odometryPlusVision.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
     Pose2d expPose = experimental.updateWithTime(currentTimeSeconds, gyroAngle, modulePositions);
 
     return expPose;
   }
 
   public void addVisionMeasurement(Pose2d visionRobotPoseMeters, double timestampSeconds) {
-
-    odometryPlusVision.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
     experimental.addVisionMeasurement(visionRobotPoseMeters, timestampSeconds);
   }
 
@@ -75,19 +67,15 @@ public class PoseTracker {
       double timestampSeconds,
       Matrix<N3, N1> visionMeasurementStdDevs) {
     Logger.recordOutput("Odometry/VisionUpdate", visionRobotPoseMeters);
-    odometryPlusVision.addVisionMeasurement(
-        visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
     experimental.addVisionMeasurement(
         visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
   }
 
   public Pose2d getEstimatedPosition() {
     Pose2d odometryPose = odometry.getEstimatedPosition();
-    Pose2d visionPose = odometryPlusVision.getEstimatedPosition();
     Pose2d expPose = experimental.getEstimatedPosition();
 
     Logger.recordOutput("Odometry/Basic", odometryPose);
-    Logger.recordOutput("Odometry/Vision", visionPose);
     Logger.recordOutput("Odometry/Experimental", expPose);
 
     return expPose;
@@ -96,7 +84,6 @@ public class PoseTracker {
   public void resetPosition(
       Rotation2d gyroAngle, SwerveModulePosition[] modulePositions, Pose2d poseMeters) {
     odometry.resetPosition(gyroAngle, modulePositions, poseMeters);
-    odometryPlusVision.resetPosition(gyroAngle, modulePositions, poseMeters);
     experimental.resetPosition(gyroAngle, modulePositions, poseMeters);
   }
 }
