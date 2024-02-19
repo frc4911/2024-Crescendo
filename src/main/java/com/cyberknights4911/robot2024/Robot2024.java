@@ -60,6 +60,18 @@ public final class Robot2024 implements RobotContainer {
     configureControls();
   }
 
+  boolean redAlliance;
+  double x;
+  double y;
+
+  if (redAlliance) {
+    x = 652.73;
+    y = 218.42;
+  } else {
+    x = -1.50;
+    y = 218.42;
+  }
+
   private void configureControls() {
     drive.setDefaultCommand(
         drive.joystickDrive(
@@ -98,8 +110,8 @@ public final class Robot2024 implements RobotContainer {
                 Robot2024Constants.CONTROL_CONSTANTS,
                 binding.supplierFor(StickAction.FORWARD),
                 binding.supplierFor(StickAction.STRAFE),
-                Units.inchesToMeters(652.73),
-                Units.inchesToMeters(218.42)));
+                Units.inchesToMeters(x),
+                Units.inchesToMeters(y)));
 
     binding.triggersFor(ButtonAction.StowShooter).onTrue(Commands.none());
 
