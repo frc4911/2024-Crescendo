@@ -18,6 +18,7 @@ import com.cyberknights4911.drive.ModuleIO;
 import com.cyberknights4911.drive.ModuleIOSim;
 import com.cyberknights4911.entrypoint.RobotContainer;
 import com.cyberknights4911.robot2024.Robot2024Constants;
+import com.cyberknights4911.util.Alliance;
 import com.cyberknights4911.util.GameAlerts;
 import com.cyberknights4911.vision.simple.VisionSimple;
 import com.cyberknights4911.wham.drive.ModuleIOTalonFX;
@@ -91,6 +92,16 @@ public final class Wham implements RobotContainer {
                 binding.supplierFor(StickAction.STRAFE),
                 Math.PI / 2));
 
+    double speakerX = 0;
+    double speakerY = 0;
+    if (Alliance.isRed()) {
+      speakerX = 652.73;
+      speakerY = 218.42;
+    } else {
+      // TODO: put the values for the blue speaker here
+      speakerX = 0;
+      speakerY = 0;
+    }
     binding
         .triggersFor(ButtonAction.SpeakerLockOn)
         .whileTrue(
@@ -98,8 +109,8 @@ public final class Wham implements RobotContainer {
                 Robot2024Constants.CONTROL_CONSTANTS,
                 binding.supplierFor(StickAction.FORWARD),
                 binding.supplierFor(StickAction.STRAFE),
-                Units.inchesToMeters(652.73),
-                Units.inchesToMeters(218.42)));
+                speakerX,
+                speakerY));
   }
 
   private Drive createDrive() {
