@@ -50,8 +50,6 @@ public final class WhamControllerBinding implements StickBinding, ButtonBinding 
         return new Triggers(driver.leftTrigger());
       case SpeakerLockOn:
         return new Triggers(driver.rightTrigger());
-      case StowClimber:
-        return new Triggers(driver.a());
       default:
         return new Triggers(ALWAYS_FALSE);
     }
