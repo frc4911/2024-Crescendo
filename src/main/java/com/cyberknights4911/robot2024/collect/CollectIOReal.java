@@ -107,6 +107,11 @@ public class CollectIOReal implements CollectIO {
   }
 
   @Override
+  public void setCollecterPosition(boolean extended) {
+    // TODO: actually extend or retract the solenoids
+  }
+
+  @Override
   public void configureCollectPID(double kP, double kI, double kD) {
     collectPidController.setP(kP, 0);
     collectPidController.setI(kI, 0);
