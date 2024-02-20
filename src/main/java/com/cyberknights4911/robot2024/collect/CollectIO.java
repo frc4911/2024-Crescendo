@@ -47,6 +47,8 @@ public interface CollectIO {
   /** Stop guide in open loop. */
   public default void stopGuide() {}
 
+  public default void setCollecterPosition(boolean extended) {}
+
   /** Set collect velocity PID constants. */
   public default void configureCollectPID(double kP, double kI, double kD) {}
 

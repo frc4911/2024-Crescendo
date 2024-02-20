@@ -222,6 +222,11 @@ public class Drive extends SubsystemBase {
     return getPose().getRotation();
   }
 
+  /** Returns the current roll rotation. Positive is tilting right, negative is left */
+  public Rotation2d getRoll() {
+    return gyroInputs.rollPosition;
+  }
+
   /** Resets the current odometry pose. */
   public void setPose(Pose2d pose) {
     poseEstimator.resetPosition(rawGyroRotation, getModulePositions(), pose);

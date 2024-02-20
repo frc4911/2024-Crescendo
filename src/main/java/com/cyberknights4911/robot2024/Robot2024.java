@@ -107,7 +107,7 @@ public final class Robot2024 implements RobotContainer {
 
     binding.triggersFor(ButtonAction.FireNote).onTrue(Commands.none());
 
-    binding.triggersFor(ButtonAction.StowClimber).onTrue(Commands.none());
+    binding.triggersFor(ButtonAction.StowClimber).onTrue(climb.climb(drive));
 
     binding.triggersFor(ButtonAction.ExtendClimber).onTrue(Commands.none());
   }
