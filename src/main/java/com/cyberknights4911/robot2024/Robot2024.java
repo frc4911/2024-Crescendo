@@ -60,11 +60,10 @@ public final class Robot2024 implements RobotContainer {
     configureControls();
   }
 
-  boolean redAlliance;
   double x;
   double y;
 
-  if (redAlliance) {
+  if (Alliance.isRed) {
     x = 652.73;
     y = 218.42;
   } else {
