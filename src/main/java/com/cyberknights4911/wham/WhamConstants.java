@@ -14,23 +14,18 @@ import com.cyberknights4911.constants.ControlConstantsBuilder;
 import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.constants.DriveConstantsBuilder;
 import com.cyberknights4911.constants.DriveConstantsModuleConstantsBuilder;
-import com.cyberknights4911.logging.Alert;
-import com.cyberknights4911.logging.Alert.AlertType;
 import com.cyberknights4911.logging.Mode;
 import com.cyberknights4911.util.FeedForwardValues;
+import com.cyberknights4911.util.Field;
 import com.cyberknights4911.util.PidValues;
 import com.cyberknights4911.vision.CameraConstants;
 import com.cyberknights4911.vision.CameraConstantsBuilder;
 import com.cyberknights4911.vision.VisionConstants;
 import com.cyberknights4911.vision.VisionConstantsBuilder;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
 
 public final class WhamConstants {
   private WhamConstants() {}
@@ -94,23 +89,9 @@ public final class WhamConstants {
                   .build())
           .build();
 
-  private static Alert noAprilTagLayoutAlert =
-      new Alert("No AprilTag layout file found. Update VisionConstants.", AlertType.WARNING);
-
-  private static AprilTagFieldLayout getFieldLayout() {
-    try {
-      noAprilTagLayoutAlert.set(false);
-      return AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
-    } catch (UncheckedIOException e) {
-      noAprilTagLayoutAlert.set(true);
-      return new AprilTagFieldLayout(
-          new ArrayList<>(), Units.feetToMeters(12), Units.feetToMeters(12));
-    }
-  }
-
   public static final VisionConstants VISION_CONSTANTS =
       VisionConstantsBuilder.builder()
-          .layout(getFieldLayout())
+          .layout(Field.getFieldLayout())
           .maxAmbiguity(0.03)
           .maxValidDistanceMeters(3.0)
           .build();
