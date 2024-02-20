@@ -9,7 +9,9 @@ package com.cyberknights4911.robot2024.climb;
 
 import static edu.wpi.first.units.Units.Volts;
 
+import com.cyberknights4911.drive.Drive;
 import com.cyberknights4911.logging.LoggedTunableNumber;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
@@ -34,14 +36,28 @@ public class Climb extends SubsystemBase {
   private static final LoggedTunableNumber backwardLimit =
       new LoggedTunableNumber("Climb/backwardLimit");
 
+  // Measured in OnShape
+  // climber distance from front: 10.118
+  // TODO: figure out base height (y for mount point)
+  private static final Translation2d MOUNT_POINT = new Translation2d(10.118, 3.0);
+  // TODO: figure out the fixed height as well as the segment start and end height
+  private static final double FIXED_HEIGHT = 20.0;
+  private static final double LENGTH_START = 0;
+  // TODO: figure out this value
+  private static final double WINCH_RADIUS = 1.0;
+
   private final ClimbIO climbIO;
   private final ClimbIOInputsAutoLogged inputs = new ClimbIOInputsAutoLogged();
-  private final Mechanism2d mechanism = new Mechanism2d(3, 3);
+  private final Mechanism2d mechanism;
+  private final MechanismLigament2d leftSegment;
+  private final MechanismLigament2d rightSegment;
   private final SysIdRoutine sysId;
+  private final double winchConstant;
 
   public Climb(ClimbConstants constants, ClimbIO climbIO) {
     super();
     this.climbIO = climbIO;
+    winchConstant = constants.gearRatio() * WINCH_RADIUS;
     kP.initDefault(constants.feedBackValues().kP());
     kD.initDefault(constants.feedBackValues().kD());
     forwardLimit.initDefault(constants.forwardLimit());
@@ -51,7 +67,22 @@ public class Climb extends SubsystemBase {
     lockToggleTime.initDefault(constants.lockToggleTime());
     climbIO.configurePID(kP.get(), 0.0, kD.get());
 
-    setupClimberMechanism(mechanism);
+    mechanism = new Mechanism2d(28.0, 28.0);
+    // Where the climber is attached (These aren't really offset by 2 inches, but we want to see
+    // them both in 2d)
+    MechanismRoot2d rootLeft =
+        mechanism.getRoot("climberLeft", MOUNT_POINT.getX() - 1.0, MOUNT_POINT.getY());
+    MechanismRoot2d rootRight =
+        mechanism.getRoot("climberRight", MOUNT_POINT.getX() + 1.0, MOUNT_POINT.getY());
+    // The first segment is always at a fixed height, but the second segment "grows".
+    leftSegment =
+        rootLeft
+            .append(new MechanismLigament2d("segmentLeft1", FIXED_HEIGHT, 90))
+            .append(new MechanismLigament2d("segmentLeft2", LENGTH_START, 90));
+    rightSegment =
+        rootRight
+            .append(new MechanismLigament2d("segmentRight1", FIXED_HEIGHT, 90))
+            .append(new MechanismLigament2d("segmentRight2", LENGTH_START, 90));
 
     sysId =
         new SysIdRoutine(
@@ -80,6 +111,11 @@ public class Climb extends SubsystemBase {
       climbIO.configureLimits(forwardLimit.get(), backwardLimit.get());
     }
 
+    leftSegment.setLength(LENGTH_START + winchConstant * inputs.leftPositionRad);
+    rightSegment.setLength(LENGTH_START + winchConstant * inputs.rightPositionRad);
+
+    Logger.recordOutput("Climb/Mechanism", mechanism);
+
     if (DriverStation.isDisabled()) {
       stop();
     }
@@ -95,13 +131,28 @@ public class Climb extends SubsystemBase {
     climbIO.stop();
   }
 
-  private void setupClimberMechanism(Mechanism2d mechanism2) {
-    // Where the climber is attached
-    MechanismRoot2d root = mechanism.getRoot("climber", 1.5, 0);
-    // The first climber segment. This is the portion that is always at a fixed height.
-    MechanismLigament2d segment = root.append(new MechanismLigament2d("segment1", 1, 90));
-    // The second climber segment. This represents the section that extends upward.
-    segment.append(new MechanismLigament2d("segment2", 0, 90));
+  boolean isClimbComplete() {
+    // TODO: Check both left and right climbers against "retractPosition"
+    return false;
+  }
+
+  void setClimbMode(Mode mode) {
+    switch (mode) {
+      case Right:
+        // hold left, climb right
+        break;
+      case Left:
+        // hold right, climb left
+        break;
+      case Both:
+        // climb left and right
+        break;
+      case Hold:
+        // hold left and right
+        break;
+      default:
+        break;
+    }
   }
 
   private Command setClimbLock(boolean locked) {
@@ -113,32 +164,26 @@ public class Climb extends SubsystemBase {
         .andThen(Commands.waitSeconds(lockToggleTime.get()));
   }
 
-  /** Extends the climbers to climbing height. */
+  /** Extends both climbers to extended height. */
   public Command extendClimber() {
     return setClimbLock(false)
         .andThen(
-            Commands.runOnce(
-                () -> {
-                  climbIO.setPosition(extendPosition.get());
-                },
-                this))
-        .until(
-            () -> {
-              return inputs.positionLinear >= extendPosition.get();
-            });
+            Commands.runOnce(() -> climbIO.setPositionLeft(extendPosition.get()))
+                .until(() -> inputs.leftPositionRad >= extendPosition.get())
+                .alongWith(
+                    Commands.runOnce(() -> climbIO.setPositionRight(extendPosition.get()))
+                        .until(() -> inputs.rightPositionRad >= extendPosition.get())));
   }
 
-  /** Retracts the climbers to the climbed height. */
-  public Command climb() {
-    return Commands.runOnce(
-            () -> {
-              climbIO.setPosition(retractPosition.get());
-            },
-            this)
-        .until(
-            () -> {
-              return inputs.positionLinear <= retractPosition.get();
-            })
-        .andThen(setClimbLock(true));
+  /** Perform a climb. */
+  public Command climb(Drive drive) {
+    return new ClimbCommand(drive, this).andThen(setClimbLock(true));
+  }
+
+  public static enum Mode {
+    Left,
+    Right,
+    Both,
+    Hold
   }
 }

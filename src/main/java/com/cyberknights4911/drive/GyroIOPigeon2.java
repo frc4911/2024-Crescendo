@@ -21,23 +21,39 @@ public class GyroIOPigeon2 implements GyroIO {
   private final Pigeon2 pigeon;
   private final StatusSignal<Double> yaw;
   private final StatusSignal<Double> yawVelocity;
+  private final StatusSignal<Double> roll;
+  private final StatusSignal<Double> rollVelocity;
 
   public GyroIOPigeon2(DriveConstants constants) {
     pigeon = new Pigeon2(constants.pigeonId());
+
     yaw = pigeon.getYaw();
     yawVelocity = pigeon.getAngularVelocityZWorld();
 
+    roll = pigeon.getRoll();
+    rollVelocity = pigeon.getAngularVelocityXWorld();
+
     pigeon.getConfigurator().apply(new Pigeon2Configuration());
     pigeon.getConfigurator().setYaw(0.0);
+
     yaw.setUpdateFrequency(100.0);
     yawVelocity.setUpdateFrequency(100.0);
+
+    roll.setUpdateFrequency(100.0);
+    rollVelocity.setUpdateFrequency(100.0);
+
     pigeon.optimizeBusUtilization();
   }
 
   @Override
   public void updateInputs(GyroIOInputs inputs) {
-    inputs.connected = BaseStatusSignal.refreshAll(yaw, yawVelocity).equals(StatusCode.OK);
+    inputs.connected =
+        BaseStatusSignal.refreshAll(yaw, yawVelocity, roll, rollVelocity).equals(StatusCode.OK);
+
     inputs.yawPosition = Rotation2d.fromDegrees(yaw.getValueAsDouble());
     inputs.yawVelocityRadPerSec = Units.degreesToRadians(yawVelocity.getValueAsDouble());
+
+    inputs.rollPosition = Rotation2d.fromDegrees(roll.getValueAsDouble());
+    inputs.rollVelocityRadPerSec = Units.degreesToRadians(rollVelocity.getValueAsDouble());
   }
 }
