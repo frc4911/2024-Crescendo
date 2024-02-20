@@ -29,12 +29,11 @@ final class ClimbCommand extends Command {
       return;
     }
     double rollDegrees = drive.getRoll().getDegrees();
-    if (Math.abs(rollDegrees) < 0.1) {
-      // Robot is level. React accordingly
+    if (Math.abs(rollDegrees) < 5) {
     } else if (rollDegrees < 0) {
-      // Robot is tilting left. React accordingly
+      System.out.println("Tilting left!");
     } else {
-      // Robot is tilting right. React accordingly
+      System.out.println("Tilting right");
     }
   }
 

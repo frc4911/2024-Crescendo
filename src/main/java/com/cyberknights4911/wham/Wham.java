@@ -18,6 +18,8 @@ import com.cyberknights4911.drive.ModuleIO;
 import com.cyberknights4911.drive.ModuleIOSim;
 import com.cyberknights4911.entrypoint.RobotContainer;
 import com.cyberknights4911.robot2024.Robot2024Constants;
+import com.cyberknights4911.robot2024.climb.Climb;
+import com.cyberknights4911.robot2024.climb.ClimbIO;
 import com.cyberknights4911.util.GameAlerts;
 import com.cyberknights4911.vision.simple.VisionSimple;
 import com.cyberknights4911.wham.drive.ModuleIOTalonFX;
@@ -34,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import org.littletonrobotics.junction.LoggedRobot;
 
 public final class Wham implements RobotContainer {
+  private final Climb climb;
   private final Drive drive;
   private final Slurpp slurpp;
   private final VisionSimple vision;
@@ -46,6 +49,7 @@ public final class Wham implements RobotContainer {
   public Wham() {
     constants = WhamConstants.WHAM;
     binding = new WhamControllerBinding();
+    climb = createClimb();
     drive = createDrive();
     slurpp = createSlurpp();
     vision =
@@ -55,6 +59,10 @@ public final class Wham implements RobotContainer {
             WhamConstants.CAMERA_CONSTANTS_FRONT_RIGHT);
 
     configureControls();
+  }
+
+  private Climb createClimb() {
+    return new Climb(Robot2024Constants.CLIMB_CONSTANTS, new ClimbIO() {});
   }
 
   private void configureControls() {
@@ -68,6 +76,8 @@ public final class Wham implements RobotContainer {
     binding.triggersFor(ButtonAction.Brake).whileTrue(drive.stopWithX());
 
     binding.triggersFor(ButtonAction.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
+
+    binding.triggersFor(ButtonAction.StowClimber).onTrue(climb.climb(drive));
 
     binding
         .triggersFor(ButtonAction.ZeroSpeaker)

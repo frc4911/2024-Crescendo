@@ -224,8 +224,7 @@ public class Drive extends SubsystemBase {
 
   /** Returns the current roll rotation. Positive is tilting right, negative is left */
   public Rotation2d getRoll() {
-    // TODO: get the rotation from the gyro inputs
-    return new Rotation2d();
+    return gyroInputs.rollPosition;
   }
 
   /** Resets the current odometry pose. */
