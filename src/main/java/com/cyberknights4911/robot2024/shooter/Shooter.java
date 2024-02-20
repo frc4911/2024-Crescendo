@@ -11,8 +11,12 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -46,11 +50,19 @@ public class Shooter extends SubsystemBase {
       new LoggedTunableNumber("Shooter/forwardLimit");
   private static final LoggedTunableNumber backwardLimit =
       new LoggedTunableNumber("Shooter/backwardLimit");
+      
+  // Measured in OnShape
+  // motor distance 5.558
+  // pivot to lower motor 7.115
+  private static final Translation2d MOUNT_POINT = new Translation2d(9.141, 10.882);
+  private static final double MOUNT_TO_SHOOTER_FRONT = 10.5;
 
   private final ShooterIO shooterIO;
   private final ShooterIOInputsAutoLogged inputs = new ShooterIOInputsAutoLogged();
   private SimpleMotorFeedforward feedforward;
   private final SysIdRoutine sysId;
+  private final Mechanism2d mechanism;
+  private final MechanismLigament2d segment;
 
   public Shooter(ShooterConstants constants, ShooterIO shooterIO) {
     super();
@@ -71,6 +83,12 @@ public class Shooter extends SubsystemBase {
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     shooterIO.configureShooterPID(kP.get(), 0.0, kD.get());
 
+    mechanism = new Mechanism2d(28.0, 28.0);
+    // Where the shooter is attached to the frame
+    MechanismRoot2d root = mechanism.getRoot("shooter", MOUNT_POINT.getX(), MOUNT_POINT.getY());
+    // The the tilting segment. This is the portion that is moved by the aimer.
+    segment = root.append(new MechanismLigament2d("segment", MOUNT_TO_SHOOTER_FRONT, 0));
+    
     sysId =
         new SysIdRoutine(
             new SysIdRoutine.Config(
@@ -146,6 +164,10 @@ public class Shooter extends SubsystemBase {
     if (forwardLimit.hasChanged(hashCode()) || backwardLimit.hasChanged(hashCode())) {
       shooterIO.configureLimits(forwardLimit.get(), backwardLimit.get());
     }
+
+    // TODO: convert this to the actual angle (correct for gear ratio)
+    segment.setAngle(Math.toDegrees(inputs.aimerPositionRad));
+    Logger.recordOutput("Shooter/Mechanism", mechanism);
 
     if (DriverStation.isDisabled()) {
       stopShooter();
