@@ -10,4 +10,4 @@ package com.cyberknights4911.robot2024.lights;
 import io.soabase.recordbuilder.core.RecordBuilder;
 
 @RecordBuilder
-public record LightsConstants(int analogOutputId) {}
+public record LightsConstants(int hueOutputId, int patternOutputId) {}

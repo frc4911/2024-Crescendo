@@ -8,5 +8,7 @@
 package com.cyberknights4911.robot2024.lights;
 
 public interface LightsIO {
-  public default void setSignalVoltage(double voltage) {}
+  public default void setHueVoltage(double voltage) {}
+
+  public default void setPatternVoltage(double voltage) {}
 }

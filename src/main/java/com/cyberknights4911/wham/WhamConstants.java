@@ -122,5 +122,5 @@ public final class WhamConstants {
           .build();
 
   public static final LightsConstants LIGHTS_CONSTANTS =
-      LightsConstantsBuilder.builder().analogOutputId(2).build();
+      LightsConstantsBuilder.builder().hueOutputId(2).patternOutputId(3).build();
 }

@@ -11,13 +11,19 @@ import edu.wpi.first.wpilibj.AnalogOutput;
 
 public final class LightsIOReal implements LightsIO {
 
-  private final AnalogOutput output;
+  private final AnalogOutput hueOutput;
+  private final AnalogOutput patternOutput;
 
   public LightsIOReal(LightsConstants constants) {
-    output = new AnalogOutput(constants.analogOutputId());
+    hueOutput = new AnalogOutput(constants.hueOutputId());
+    patternOutput = new AnalogOutput(constants.hueOutputId());
   }
 
-  public void setSignalVoltage(double voltage) {
-    output.setVoltage(voltage);
+  public void setHueVoltage(double voltage) {
+    hueOutput.setVoltage(voltage);
+  }
+
+  public void setPatternVoltage(double voltage) {
+    patternOutput.setVoltage(voltage);
   }
 }

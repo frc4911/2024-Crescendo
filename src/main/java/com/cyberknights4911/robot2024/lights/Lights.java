@@ -12,23 +12,31 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public final class Lights extends SubsystemBase {
   private final LightsIO lightsIO;
 
-  private Mode message = Mode.Red;
+  private Hue hue = Hue.Red;
+  private Pattern pattern = Pattern.SINELON;
 
   public Lights(LightsIO lightsIO) {
     this.lightsIO = lightsIO;
   }
 
-  public void setMode(Mode mode) {
-    this.message = mode;
+  public void setMode(Hue hue) {
+    this.hue = hue;
+  }
+
+  public void setPattern(Pattern pattern) {
+    this.pattern = pattern;
   }
 
   @Override
   public void periodic() {
-    double percent = ((double) message.hueDegrees) / 360.0;
-    lightsIO.setSignalVoltage(5.0 * percent);
+    double percentHue = ((double) hue.hueDegrees) / 360.0;
+    lightsIO.setHueVoltage(5.0 * percentHue);
+
+    double patternPercent = ((double) pattern.number) / 20.0;
+    lightsIO.setPatternVoltage(5.0 * patternPercent);
   }
 
-  public enum Mode {
+  public enum Hue {
     Red(0),
     Orange(35),
     Green(100),
@@ -38,8 +46,24 @@ public final class Lights extends SubsystemBase {
 
     final int hueDegrees;
 
-    Mode(int hueDegrees) {
+    Hue(int hueDegrees) {
       this.hueDegrees = hueDegrees;
+    }
+  }
+
+  public enum Pattern {
+    DEFAULT(0),
+    CYLON(1),
+    FLASH(2),
+    CONFETTI(3),
+    SINELON(4),
+    BPM(5),
+    JUGGLE(6);
+
+    final int number;
+
+    Pattern(int number) {
+      this.number = number;
     }
   }
 }
