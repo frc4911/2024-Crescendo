@@ -7,21 +7,15 @@
 
 package com.cyberknights4911.robot2024.lights;
 
-import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public final class Lights extends SubsystemBase {
-  private SerialPort arduino;
+  private final LightsIO lightsIO;
 
   private Mode message = Mode.Red;
 
-  public Lights() {
-    try {
-      //   arduino = new SerialPort(9600, SerialPort.Port.kUSB);
-    } catch (Exception e) {
-      System.out.println("Can't open port");
-      e.printStackTrace();
-    }
+  public Lights(LightsIO lightsIO) {
+    this.lightsIO = lightsIO;
   }
 
   public void setMode(Mode mode) {
@@ -30,20 +24,22 @@ public final class Lights extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (arduino == null) {
-      return;
-    }
-    arduino.write(new byte[] {}, 1);
+    double percent = ((double) message.hueDegrees) / 360.0;
+    lightsIO.setSignalVoltage(5.0 * percent);
   }
 
   public enum Mode {
     Red(0),
-    Blue(240);
+    Orange(35),
+    Green(100),
+    Blue(240),
+    Purple(275),
+    Pink(300);
 
-    final byte message;
+    final int hueDegrees;
 
-    Mode(Integer message) {
-      this.message = message.byteValue();
+    Mode(int hueDegrees) {
+      this.hueDegrees = hueDegrees;
     }
   }
 }

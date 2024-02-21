@@ -15,6 +15,8 @@ import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.constants.DriveConstantsBuilder;
 import com.cyberknights4911.constants.DriveConstantsModuleConstantsBuilder;
 import com.cyberknights4911.logging.Mode;
+import com.cyberknights4911.robot2024.lights.LightsConstants;
+import com.cyberknights4911.robot2024.lights.LightsConstantsBuilder;
 import com.cyberknights4911.util.FeedForwardValues;
 import com.cyberknights4911.util.Field;
 import com.cyberknights4911.util.PidValues;
@@ -118,4 +120,7 @@ public final class WhamConstants {
                       SWERVE_MOUNTED_CAMERA_OFFSET_Z),
                   new Rotation3d(0, -SWERVE_MOUNTED_CAMERA_PITCH, -SWERVE_MOUNTED_CAMERA_YAW)))
           .build();
+
+  public static final LightsConstants LIGHTS_CONSTANTS =
+      LightsConstantsBuilder.builder().analogOutputId(2).build();
 }
