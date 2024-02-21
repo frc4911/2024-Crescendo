@@ -18,6 +18,7 @@ import com.cyberknights4911.drive.ModuleIO;
 import com.cyberknights4911.drive.ModuleIOSim;
 import com.cyberknights4911.entrypoint.RobotContainer;
 import com.cyberknights4911.robot2024.Robot2024Constants;
+import com.cyberknights4911.robot2024.lights.Lights;
 import com.cyberknights4911.util.GameAlerts;
 import com.cyberknights4911.vision.simple.VisionSimple;
 import com.cyberknights4911.wham.drive.ModuleIOTalonFX;
@@ -37,6 +38,7 @@ public final class Wham implements RobotContainer {
   private final Drive drive;
   private final Slurpp slurpp;
   private final VisionSimple vision;
+  private final Lights lights;
   private final WhamControllerBinding binding;
   private final Constants constants;
 
@@ -54,6 +56,7 @@ public final class Wham implements RobotContainer {
             drive::addVisionMeasurement,
             WhamConstants.CAMERA_CONSTANTS_FRONT_RIGHT);
 
+    lights = new Lights();
     configureControls();
   }
 
@@ -81,7 +84,8 @@ public final class Wham implements RobotContainer {
                           new Rotation2d()));
                 },
                 drive));
-
+    // Command lightCommand = Commands.none();
+    // Commands.startEnd(() -> lights.setMode(Mode.Blue), () -> lights.setMode(Mode.Red), lights);
     binding
         .triggersFor(ButtonAction.AmpLockOn)
         .whileTrue(
@@ -89,7 +93,9 @@ public final class Wham implements RobotContainer {
                 Robot2024Constants.CONTROL_CONSTANTS,
                 binding.supplierFor(StickAction.FORWARD),
                 binding.supplierFor(StickAction.STRAFE),
-                Math.PI / 2));
+                Math.PI / 2)
+            // .alongWith(lightCommand)
+            );
 
     binding
         .triggersFor(ButtonAction.SpeakerLockOn)
@@ -99,7 +105,9 @@ public final class Wham implements RobotContainer {
                 binding.supplierFor(StickAction.FORWARD),
                 binding.supplierFor(StickAction.STRAFE),
                 Units.inchesToMeters(652.73),
-                Units.inchesToMeters(218.42)));
+                Units.inchesToMeters(218.42))
+            // .alongWith(lightCommand)
+            );
   }
 
   private Drive createDrive() {
