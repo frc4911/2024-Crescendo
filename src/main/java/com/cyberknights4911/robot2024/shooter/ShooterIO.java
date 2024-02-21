@@ -30,7 +30,7 @@ public interface ShooterIO {
     public double indexerAppliedVolts = 0.0;
     public double indexerCurrentAmps = 0.0;
 
-    public double beamBreakVoltage = 0.0;
+    public double beamBreakValue = 0.0;
   }
 
   /** Updates the set of loggable inputs. */
