@@ -123,6 +123,7 @@ public final class Robot2024Constants {
           .aimerGearRatio(84.0 / 14.0)
           .feedBackValues(new PidValues(0, 0, 0))
           .feedForwardValues(new FeedForwardValues(0, 0))
+          .beamThreshold(200)
           .build();
 
   // Note: these measurements are for the front right swerve-mounted camera

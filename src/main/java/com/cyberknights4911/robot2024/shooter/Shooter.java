@@ -79,6 +79,7 @@ public class Shooter extends SubsystemBase {
     backwardLimit.initDefault(constants.aimerBackwardLimit());
     indexVelocityRpm.initDefault(constants.indexVelocityRpm());
     feedVelocityRpm.initDefault(constants.feedVelocityRpm());
+    beamThreshold.initDefault(constants.beamThreshold());
 
     feedforward = new SimpleMotorFeedforward(kS.get(), kV.get());
     shooterIO.configureShooterPID(kP.get(), 0.0, kD.get());
@@ -147,7 +148,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isBeamBreakBlocked() {
-    return inputs.beamBreakVoltage > beamThreshold.get();
+    return inputs.beamBreakValue > beamThreshold.get();
   }
 
   @Override
