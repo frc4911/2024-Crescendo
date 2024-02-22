@@ -24,16 +24,16 @@ public class ShooterIOReal implements ShooterIO {
   private final CANSparkFlex shooterTop;
   private final CANSparkFlex shooterBottom;
   private final CANSparkFlex aimer;
-  private final CANSparkFlex indexer;
+  private final CANSparkFlex guide;
 
   private final RelativeEncoder shooterTopEncoder;
   private final RelativeEncoder shooterBottomEncoder;
   private final RelativeEncoder aimerEncoder;
-  private final RelativeEncoder indexerEncoder;
+  private final RelativeEncoder guideEncoder;
 
   private final SparkPIDController shooterPidController;
   private final SparkPIDController aimerPidController;
-  private final SparkPIDController indexerPidController;
+  private final SparkPIDController guidePidController;
 
   private final AnalogInput beamBreak;
 
@@ -55,10 +55,9 @@ public class ShooterIOReal implements ShooterIO {
     aimerEncoder = aimer.getEncoder();
     aimerPidController = aimer.getPIDController();
 
-    // motor for the indexer and moving notes to the shooter to shoot
-    indexer = new CANSparkFlex(constants.indexerMotorId(), MotorType.kBrushless);
-    indexerEncoder = indexer.getEncoder();
-    indexerPidController = indexer.getPIDController();
+    guide = new CANSparkFlex(constants.guideMotorId(), MotorType.kBrushless);
+    guideEncoder = guide.getEncoder();
+    guidePidController = guide.getPIDController();
 
     beamBreak = new AnalogInput(constants.sensorId());
 
@@ -91,8 +90,8 @@ public class ShooterIOReal implements ShooterIO {
   }
 
   @Override
-  public void setIndexerVelocity(double velocityRadiansPerSecond) {
-    indexerPidController.setReference(
+  public void setGuideVelocity(double velocityRadiansPerSecond) {
+    guidePidController.setReference(
         Units.radiansPerSecondToRotationsPerMinute(velocityRadiansPerSecond),
         ControlType.kVelocity);
   }
@@ -108,9 +107,9 @@ public class ShooterIOReal implements ShooterIO {
     inputs.aimerPositionRad = Units.rotationsToRadians(aimerEncoder.getPosition()) / aimerGearRatio;
     inputs.aimerVelocityRadPerSec =
         Units.rotationsPerMinuteToRadiansPerSecond(aimerEncoder.getVelocity()) / aimerGearRatio;
-    inputs.indexerPositionRad = Units.rotationsToRadians(indexerEncoder.getPosition());
-    inputs.indexerVelocityRadPerSec =
-        Units.rotationsPerMinuteToRadiansPerSecond(indexerEncoder.getVelocity());
+    inputs.guidePositionRad = Units.rotationsToRadians(guideEncoder.getPosition());
+    inputs.guideVelocityRadPerSec =
+        Units.rotationsPerMinuteToRadiansPerSecond(guideEncoder.getVelocity());
 
     inputs.shooterTopAppliedVolts = shooterTop.getAppliedOutput() * shooterTop.getBusVoltage();
     inputs.shooterTopCurrentAmps = shooterTop.getOutputCurrent();
@@ -119,8 +118,8 @@ public class ShooterIOReal implements ShooterIO {
     inputs.shooterBottomCurrentAmps = shooterBottom.getOutputCurrent();
     inputs.aimerAppliedVolts = aimer.getAppliedOutput() * aimer.getBusVoltage();
     inputs.aimerCurrentAmps = aimer.getOutputCurrent();
-    inputs.indexerAppliedVolts = indexer.getAppliedOutput() * indexer.getBusVoltage();
-    inputs.indexerCurrentAmps = indexer.getOutputCurrent();
+    inputs.guideAppliedVolts = guide.getAppliedOutput() * guide.getBusVoltage();
+    inputs.guideCurrentAmps = guide.getOutputCurrent();
 
     inputs.beamBreakValue = beamBreak.getVoltage();
   }
@@ -136,8 +135,8 @@ public class ShooterIOReal implements ShooterIO {
   }
 
   @Override
-  public void stopIndexer() {
-    indexer.stopMotor();
+  public void stopGuide() {
+    guide.stopMotor();
   }
 
   @Override
@@ -162,23 +161,23 @@ public class ShooterIOReal implements ShooterIO {
           SparkConfig.configLeaderFollower(shooterBottom);
           SparkConfig.configLeaderFollower(shooterTop);
           SparkConfig.configNotLeader(aimer);
-          SparkConfig.configNotLeader(indexer);
+          SparkConfig.configNotLeader(guide);
 
           shooterBottom.follow(shooterTop, true);
 
           shooterTop.setSmartCurrentLimit(40);
           shooterBottom.setSmartCurrentLimit(40);
           aimer.setSmartCurrentLimit(40);
-          indexer.setSmartCurrentLimit(30);
+          guide.setSmartCurrentLimit(30);
           shooterTop.enableVoltageCompensation(12);
           shooterBottom.enableVoltageCompensation(12);
           aimer.enableVoltageCompensation(12);
-          indexer.enableVoltageCompensation(12);
+          guide.enableVoltageCompensation(12);
 
           shooterTop.setIdleMode(IdleMode.kCoast);
           shooterBottom.setIdleMode(IdleMode.kCoast);
           aimer.setIdleMode(IdleMode.kBrake);
-          indexer.setIdleMode(IdleMode.kBrake);
+          guide.setIdleMode(IdleMode.kBrake);
 
           shooterTopEncoder.setPosition(0.0);
           shooterTopEncoder.setMeasurementPeriod(10);
@@ -189,13 +188,13 @@ public class ShooterIOReal implements ShooterIO {
           aimerEncoder.setPosition(0.0);
           aimerEncoder.setMeasurementPeriod(10);
           aimerEncoder.setAverageDepth(2);
-          indexerEncoder.setPosition(0.0);
-          indexerEncoder.setMeasurementPeriod(10);
-          indexerEncoder.setAverageDepth(2);
+          guideEncoder.setPosition(0.0);
+          guideEncoder.setMeasurementPeriod(10);
+          guideEncoder.setAverageDepth(2);
         },
         shooterTop,
         shooterBottom,
         aimer,
-        indexer);
+        guide);
   }
 }

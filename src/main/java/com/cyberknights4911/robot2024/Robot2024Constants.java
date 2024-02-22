@@ -19,6 +19,8 @@ import com.cyberknights4911.robot2024.climb.ClimbConstants;
 import com.cyberknights4911.robot2024.climb.ClimbConstantsBuilder;
 import com.cyberknights4911.robot2024.collect.CollectConstants;
 import com.cyberknights4911.robot2024.collect.CollectConstantsBuilder;
+import com.cyberknights4911.robot2024.indexer.IndexerConstants;
+import com.cyberknights4911.robot2024.indexer.IndexerConstantsBuilder;
 import com.cyberknights4911.robot2024.shooter.ShooterConstants;
 import com.cyberknights4911.robot2024.shooter.ShooterConstantsBuilder;
 import com.cyberknights4911.util.FeedForwardValues;
@@ -106,13 +108,19 @@ public final class Robot2024Constants {
   public static CollectConstants COLLECT_CONSTANTS =
       CollectConstantsBuilder.builder()
           .motorCollectId(11)
-          .motorGuideId(12)
           .sensorId(0)
           .solenoidLeftId(0)
           .solenoidRightId(0)
           .collectGearRatio(24.0 / 18.0)
           .collectFeedBackValues(new PidValues(0, 0, 0))
-          .guideFeedBackValues(new PidValues(0, 0, 0))
+          .build();
+
+  public static IndexerConstants INDEXER_CONSTANTS =
+      IndexerConstantsBuilder.builder()
+          .motorId(31)
+          .sensorId(0)
+          .speed(100)
+          .feedBackValues(new PidValues(0, 0, 0))
           .build();
 
   public static ShooterConstants SHOOTER_CONSTANTS =

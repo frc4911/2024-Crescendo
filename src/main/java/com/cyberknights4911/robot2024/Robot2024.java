@@ -25,6 +25,8 @@ import com.cyberknights4911.robot2024.collect.CollectIO;
 import com.cyberknights4911.robot2024.collect.CollectIOSim;
 import com.cyberknights4911.robot2024.control.ControllerBinding;
 import com.cyberknights4911.robot2024.drive.ModuleIOSparkFlex;
+import com.cyberknights4911.robot2024.indexer.Indexer;
+import com.cyberknights4911.robot2024.indexer.IndexerIO;
 import com.cyberknights4911.robot2024.shooter.Shooter;
 import com.cyberknights4911.robot2024.shooter.ShooterIO;
 import com.cyberknights4911.robot2024.shooter.ShooterIOSim;
@@ -34,6 +36,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -42,6 +45,7 @@ import org.littletonrobotics.junction.LoggedRobot;
 public final class Robot2024 implements RobotContainer {
   private final Climb climb;
   private final Collect collect;
+  private final Indexer indexer;
   private final Shooter shooter;
   private final Drive drive;
   private final Constants constants;
@@ -53,6 +57,7 @@ public final class Robot2024 implements RobotContainer {
     burnManager = new SparkBurnManager(constants);
     climb = createClimb();
     collect = createCollect();
+    indexer = createIndexer();
     shooter = createShooter();
     drive = createDrive();
 
@@ -68,6 +73,7 @@ public final class Robot2024 implements RobotContainer {
             binding.supplierFor(StickAction.STRAFE),
             binding.supplierFor(StickAction.ROTATE)));
 
+    // TODO: Maybe remove this or make it harder to do by accident.
     binding.triggersFor(ButtonAction.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
 
     binding
@@ -91,6 +97,8 @@ public final class Robot2024 implements RobotContainer {
                 binding.supplierFor(StickAction.FORWARD),
                 binding.supplierFor(StickAction.STRAFE),
                 Math.PI / 2));
+
+    // TODO: combine with auto-aim.
     binding
         .triggersFor(ButtonAction.SpeakerLockOn)
         .whileTrue(
@@ -103,13 +111,29 @@ public final class Robot2024 implements RobotContainer {
 
     binding.triggersFor(ButtonAction.StowShooter).onTrue(Commands.none());
 
-    binding.triggersFor(ButtonAction.CollectNote).onTrue(Commands.none());
+    binding.triggersFor(ButtonAction.CollectNote).onTrue(collectNote());
 
     binding.triggersFor(ButtonAction.FireNote).onTrue(Commands.none());
 
     binding.triggersFor(ButtonAction.StowClimber).onTrue(climb.climb(drive));
 
-    binding.triggersFor(ButtonAction.ExtendClimber).onTrue(Commands.none());
+    binding.triggersFor(ButtonAction.ExtendClimber).onTrue(climb.extendClimber());
+  }
+
+  private Command collectNote() {
+    Command stowShooter = shooter.stowShooter();
+    Command runIndexer = indexer.runIndexUntilSensor();
+    Command collectNote =
+        collect.collectAtTunableSpeed(
+            () -> {
+              /* TODO: notify drive team that note is secure (lights & rumble) */
+            });
+
+    return Commands.parallel(stowShooter, runIndexer, collectNote)
+        .andThen(
+            () -> {
+              /* TODO: notify drive team that we're ready to fire (probably rumble only) */
+            });
   }
 
   @Override
@@ -117,25 +141,11 @@ public final class Robot2024 implements RobotContainer {
     binding.checkControllers();
 
     if (GameAlerts.shouldAlert(GameAlerts.Endgame1)) {
-      CommandScheduler.getInstance()
-          .schedule(
-              Commands.runOnce(() -> binding.setDriverRumble(true))
-                  .withTimeout(1.5)
-                  .andThen(() -> binding.setDriverRumble(false))
-                  .withTimeout(1.0));
+      CommandScheduler.getInstance().schedule(rumbleLongOnce());
     }
 
     if (GameAlerts.shouldAlert(GameAlerts.Endgame2)) {
-      CommandScheduler.getInstance()
-          .schedule(
-              Commands.runOnce(() -> binding.setDriverRumble(true))
-                  .withTimeout(1.0)
-                  .andThen(() -> binding.setDriverRumble(false))
-                  .withTimeout(0.5)
-                  .andThen(() -> binding.setDriverRumble(true))
-                  .withTimeout(1.0)
-                  .andThen(() -> binding.setDriverRumble(false))
-                  .withTimeout(0.5));
+      CommandScheduler.getInstance().schedule(rumbleMediumTwice());
     }
   }
 
@@ -168,6 +178,17 @@ public final class Robot2024 implements RobotContainer {
       case REPLAY:
       default:
         return new Collect(Robot2024Constants.COLLECT_CONSTANTS, new CollectIO() {});
+    }
+  }
+
+  private Indexer createIndexer() {
+    switch (constants.mode()) {
+      case SIM:
+        return new Indexer(SimRobot2024Constants.INDEXER_CONSTANTS, new IndexerIO() {});
+      case REAL:
+      case REPLAY:
+      default:
+        return new Indexer(Robot2024Constants.INDEXER_CONSTANTS, new IndexerIO() {});
     }
   }
 
@@ -227,6 +248,35 @@ public final class Robot2024 implements RobotContainer {
             new ModuleIO() {},
             new ModuleIO() {});
     }
+  }
+
+  private Command rumbleLongOnce() {
+    return Commands.runOnce(() -> binding.setDriverRumble(true))
+        .withTimeout(1.5)
+        .andThen(() -> binding.setDriverRumble(false))
+        .withTimeout(1.0);
+  }
+
+  private Command rumbleMediumTwice() {
+    return Commands.runOnce(() -> binding.setDriverRumble(true))
+        .withTimeout(1.0)
+        .andThen(() -> binding.setDriverRumble(false))
+        .withTimeout(0.5)
+        .andThen(() -> binding.setDriverRumble(true))
+        .withTimeout(1.0)
+        .andThen(() -> binding.setDriverRumble(false))
+        .withTimeout(0.5);
+  }
+
+  private Command rumbleQuickTwice() {
+    return Commands.runOnce(() -> binding.setDriverRumble(true))
+        .withTimeout(0.5)
+        .andThen(() -> binding.setDriverRumble(false))
+        .withTimeout(0.25)
+        .andThen(() -> binding.setDriverRumble(true))
+        .withTimeout(0.5)
+        .andThen(() -> binding.setDriverRumble(false))
+        .withTimeout(0.25);
   }
 }
 

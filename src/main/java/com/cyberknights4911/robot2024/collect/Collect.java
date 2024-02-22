@@ -24,18 +24,14 @@ import org.littletonrobotics.junction.Logger;
 
 public class Collect extends SubsystemBase {
   private static final LoggedTunableNumber beamThreshold =
-      new LoggedTunableNumber("Collect/beamThreshold");
+      new LoggedTunableNumber("Collect/BeamThreshold");
   private static final LoggedTunableNumber ejectSpeed =
       new LoggedTunableNumber("Collect/EjectVelocityRPM");
   private static final LoggedTunableNumber collectSpeed =
       new LoggedTunableNumber("Collect/CollectVelocityRPM");
-  private static final LoggedTunableNumber feedShooterSpeed =
-      new LoggedTunableNumber("Collect/FeedShooterVelocityRPM");
   private static final LoggedTunableNumber collectKp = new LoggedTunableNumber("Collect/CollectKp");
   private static final LoggedTunableNumber collectKd = new LoggedTunableNumber("Collect/CollectKd");
   private static final LoggedTunableNumber ejectTime = new LoggedTunableNumber("Collect/EjectTime");
-  private static final LoggedTunableNumber guideKp = new LoggedTunableNumber("Collect/GuideKp");
-  private static final LoggedTunableNumber guideKd = new LoggedTunableNumber("Collect/GuideKd");
 
   // Measured in OnShape
   private static final Translation2d SEGMENT_1_START = new Translation2d(3.267, 15.613);
@@ -68,14 +64,10 @@ public class Collect extends SubsystemBase {
     this.collectIO = collectIO;
     collectKp.initDefault(constants.collectFeedBackValues().kP());
     collectKd.initDefault(constants.collectFeedBackValues().kD());
-    feedShooterSpeed.initDefault(constants.feedShooterSpeed());
     collectSpeed.initDefault(constants.collectSpeed());
     ejectSpeed.initDefault(constants.ejectSpeed());
     ejectTime.initDefault(constants.ejectTime());
-    guideKp.initDefault(constants.guideFeedBackValues().kP());
-    guideKd.initDefault(constants.guideFeedBackValues().kP());
     collectIO.configureCollectPID(collectKp.get(), 0.0, collectKd.get());
-    collectIO.configureGuidePID(guideKp.get(), 0.0, guideKd.get());
 
     mechanism = new Mechanism2d(28.0, 28.0);
     // Where the collector is attached to the frame
@@ -113,18 +105,6 @@ public class Collect extends SubsystemBase {
     Logger.recordOutput("Collect/SetpointRPM", velocityRpm);
   }
 
-  /** Run guide closed loop at the specified velocity. */
-  public void runGuideVelocity(double velocityRpm) {
-    var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRpm);
-    collectIO.setGuideVelocity(velocityRadPerSec);
-
-    Logger.recordOutput("Collect/GuideSetpointRPM", velocityRpm);
-  }
-
-  public void stopGuide() {
-    collectIO.stopGuide();
-  }
-
   public void extendCollecter() {
     collectIO.setCollecterPosition(true);
   }
@@ -142,10 +122,6 @@ public class Collect extends SubsystemBase {
       collectIO.configureCollectPID(collectKp.get(), 0.0, collectKd.get());
     }
 
-    if (guideKp.hasChanged(hashCode()) || guideKd.hasChanged(hashCode())) {
-      collectIO.configureGuidePID(guideKp.get(), 0.0, guideKd.get());
-    }
-
     if (inputs.leftSolenoid && inputs.rightSolenoid) {
       segment1.setAngle(SEGMENT_1_END_ANGLE);
       segment2.setAngle(SEGMENT_2_END_ANGLE);
@@ -160,7 +136,6 @@ public class Collect extends SubsystemBase {
 
     if (DriverStation.isDisabled()) {
       stopCollector();
-      stopGuide();
     }
   }
 
@@ -205,6 +180,21 @@ public class Collect extends SubsystemBase {
   }
 
   /**
+   * Creates a command that runs the collector at the proper collector speed. The collector will
+   * stay running after this command ends, but the provided callback will be notified when the
+   * gamepiece reaches the collector's sensor.
+   *
+   * @param sensorTrippedCallback will notify when the gamepiece reaches the sensor. At this point,
+   *     the gamepiece is secure in the robot and the driver should be able to move the robot freely
+   *     while the gamepiece moves through the robot.
+   */
+  public Command collectAtTunableSpeed(Runnable sensorTrippedCallback) {
+    return Commands.runOnce(() -> runCollectVelocity(collectSpeed.get()), this)
+        .until(this::isBeamBreakBlocked)
+        .andThen(() -> sensorTrippedCallback.run());
+  }
+
+  /**
    * Creates a command that runs the collector at the proper collector speed, but stops when the
    * gamepiece reaches the sensor.
    */
@@ -212,11 +202,6 @@ public class Collect extends SubsystemBase {
     return collectAtSpeed(collectSpeed)
         .until(this::isBeamBreakBlocked)
         .andThen(this::stopCollector, this);
-  }
-
-  /** Creates a command that runs the collector in the mode for handing gamepieces to the shooter */
-  public Command handGamePieceToShooter() {
-    return collectAtSpeed(feedShooterSpeed);
   }
 
   /** Creates a command for ejecting gamepieces backwards, out of the collector. */

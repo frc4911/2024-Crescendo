@@ -18,8 +18,8 @@ public interface ShooterIO {
     public double shooterBottomVelocityRadPerSec = 0.0;
     public double aimerPositionRad = 0.0;
     public double aimerVelocityRadPerSec = 0.0;
-    public double indexerPositionRad = 0.0;
-    public double indexerVelocityRadPerSec = 0.0;
+    public double guidePositionRad = 0.0;
+    public double guideVelocityRadPerSec = 0.0;
 
     public double shooterTopAppliedVolts = 0.0;
     public double shooterTopCurrentAmps = 0.0;
@@ -27,8 +27,8 @@ public interface ShooterIO {
     public double shooterBottomCurrentAmps = 0.0;
     public double aimerAppliedVolts = 0.0;
     public double aimerCurrentAmps = 0.0;
-    public double indexerAppliedVolts = 0.0;
-    public double indexerCurrentAmps = 0.0;
+    public double guideAppliedVolts = 0.0;
+    public double guideCurrentAmps = 0.0;
 
     public double beamBreakValue = 0.0;
   }
@@ -48,14 +48,14 @@ public interface ShooterIO {
   /** Run closed loop to the specified position. */
   public default void setAimerPosition(double position, double ffVolts) {}
 
-  /** Run indexer in closed loop at the specified velocity. */
-  public default void setIndexerVelocity(double velocityRadPerSec) {}
+  /** Run guide in closed loop at the specified velocity. */
+  public default void setGuideVelocity(double velocityRadPerSec) {}
 
   /** Stop aimer in open loop. */
   public default void stopAimer() {}
 
-  /** Stop indexer in open loop. */
-  public default void stopIndexer() {}
+  /** Stop guide in open loop. */
+  public default void stopGuide() {}
 
   /** Set velocity PID constants. */
   public default void configureShooterPID(double kP, double kI, double kD) {}

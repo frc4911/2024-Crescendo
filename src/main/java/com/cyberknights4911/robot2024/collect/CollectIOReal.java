@@ -22,13 +22,8 @@ import edu.wpi.first.wpilibj.Solenoid;
 
 public class CollectIOReal implements CollectIO {
   private final CANSparkFlex collect;
-  private final CANSparkFlex guide;
-
   private final RelativeEncoder collectEncoder;
-  private final RelativeEncoder guideEncoder;
-
   private final SparkPIDController collectPidController;
-  private final SparkPIDController guidePidController;
 
   private final Solenoid left;
   private final Solenoid right;
@@ -45,10 +40,6 @@ public class CollectIOReal implements CollectIO {
     collectEncoder = collect.getEncoder();
     collectPidController = collect.getPIDController();
 
-    guide = new CANSparkFlex(constants.motorGuideId(), MotorType.kBrushless);
-    guideEncoder = guide.getEncoder();
-    guidePidController = guide.getPIDController();
-
     left = new Solenoid(PneumaticsModuleType.REVPH, constants.solenoidLeftId());
     right = new Solenoid(PneumaticsModuleType.REVPH, constants.solenoidRightId());
 
@@ -63,14 +54,9 @@ public class CollectIOReal implements CollectIO {
         Units.rotationsToRadians(collectEncoder.getPosition() / collectGearRatio);
     inputs.collectVelocityRadPerSec =
         Units.rotationsPerMinuteToRadiansPerSecond(collectEncoder.getVelocity() / collectGearRatio);
-    inputs.guidePositionRad = Units.rotationsToRadians(guideEncoder.getPosition());
-    inputs.guideVelocityRadPerSec =
-        Units.rotationsPerMinuteToRadiansPerSecond(guideEncoder.getVelocity());
 
     inputs.collectAppliedVolts = collect.getAppliedOutput() * collect.getBusVoltage();
     inputs.collectCurrentAmps = collect.getOutputCurrent();
-    inputs.guideAppliedVolts = guide.getAppliedOutput() * guide.getBusVoltage();
-    inputs.guideCurrentAmps = guide.getOutputCurrent();
 
     inputs.leftSolenoid = left.get();
     inputs.rightSolenoid = right.get();
@@ -96,17 +82,6 @@ public class CollectIOReal implements CollectIO {
   }
 
   @Override
-  public void setGuideVelocity(double velocityRadPerSec) {
-    guidePidController.setReference(
-        Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec), ControlType.kVelocity);
-  }
-
-  @Override
-  public void stopGuide() {
-    guide.stopMotor();
-  }
-
-  @Override
   public void setCollecterPosition(boolean extended) {
     // TODO: actually extend or retract the solenoids
   }
@@ -119,38 +94,19 @@ public class CollectIOReal implements CollectIO {
     collectPidController.setFF(0, 0);
   }
 
-  @Override
-  public void configureGuidePID(double kP, double kI, double kD) {
-    guidePidController.setP(kP, 0);
-    guidePidController.setI(kI, 0);
-    guidePidController.setD(kD, 0);
-    guidePidController.setFF(0, 0);
-  }
-
   private void configureDevices() {
     sparkBurnManager.maybeBurnConfig(
         () -> {
           SparkConfig.configNotLeader(collect);
-          SparkConfig.configNotLeader(guide);
 
           collect.setIdleMode(IdleMode.kBrake);
-          guide.setIdleMode(IdleMode.kBrake);
-
           collect.setSmartCurrentLimit(40);
-          guide.setSmartCurrentLimit(40);
-
           collect.enableVoltageCompensation(12.0);
-          guide.enableVoltageCompensation(12.0);
 
           collectEncoder.setPosition(0.0);
           collectEncoder.setMeasurementPeriod(10);
           collectEncoder.setAverageDepth(2);
-
-          guideEncoder.setPosition(0.0);
-          guideEncoder.setMeasurementPeriod(10);
-          guideEncoder.setAverageDepth(2);
         },
-        collect,
-        guide);
+        collect);
   }
 }

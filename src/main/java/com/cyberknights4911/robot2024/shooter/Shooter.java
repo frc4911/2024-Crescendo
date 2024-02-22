@@ -138,13 +138,13 @@ public class Shooter extends SubsystemBase {
   /** Run indexer closed loop at the specified velocity. */
   public void runIndexerVelocity(double velocityRPM) {
     var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRPM);
-    shooterIO.setIndexerVelocity(velocityRadPerSec);
+    shooterIO.setGuideVelocity(velocityRadPerSec);
 
     Logger.recordOutput("Shooter/IndexerSetpointRPM", velocityRPM);
   }
 
   public void stopIndexer() {
-    shooterIO.stopIndexer();
+    shooterIO.stopGuide();
   }
 
   public boolean isBeamBreakBlocked() {
@@ -256,7 +256,7 @@ public class Shooter extends SubsystemBase {
             Commands.waitUntil(
                 () -> {
                   return Math.abs(
-                          Units.radiansToDegrees(inputs.indexerPositionRad) - angleDegrees.get())
+                          Units.radiansToDegrees(inputs.guidePositionRad) - angleDegrees.get())
                       < shooterPositionError.get();
                 }));
   }

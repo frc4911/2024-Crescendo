@@ -22,7 +22,6 @@ import io.soabase.recordbuilder.core.RecordBuilder;
 @RecordBuilder
 public record CollectConstants(
     int motorCollectId,
-    int motorGuideId,
     int sensorId,
     int solenoidLeftId,
     int solenoidRightId,
@@ -30,6 +29,4 @@ public record CollectConstants(
     double ejectTime,
     double ejectSpeed,
     double collectSpeed,
-    double feedShooterSpeed,
-    PidValues collectFeedBackValues,
-    PidValues guideFeedBackValues) {}
+    PidValues collectFeedBackValues) {}
