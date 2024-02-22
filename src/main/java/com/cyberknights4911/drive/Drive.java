@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.Volts;
 import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.constants.ControlConstants;
 import com.cyberknights4911.constants.DriveConstants;
+import com.cyberknights4911.util.Alliance;
 import com.cyberknights4911.vision.VisionUpdate;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -269,12 +270,17 @@ public class Drive extends SubsystemBase {
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier,
       boolean applyOmegaDeadbandAndScaling) {
+
     // Apply deadband
+    double x = xSupplier.getAsDouble();
+    double y = ySupplier.getAsDouble();
+    if (Alliance.isRed()) {
+      x = -x;
+      y = -y;
+    }
     double linearMagnitude =
-        MathUtil.applyDeadband(
-            Math.hypot(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
-            controlConstants.stickDeadband());
-    Rotation2d linearDirection = new Rotation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble());
+        MathUtil.applyDeadband(Math.hypot(x, y), controlConstants.stickDeadband());
+    Rotation2d linearDirection = new Rotation2d(x, y);
     double omega =
         applyOmegaDeadbandAndScaling
             ? MathUtil.applyDeadband(omegaSupplier.getAsDouble(), controlConstants.stickDeadband())

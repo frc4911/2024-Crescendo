@@ -50,7 +50,7 @@ public class Shooter extends SubsystemBase {
       new LoggedTunableNumber("Shooter/forwardLimit");
   private static final LoggedTunableNumber backwardLimit =
       new LoggedTunableNumber("Shooter/backwardLimit");
-      
+
   // Measured in OnShape
   // motor distance 5.558
   // pivot to lower motor 7.115
@@ -89,7 +89,7 @@ public class Shooter extends SubsystemBase {
     MechanismRoot2d root = mechanism.getRoot("shooter", MOUNT_POINT.getX(), MOUNT_POINT.getY());
     // The the tilting segment. This is the portion that is moved by the aimer.
     segment = root.append(new MechanismLigament2d("segment", MOUNT_TO_SHOOTER_FRONT, 0));
-    
+
     sysId =
         new SysIdRoutine(
             new SysIdRoutine.Config(

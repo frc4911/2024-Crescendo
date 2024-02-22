@@ -10,6 +10,7 @@ package com.cyberknights4911.wham;
 import com.cyberknights4911.auto.AutoCommandHandler;
 import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.drive.Drive;
+import com.cyberknights4911.util.Alliance;
 import com.cyberknights4911.util.LocalADStarAK;
 import com.cyberknights4911.wham.slurpp.Slurpp;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -20,10 +21,8 @@ import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.pathplanner.lib.util.ReplanningConfig;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import java.util.function.BooleanSupplier;
 import org.littletonrobotics.junction.Logger;
 
 final class Autos {
@@ -38,15 +37,6 @@ final class Autos {
     double driveBaseRadius =
         Math.hypot(driveConstants.trackWidthX() / 2.0, driveConstants.trackWidthY() / 2.0);
 
-    BooleanSupplier shouldFlipPath =
-        () -> {
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        };
-
     AutoBuilder.configureHolonomic(
         drive::getPose,
         drive::setPose,
@@ -54,7 +44,7 @@ final class Autos {
         drive::runVelocity,
         new HolonomicPathFollowerConfig(
             driveConstants.maxLinearSpeed(), driveBaseRadius, new ReplanningConfig()),
-        shouldFlipPath,
+        Alliance::isRed,
         drive);
     Pathfinding.setPathfinder(new LocalADStarAK());
     PathPlannerLogging.setLogActivePathCallback(
