@@ -65,11 +65,11 @@ public final class Robot2024 implements RobotContainer {
     double x;
     double y;
     if (Alliance.isRed()) {
-    x = 652.73;
-    y = 218.42;
+      x = 652.73;
+      y = 218.42;
     } else {
-    x = -1.50;
-    y = 218.42;
+      x = -1.50;
+      y = 218.42;
     }
     drive.setDefaultCommand(
         drive.joystickDrive(
