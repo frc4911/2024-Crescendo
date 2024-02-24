@@ -28,6 +28,7 @@ import com.cyberknights4911.robot2024.drive.ModuleIOSparkFlex;
 import com.cyberknights4911.robot2024.shooter.Shooter;
 import com.cyberknights4911.robot2024.shooter.ShooterIO;
 import com.cyberknights4911.robot2024.shooter.ShooterIOSim;
+import com.cyberknights4911.util.Alliance;
 import com.cyberknights4911.util.GameAlerts;
 import com.cyberknights4911.util.SparkBurnManager;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -60,17 +61,16 @@ public final class Robot2024 implements RobotContainer {
     configureControls();
   }
 
-  if (Alliance.isRed()) {
-    x = 652.73;
-    y = 218.42;
-  } else {
-    x = -1.50;
-    y = 218.42;
-  }
-
   private void configureControls() {
     double x;
     double y;
+    if (Alliance.isRed()) {
+    x = 652.73;
+    y = 218.42;
+    } else {
+    x = -1.50;
+    y = 218.42;
+    }
     drive.setDefaultCommand(
         drive.joystickDrive(
             Robot2024Constants.CONTROL_CONSTANTS,
