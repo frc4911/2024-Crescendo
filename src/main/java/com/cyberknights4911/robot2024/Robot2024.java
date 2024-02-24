@@ -60,10 +60,7 @@ public final class Robot2024 implements RobotContainer {
     configureControls();
   }
 
-  double x;
-  double y;
-
-  if (Alliance.isRed) {
+  if (Alliance.isRed()) {
     x = 652.73;
     y = 218.42;
   } else {
@@ -72,6 +69,8 @@ public final class Robot2024 implements RobotContainer {
   }
 
   private void configureControls() {
+    double x;
+    double y;
     drive.setDefaultCommand(
         drive.joystickDrive(
             Robot2024Constants.CONTROL_CONSTANTS,
