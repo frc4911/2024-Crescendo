@@ -122,7 +122,7 @@ public class ShooterIOReal implements ShooterIO {
     inputs.indexerAppliedVolts = indexer.getAppliedOutput() * indexer.getBusVoltage();
     inputs.indexerCurrentAmps = indexer.getOutputCurrent();
 
-    inputs.beamBreakVoltage = beamBreak.getVoltage();
+    inputs.beamBreakValue = beamBreak.getVoltage();
   }
 
   @Override

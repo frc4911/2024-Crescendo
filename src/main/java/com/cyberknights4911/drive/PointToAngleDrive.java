@@ -16,7 +16,7 @@ import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
 
 public final class PointToAngleDrive extends Command {
-  private static final LoggedTunableNumber pointKp = new LoggedTunableNumber("Drive/Point/kP", 5.0);
+  private static final LoggedTunableNumber pointKp = new LoggedTunableNumber("Drive/Point/kP", 0.5);
   private static final LoggedTunableNumber pointKd = new LoggedTunableNumber("Drive/Point/kD", 0.0);
 
   private final PIDController pointController;
