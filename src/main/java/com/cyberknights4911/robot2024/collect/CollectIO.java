@@ -41,17 +41,8 @@ public interface CollectIO {
   /** Stop collector in open loop. */
   public default void stopCollector() {}
 
-  /** Run guide closed loop at the specified velocity. */
-  public default void setGuideVelocity(double velocityRadPerSec) {}
-
-  /** Stop guide in open loop. */
-  public default void stopGuide() {}
-
   public default void setCollecterPosition(boolean extended) {}
 
-  /** Set collect velocity PID constants. */
+  /** Set velocity PID constants. */
   public default void configureCollectPID(double kP, double kI, double kD) {}
-
-  /** Set guide velocity PID constants. */
-  public default void configureGuidePID(double kP, double kI, double kD) {}
 }

@@ -16,7 +16,7 @@ public record ShooterConstants(
     int shooterMotorTopId,
     int shooterMotorBottomId,
     int aimerMotorId,
-    int indexerMotorId,
+    int guideMotorId,
     int sensorId,
     int beamThreshold,
     double aimerGearRatio,
