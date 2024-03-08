@@ -102,25 +102,28 @@ public final class Robot2024Constants {
           .leftMotorId(41)
           .rightMotorId(42)
           .gearRatio(1.0) // todo: Find gear ratio for climber, and possible climb hold thing.
-          .feedBackValues(new PidValues(0, 0, 0))
+          .feedBackValues(new PidValues(0.1, 0, 0))
           .build();
 
   public static CollectConstants COLLECT_CONSTANTS =
       CollectConstantsBuilder.builder()
-          .motorCollectId(11)
+          .motorCollectRightId(11)
           .sensorId(0)
-          .solenoidLeftId(0)
-          .solenoidRightId(0)
+          .solenoidLeftForwardId(7)
+          .solenoidLeftReverseId(8)
+          .solenoidRightForwardId(6)
+          .solenoidRightReverseId(9)
+          .collectPercent(0.4)
           .collectGearRatio(24.0 / 18.0)
-          .collectFeedBackValues(new PidValues(0, 0, 0))
+          .collectFeedBackValues(new PidValues(0.1, 0, 0))
           .build();
 
   public static IndexerConstants INDEXER_CONSTANTS =
       IndexerConstantsBuilder.builder()
           .motorId(31)
-          .sensorId(0)
-          .speed(100)
-          .feedBackValues(new PidValues(0, 0, 0))
+          .sensorId(1)
+          .percentOutput(.2)
+          .feedBackValues(new PidValues(0.1, 0, 0))
           .build();
 
   public static ShooterConstants SHOOTER_CONSTANTS =
@@ -128,10 +131,22 @@ public final class Robot2024Constants {
           .shooterMotorTopId(21)
           .shooterMotorBottomId(22)
           .aimerMotorId(23)
-          .aimerGearRatio(84.0 / 14.0)
-          .feedBackValues(new PidValues(0, 0, 0))
-          .feedForwardValues(new FeedForwardValues(0, 0))
-          .beamThreshold(200)
+          .guideMotorId(24)
+          .sensorId(2)
+          .aimerGearRatio((60 / 20) * (60 / 20))
+          .guidePercentOutput(.2)
+          .guideReversePercentOutput(-.075)
+          .feedTime(1)
+          .speakerPositionDegrees(54)
+          .collectPositionDegrees(34)
+          .firePercentOutput(.3)
+          .shooterFeedBackValues(new PidValues(0.1, 0, 0))
+          .shooterFeedForwardValues(new FeedForwardValues(0, 0))
+          .aimerFeedBackValues(new PidValues(0.2, 0, 0))
+          .aimerFeedForwardValues(new FeedForwardValues(0, 0))
+          .guideFeedBackValues(new PidValues(0.1, 0, 0))
+          .guideFeedForwardValues(new FeedForwardValues(0, 0))
+          .beamThreshold(.2)
           .build();
 
   // Note: these measurements are for the front right swerve-mounted camera

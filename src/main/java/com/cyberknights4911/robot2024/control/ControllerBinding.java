@@ -50,14 +50,22 @@ public final class ControllerBinding implements StickBinding, ButtonBinding {
   @Override
   public Triggers triggersFor(ButtonAction action) {
     switch (action) {
-      case ZeroGyro:
-        return new Triggers(driver.y());
-      case ZeroSpeaker:
-        return new Triggers(driver.start());
-      case AmpLockOn:
-        return new Triggers(driver.leftTrigger());
-      case SpeakerLockOn:
-        return new Triggers(driver.rightTrigger());
+        // case ZeroGyro:
+        //   return new Triggers(driver.y());
+        // case ZeroSpeaker:
+        //   return new Triggers(driver.start());
+        // case AmpLockOn:
+        //   return new Triggers(driver.leftTrigger());
+        // case SpeakerLockOn:
+        //   return new Triggers(driver.rightTrigger());
+      case CollectNote:
+        return new Triggers(driver.a());
+      case StowCollector:
+        return new Triggers(driver.b());
+      case AimSpeaker:
+        return new Triggers(driver.povRight());
+      case FireNote:
+        return new Triggers(driver.rightBumper());
       default:
         return new Triggers(ALWAYS_FALSE);
     }

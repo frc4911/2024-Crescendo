@@ -25,6 +25,10 @@ public interface IndexerIO {
   /** Updates the set of loggable inputs. */
   public default void updateInputs(IndexerIOInputs inputs) {}
 
+  public default void setOutput(double percent) {}
+
+  public default void setVoltage(double voltage) {}
+
   /** Run indexer closed loop at the specified velocity. */
   public default void setVelocity(double velocityRadPerSec) {}
 

@@ -10,38 +10,29 @@ package com.cyberknights4911.robot2024.indexer;
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
 public final class Indexer extends SubsystemBase {
   private static final LoggedTunableNumber beamThreshold =
       new LoggedTunableNumber("Indexer/BeamThreshold");
-  private static final LoggedTunableNumber speed = new LoggedTunableNumber("Indexer/VelocityRPM");
+  private static final LoggedTunableNumber percent =
+      new LoggedTunableNumber("Indexer/PercentOutput");
   private static final LoggedTunableNumber kp = new LoggedTunableNumber("Indexer/Kp");
   private static final LoggedTunableNumber kd = new LoggedTunableNumber("Indexer/Kd");
 
   private final IndexerIO indexerIO;
   private final IndexerIOInputsAutoLogged inputs = new IndexerIOInputsAutoLogged();
 
-  private final Command runIndexAtTunableSpeed;
-  private final Command runIndexUntilSensor;
-
   public Indexer(IndexerConstants constants, IndexerIO indexerIO) {
     super();
     this.indexerIO = indexerIO;
 
-    speed.initDefault(constants.speed());
+    percent.initDefault(constants.percentOutput());
     kp.initDefault(constants.feedBackValues().kP());
-    kd.initDefault(constants.feedBackValues().kP());
+    kd.initDefault(constants.feedBackValues().kD());
 
     indexerIO.configurePID(kp.get(), 0.0, kd.get());
-
-    runIndexAtTunableSpeed = Commands.runOnce(() -> runVelocity(speed.get()), this);
-
-    runIndexUntilSensor =
-        runIndexAtTunableSpeed.until(this::isBeamBreakBlocked).andThen(this::stop, this);
   }
 
   @Override
@@ -62,6 +53,18 @@ public final class Indexer extends SubsystemBase {
     return inputs.beamBreakVoltage > beamThreshold.get();
   }
 
+  public void runVolts(double voltage) {
+    indexerIO.setVoltage(voltage);
+
+    Logger.recordOutput("Shooter/IndexerVoltage", voltage);
+  }
+
+  public void runOutput(double percent) {
+    indexerIO.setOutput(percent);
+
+    Logger.recordOutput("Shooter/IndexerPercent", percent);
+  }
+
   /** Run closed loop at the specified velocity. */
   public void runVelocity(double velocityRpm) {
     var velocityRadPerSec = Units.rotationsPerMinuteToRadiansPerSecond(velocityRpm);
@@ -74,19 +77,7 @@ public final class Indexer extends SubsystemBase {
     indexerIO.stop();
   }
 
-  /**
-   * Returns a command that runs the collector at the tunable speed. This command completes
-   * immediately and the indexer will stay running afterward.
-   */
-  public Command runIndexAtTunableSpeed() {
-    return runIndexAtTunableSpeed;
-  }
-
-  /**
-   * Returns a command that runs the indexer at the tunable speed, but stops when the gamepiece
-   * reaches the sensor.
-   */
-  public Command runIndexUntilSensor() {
-    return runIndexUntilSensor;
+  public void runIndexAtTunableOutput() {
+    runOutput(percent.get());
   }
 }

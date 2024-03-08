@@ -16,8 +16,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
@@ -25,10 +23,8 @@ import org.littletonrobotics.junction.Logger;
 public class Collect extends SubsystemBase {
   private static final LoggedTunableNumber beamThreshold =
       new LoggedTunableNumber("Collect/BeamThreshold");
-  private static final LoggedTunableNumber ejectSpeed =
-      new LoggedTunableNumber("Collect/EjectVelocityRPM");
-  private static final LoggedTunableNumber collectSpeed =
-      new LoggedTunableNumber("Collect/CollectVelocityRPM");
+  private static final LoggedTunableNumber collectOutput =
+      new LoggedTunableNumber("Collect/OutputPercent");
   private static final LoggedTunableNumber collectKp = new LoggedTunableNumber("Collect/CollectKp");
   private static final LoggedTunableNumber collectKd = new LoggedTunableNumber("Collect/CollectKd");
   private static final LoggedTunableNumber ejectTime = new LoggedTunableNumber("Collect/EjectTime");
@@ -64,8 +60,7 @@ public class Collect extends SubsystemBase {
     this.collectIO = collectIO;
     collectKp.initDefault(constants.collectFeedBackValues().kP());
     collectKd.initDefault(constants.collectFeedBackValues().kD());
-    collectSpeed.initDefault(constants.collectSpeed());
-    ejectSpeed.initDefault(constants.ejectSpeed());
+    collectOutput.initDefault(constants.collectPercent());
     ejectTime.initDefault(constants.ejectTime());
     collectIO.configureCollectPID(collectKp.get(), 0.0, collectKd.get());
 
@@ -90,6 +85,10 @@ public class Collect extends SubsystemBase {
 
   public boolean isBeamBreakBlocked() {
     return inputs.beamBreakVoltage > beamThreshold.get();
+  }
+
+  public void runCollectOutput(double percent) {
+    collectIO.setCollectOutput(percent);
   }
 
   /** Run collector open loop at the specified voltage. */
@@ -132,7 +131,7 @@ public class Collect extends SubsystemBase {
       System.out.println("ERROR: collector solenoids are in different states.");
     }
 
-    Logger.recordOutput("Collect/Mechanism", mechanism);
+    // Logger.recordOutput("Collect/Mechanism", mechanism);
 
     if (DriverStation.isDisabled()) {
       stopCollector();
@@ -167,47 +166,7 @@ public class Collect extends SubsystemBase {
     collectIO.stopCollector();
   }
 
-  /**
-   * Creates a command that runs the collector at a desired speed. The collector will stay running
-   * after this command ends
-   */
-  private Command collectAtSpeed(LoggedTunableNumber desiredSpeed) {
-    return Commands.runOnce(
-        () -> {
-          runCollectVelocity(desiredSpeed.get());
-        },
-        this);
-  }
-
-  /**
-   * Creates a command that runs the collector at the proper collector speed. The collector will
-   * stay running after this command ends, but the provided callback will be notified when the
-   * gamepiece reaches the collector's sensor.
-   *
-   * @param sensorTrippedCallback will notify when the gamepiece reaches the sensor. At this point,
-   *     the gamepiece is secure in the robot and the driver should be able to move the robot freely
-   *     while the gamepiece moves through the robot.
-   */
-  public Command collectAtTunableSpeed(Runnable sensorTrippedCallback) {
-    return Commands.runOnce(() -> runCollectVelocity(collectSpeed.get()), this)
-        .until(this::isBeamBreakBlocked)
-        .andThen(() -> sensorTrippedCallback.run());
-  }
-
-  /**
-   * Creates a command that runs the collector at the proper collector speed, but stops when the
-   * gamepiece reaches the sensor.
-   */
-  public Command collectGamePieceAndStop() {
-    return collectAtSpeed(collectSpeed)
-        .until(this::isBeamBreakBlocked)
-        .andThen(this::stopCollector, this);
-  }
-
-  /** Creates a command for ejecting gamepieces backwards, out of the collector. */
-  public Command ejectGamePiece() {
-    return collectAtSpeed(ejectSpeed)
-        .andThen(Commands.waitSeconds(ejectTime.get()))
-        .andThen(this::stopCollector, this);
+  public void collectAtTunableOutput() {
+    runCollectOutput(collectOutput.get());
   }
 }

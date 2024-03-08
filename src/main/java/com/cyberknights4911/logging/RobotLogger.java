@@ -13,6 +13,7 @@ import com.cyberknights4911.logging.Alert.AlertType;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DriverStationSim;
@@ -26,6 +27,7 @@ import java.util.function.BiConsumer;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
@@ -92,7 +94,7 @@ public final class RobotLogger {
         }
         Logger.addDataReceiver(new NT4Publisher());
         // TODO: set this up if using rev
-        // LoggedPowerDistribution.getInstance(50, ModuleType.kRev);
+        LoggedPowerDistribution.getInstance(1, ModuleType.kRev);
         break;
 
       case SIM:
