@@ -12,15 +12,9 @@
     "data": {
       "commands": [
         {
-          "type": "named",
-          "data": {
-            "name": "Score"
-          }
-        },
-        {
           "type": "path",
           "data": {
-            "pathName": "Leave"
+            "pathName": "LeaveSubwooferFront"
           }
         }
       ]

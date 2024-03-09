@@ -40,6 +40,7 @@ public class Shooter extends SubsystemBase {
   private static final LoggedTunableNumber guideKd = new LoggedTunableNumber("Shooter/guidekD");
 
   private static final LoggedTunableNumber feedTime = new LoggedTunableNumber("Shooter/feedTime");
+  private static final LoggedTunableNumber aimTime = new LoggedTunableNumber("Shooter/aimTime");
   private static final LoggedTunableNumber guideOutput =
       new LoggedTunableNumber("Shooter/GuideOutputPercent");
   private static final LoggedTunableNumber guideReverseOutput =
@@ -84,6 +85,7 @@ public class Shooter extends SubsystemBase {
     guideKp.initDefault(constants.guideFeedBackValues().kP());
     guideKd.initDefault(constants.guideFeedBackValues().kD());
     feedTime.initDefault(constants.feedTime());
+    aimTime.initDefault(constants.aimTime());
     guideOutput.initDefault(constants.guidePercentOutput());
     guideReverseOutput.initDefault(constants.guideReversePercentOutput());
     fireOutput.initDefault(constants.firePercentOutput());
@@ -217,7 +219,6 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isBeamBreakBlocked() {
-    System.out.println("BeamBreak Value: " + inputs.beamBreakValue);
     return inputs.beamBreakValue < .1;
   }
 
@@ -271,6 +272,10 @@ public class Shooter extends SubsystemBase {
 
   public double feedTime() {
     return feedTime.get();
+  }
+
+  public double aimTime() {
+    return aimTime.get();
   }
 
   /**

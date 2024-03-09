@@ -137,6 +137,7 @@ public final class Robot2024Constants {
           .guidePercentOutput(.2)
           .guideReversePercentOutput(-.075)
           .feedTime(1)
+          .aimTime(.5)
           .speakerPositionDegrees(54)
           .collectPositionDegrees(34)
           .firePercentOutput(.3)

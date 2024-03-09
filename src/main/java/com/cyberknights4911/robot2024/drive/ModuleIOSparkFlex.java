@@ -70,7 +70,7 @@ public class ModuleIOSparkFlex implements ModuleIO {
     sparkBurnManager.maybeBurnConfig(
         () -> {
           turnSparkMax.setInverted(isTurnMotorInverted);
-          driveSparkMax.setSmartCurrentLimit(60);
+          driveSparkMax.setSmartCurrentLimit(40);
           turnSparkMax.setSmartCurrentLimit(30);
           driveSparkMax.enableVoltageCompensation(12.0);
           turnSparkMax.enableVoltageCompensation(12.0);

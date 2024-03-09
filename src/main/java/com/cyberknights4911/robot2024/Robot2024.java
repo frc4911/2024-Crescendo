@@ -248,7 +248,6 @@ public final class Robot2024 implements RobotContainer {
   private Command collectNote() {
     return Commands.runOnce(
             () -> {
-              System.out.println("collectNote");
               shooter.stopShooter();
               collect.collectAtTunableOutput();
               collect.extendCollecter();
@@ -279,15 +278,19 @@ public final class Robot2024 implements RobotContainer {
         shooter);
   }
 
-  private Command aimSpeaker() {
+  private Command backNoteFromShooter() {
     return Commands.runOnce(
             () -> {
               shooter.guideReverseAtTunableOutput();
               shooter.setAimerForCollect();
             })
-        .andThen(Commands.waitUntil(() -> !shooter.isBeamBreakBlocked()))
+        .andThen(Commands.waitUntil(() -> !shooter.isBeamBreakBlocked()));
+  }
+
+  private Command aimSpeaker() {
+    return backNoteFromShooter()
         .andThen(() -> shooter.setAimerForSpeaker())
-        .andThen(Commands.waitSeconds(.5))
+        .andThen(Commands.waitSeconds(shooter.aimTime()))
         .andThen(
             () -> {
               shooter.runShooterAtTunableSpeed();
@@ -296,13 +299,14 @@ public final class Robot2024 implements RobotContainer {
   }
 
   private Command aimPodium() {
-    return Commands.runOnce(
+    return backNoteFromShooter()
+        .andThen(() -> shooter.setAimerForPodium())
+        .andThen(Commands.waitSeconds(shooter.aimTime()))
+        .andThen(
             () -> {
-              shooter.guideReverseAtTunableOutput();
-              shooter.setAimerForPodium();
-            })
-        .until(() -> !shooter.isBeamBreakBlocked())
-        .andThen(() -> shooter.runShooterAtTunableSpeed());
+              shooter.runShooterAtTunableSpeed();
+              shooter.stopGuide();
+            });
   }
 
   private Command fire() {

@@ -16,6 +16,7 @@ import com.cyberknights4911.control.Triggers;
 import com.cyberknights4911.logging.Alert;
 import com.cyberknights4911.logging.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.function.DoubleSupplier;
 
@@ -50,22 +51,22 @@ public final class ControllerBinding implements StickBinding, ButtonBinding {
   @Override
   public Triggers triggersFor(ButtonAction action) {
     switch (action) {
-        // case ZeroGyro:
-        //   return new Triggers(driver.y());
+      case ZeroGyro:
+        return new Triggers(driver.y());
         // case ZeroSpeaker:
         //   return new Triggers(driver.start());
         // case AmpLockOn:
-        //   return new Triggers(driver.leftTrigger());
+        //   retaurn new Triggers(driver.leftTrigger());
         // case SpeakerLockOn:
         //   return new Triggers(driver.rightTrigger());
       case CollectNote:
-        return new Triggers(driver.a());
+        return new Triggers(operator.a());
       case StowCollector:
-        return new Triggers(driver.b());
+        return new Triggers(operator.b());
       case AimSpeaker:
-        return new Triggers(driver.povRight());
+        return new Triggers(operator.povRight());
       case FireNote:
-        return new Triggers(driver.rightBumper());
+        return new Triggers(operator.rightTrigger());
       default:
         return new Triggers(ALWAYS_FALSE);
     }
@@ -81,10 +82,10 @@ public final class ControllerBinding implements StickBinding, ButtonBinding {
   }
 
   public void setDriverRumble(boolean enabled) {
-    // TODO: turn rumble on or off for the driver controller
+    driver.getHID().setRumble(RumbleType.kBothRumble, enabled ? 1 : 0);
   }
 
   public void setOperatorRumble(boolean enabled) {
-    // TODO: turn rumble on or off for the operator controller
+    operator.getHID().setRumble(RumbleType.kBothRumble, enabled ? 1 : 0);
   }
 }

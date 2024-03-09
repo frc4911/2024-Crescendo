@@ -35,7 +35,7 @@ public final class SimRobot2024Constants {
       ConstantsBuilder.builder()
           .name("SimRobot2024")
           .loopPeriodSecs(0.02)
-          .tuningMode(true)
+          .tuningMode(false)
           .logPath(null)
           .mode(Mode.SIM)
           .supplier(Robot2024::new)

@@ -210,10 +210,10 @@ public class ShooterIOReal implements ShooterIO {
           guide.setInverted(true);
           // aimer.setInverted(true);
 
-          shooterTop.setSmartCurrentLimit(80);
-          shooterBottom.setSmartCurrentLimit(80);
-          aimer.setSmartCurrentLimit(80);
-          guide.setSmartCurrentLimit(80);
+          shooterTop.setSmartCurrentLimit(40);
+          shooterBottom.setSmartCurrentLimit(40);
+          aimer.setSmartCurrentLimit(40);
+          guide.setSmartCurrentLimit(40);
           shooterTop.enableVoltageCompensation(12);
           shooterBottom.enableVoltageCompensation(12);
           aimer.enableVoltageCompensation(12);

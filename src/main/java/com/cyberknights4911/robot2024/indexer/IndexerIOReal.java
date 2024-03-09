@@ -83,7 +83,7 @@ public final class IndexerIOReal implements IndexerIO {
           // SparkConfig.configNotLeader(motor);
 
           motor.setIdleMode(IdleMode.kCoast);
-          motor.setSmartCurrentLimit(80);
+          motor.setSmartCurrentLimit(60);
           // motor.enableVoltageCompensation(12.0);
 
           encoder.setPosition(0.0);

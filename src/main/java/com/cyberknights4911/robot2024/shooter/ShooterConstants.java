@@ -23,6 +23,7 @@ public record ShooterConstants(
     double aimerForwardLimit,
     double aimerBackwardLimit,
     double feedTime,
+    double aimTime,
     double guidePercentOutput,
     double guideReversePercentOutput,
     double firePercentOutput,
