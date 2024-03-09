@@ -115,7 +115,7 @@ public class CollectIOReal implements CollectIO {
           SparkConfig.configLeaderFollower(collect);
 
           collect.setIdleMode(IdleMode.kCoast);
-          collect.setSmartCurrentLimit(40);
+          collect.setSmartCurrentLimit(60);
           collect.enableVoltageCompensation(12.0);
 
           collectEncoder.setPosition(0.0);

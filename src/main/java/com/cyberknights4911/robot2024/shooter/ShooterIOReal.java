@@ -210,19 +210,19 @@ public class ShooterIOReal implements ShooterIO {
           guide.setInverted(true);
           // aimer.setInverted(true);
 
-          shooterTop.setSmartCurrentLimit(40);
-          shooterBottom.setSmartCurrentLimit(40);
-          aimer.setSmartCurrentLimit(40);
-          guide.setSmartCurrentLimit(40);
+          shooterTop.setSmartCurrentLimit(80);
+          shooterBottom.setSmartCurrentLimit(80);
+          aimer.setSmartCurrentLimit(80);
+          guide.setSmartCurrentLimit(60);
           shooterTop.enableVoltageCompensation(12);
           shooterBottom.enableVoltageCompensation(12);
           aimer.enableVoltageCompensation(12);
           guide.enableVoltageCompensation(12);
 
-          shooterTop.setIdleMode(IdleMode.kCoast);
-          shooterBottom.setIdleMode(IdleMode.kCoast);
+          shooterTop.setIdleMode(IdleMode.kBrake);
+          shooterBottom.setIdleMode(IdleMode.kBrake);
           aimer.setIdleMode(IdleMode.kBrake);
-          guide.setIdleMode(IdleMode.kCoast);
+          guide.setIdleMode(IdleMode.kBrake);
 
           shooterTopEncoder.setPosition(0.0);
           shooterTopEncoder.setMeasurementPeriod(10);
