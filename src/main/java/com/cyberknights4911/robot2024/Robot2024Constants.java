@@ -93,7 +93,7 @@ public final class Robot2024Constants {
                   .driveMotorId(4)
                   .turnMotorId(8)
                   .encoderId(4)
-                  .encoderOffset(.572)
+                  .encoderOffset(0.594)
                   .build())
           .build();
 
@@ -113,7 +113,7 @@ public final class Robot2024Constants {
           .solenoidLeftReverseId(8)
           .solenoidRightForwardId(6)
           .solenoidRightReverseId(9)
-          .collectPercent(0.4)
+          .collectPercent(0.6)
           .collectGearRatio(24.0 / 18.0)
           .collectFeedBackValues(new PidValues(0.1, 0, 0))
           .build();
@@ -135,7 +135,7 @@ public final class Robot2024Constants {
           .sensorId(2)
           .aimerGearRatio((60 / 20) * (60 / 20))
           .guidePercentOutput(.2)
-          .guideReversePercentOutput(-.075)
+          .guideReversePercentOutput(-0.025)
           .feedTime(2)
           .aimTime(.5)
           .speakerPositionDegrees(54)

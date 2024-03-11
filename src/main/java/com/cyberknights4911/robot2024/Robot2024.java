@@ -36,6 +36,7 @@ import com.cyberknights4911.robot2024.shooter.ShooterIOSim;
 import com.cyberknights4911.util.Alliance;
 import com.cyberknights4911.util.GameAlerts;
 import com.cyberknights4911.util.SparkBurnManager;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -88,6 +89,8 @@ public final class Robot2024 implements RobotContainer {
 
     // TODO: Maybe remove this or make it harder to do by accident.
     binding.triggersFor(ButtonAction.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
+
+    binding.triggersFor(ButtonAction.Brake).whileTrue(drive.stopWithX());
 
     binding
         .triggersFor(ButtonAction.ZeroSpeaker)
@@ -281,12 +284,16 @@ public final class Robot2024 implements RobotContainer {
   }
 
   private Command backNoteFromShooter() {
+    //   return Commands.runOnce(
+    //           () -> {
+    //             shooter.guideReverseAtTunableOutput();
+    //             shooter.setAimerForCollect();
+    //           })
+    //       .andThen(Commands.waitUntil(() -> !shooter.isBeamBreakBlocked()));
     return Commands.runOnce(
-            () -> {
-              shooter.guideReverseAtTunableOutput();
-              shooter.setAimerForCollect();
-            })
-        .andThen(Commands.waitUntil(() -> !shooter.isBeamBreakBlocked()));
+        () -> {
+          shooter.setAimerForCollect();
+        });
   }
 
   private Command aimSpeaker() {
@@ -339,6 +346,8 @@ public final class Robot2024 implements RobotContainer {
   public void setupAutos(AutoCommandHandler handler) {
     Autos autos = new Autos(Robot2024Constants.DRIVE_CONSTANTS, climb, collect, shooter, drive);
     autos.addAllAutos(handler);
+    NamedCommands.registerCommand("SHOOT_SUB", aimSpeaker().andThen(fire()));
+    NamedCommands.registerCommand("COLLECT", collectNote());
   }
 
   private Climb createClimb() {

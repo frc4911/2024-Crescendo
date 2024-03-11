@@ -193,7 +193,7 @@ public class Drive extends SubsystemBase {
     return driveVelocityAverage / 4.0;
   }
 
-  /** Returns the module states (turn angles and drive velocitoes) for all of the modules. */
+  /** Returns the module states (turn angles and drive velocities) for all of the modules. */
   private SwerveModuleState[] getModuleStates() {
     SwerveModuleState[] states = new SwerveModuleState[4];
     for (int i = 0; i < 4; i++) {
@@ -203,14 +203,14 @@ public class Drive extends SubsystemBase {
     return states;
   }
 
-  /** Returns the module positions (turn angles and drive velocities) for all of the modules. */
+  /** Returns the module positions (turn angles and drive distance) for all of the modules. */
   private SwerveModulePosition[] getModulePositions() {
-    SwerveModulePosition[] states = new SwerveModulePosition[4];
+    SwerveModulePosition[] positions = new SwerveModulePosition[4];
     for (int i = 0; i < 4; i++) {
-      states[i] = modules[i].getPosition();
+      positions[i] = modules[i].getPosition();
     }
-    Logger.recordOutput("SwerveStates/Measured", states);
-    return states;
+    Logger.recordOutput("SwervePositions/Measured", positions);
+    return positions;
   }
 
   /** Returns the current odometry pose. */
