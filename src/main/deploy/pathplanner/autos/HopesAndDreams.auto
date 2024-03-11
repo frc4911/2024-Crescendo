@@ -12,39 +12,45 @@
     "data": {
       "commands": [
         {
-          "type": "named",
+          "type": "path",
           "data": {
-            "name": "Score"
+            "pathName": "CollectMiddle"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CollectM"
+            "pathName": "ScoreSpeakerPositionFront"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ScoreSpeaker"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score"
+            "pathName": "CollectLeft"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CollectL"
+            "pathName": "ScoreSpeakerPositionFront"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ScoreAmp"
+            "pathName": "CollectRight"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ScoreSpeakerPositionFront"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "CollectCenterLineTop"
           }
         }
       ]

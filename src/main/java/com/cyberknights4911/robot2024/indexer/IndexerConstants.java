@@ -11,4 +11,5 @@ import com.cyberknights4911.util.PidValues;
 import io.soabase.recordbuilder.core.RecordBuilder;
 
 @RecordBuilder
-public record IndexerConstants(int motorId, int sensorId, double speed, PidValues feedBackValues) {}
+public record IndexerConstants(
+    int motorId, int sensorId, double percentOutput, PidValues feedBackValues) {}

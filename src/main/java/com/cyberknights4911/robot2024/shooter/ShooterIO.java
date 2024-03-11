@@ -36,6 +36,8 @@ public interface ShooterIO {
   /** Updates the set of loggable inputs. */
   public default void updateInputs(ShooterIOInputs inputs) {}
 
+  public default void setShooterOutput(double percent) {}
+
   /** Run the shooter at the specified voltage. */
   public default void setShooterVoltage(double volts) {}
 
@@ -45,8 +47,18 @@ public interface ShooterIO {
   /** Stop shooter in open loop. */
   public default void stopShooter() {}
 
+  public default void setAimerOutput(double percent) {}
+
+  /** Run the aimer at the specified voltage. */
+  public default void setAimerVoltage(double voltage) {}
+
   /** Run closed loop to the specified position. */
   public default void setAimerPosition(double position, double ffVolts) {}
+
+  public default void setGuideOutput(double percent) {}
+
+  /** Run the guide at the specified voltage. */
+  public default void setGuideVoltage(double voltage) {}
 
   /** Run guide in closed loop at the specified velocity. */
   public default void setGuideVelocity(double velocityRadPerSec) {}
@@ -59,6 +71,10 @@ public interface ShooterIO {
 
   /** Set velocity PID constants. */
   public default void configureShooterPID(double kP, double kI, double kD) {}
+
+  public default void configureAimerPID(double kP, double kI, double kD) {}
+
+  public default void configureGuidePID(double kP, double kI, double kD) {}
 
   public default void configureLimits(double forwardLimit, double backwardLimit) {}
 }

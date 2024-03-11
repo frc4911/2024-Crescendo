@@ -92,6 +92,12 @@ public final class Wham implements RobotContainer {
                 binding.supplierFor(StickAction.STRAFE),
                 Math.PI / 2));
 
+    Junk junk = new Junk();
+    binding
+        .triggersFor(ButtonAction.Test2)
+        .onTrue(Commands.runOnce(() -> junk.setVoltage(-3.0)))
+        .onFalse(Commands.runOnce(() -> junk.stop()));
+
     double speakerX = 0;
     double speakerY = 0;
     if (Alliance.isRed()) {

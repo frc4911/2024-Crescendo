@@ -17,16 +17,17 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
 
 public class CollectIOReal implements CollectIO {
   private final CANSparkFlex collect;
   private final RelativeEncoder collectEncoder;
   private final SparkPIDController collectPidController;
 
-  private final Solenoid left;
-  private final Solenoid right;
+  private final DoubleSolenoid left;
+  private final DoubleSolenoid right;
 
   private final AnalogInput beamBreak;
   private final double collectGearRatio;
@@ -36,12 +37,20 @@ public class CollectIOReal implements CollectIO {
     this.sparkBurnManager = sparkBurnManager;
     collectGearRatio = constants.collectGearRatio();
 
-    collect = new CANSparkFlex(constants.motorCollectId(), MotorType.kBrushless);
+    collect = new CANSparkFlex(constants.motorCollectRightId(), MotorType.kBrushless);
     collectEncoder = collect.getEncoder();
     collectPidController = collect.getPIDController();
 
-    left = new Solenoid(PneumaticsModuleType.REVPH, constants.solenoidLeftId());
-    right = new Solenoid(PneumaticsModuleType.REVPH, constants.solenoidRightId());
+    left =
+        new DoubleSolenoid(
+            PneumaticsModuleType.REVPH,
+            constants.solenoidLeftForwardId(),
+            constants.solenoidLeftReverseId());
+    right =
+        new DoubleSolenoid(
+            PneumaticsModuleType.REVPH,
+            constants.solenoidRightForwardId(),
+            constants.solenoidRightReverseId());
 
     beamBreak = new AnalogInput(constants.sensorId());
 
@@ -58,10 +67,15 @@ public class CollectIOReal implements CollectIO {
     inputs.collectAppliedVolts = collect.getAppliedOutput() * collect.getBusVoltage();
     inputs.collectCurrentAmps = collect.getOutputCurrent();
 
-    inputs.leftSolenoid = left.get();
-    inputs.rightSolenoid = right.get();
+    // inputs.leftSolenoid = left.get() == Value.kForward;
+    // inputs.rightSolenoid = right.get() == Value.kForward;
 
     inputs.beamBreakVoltage = beamBreak.getVoltage();
+  }
+
+  @Override
+  public void setCollectOutput(double percent) {
+    collect.set(percent);
   }
 
   @Override
@@ -83,7 +97,8 @@ public class CollectIOReal implements CollectIO {
 
   @Override
   public void setCollecterPosition(boolean extended) {
-    // TODO: actually extend or retract the solenoids
+    left.set(extended ? Value.kForward : Value.kReverse);
+    right.set(extended ? Value.kForward : Value.kReverse);
   }
 
   @Override
@@ -97,10 +112,10 @@ public class CollectIOReal implements CollectIO {
   private void configureDevices() {
     sparkBurnManager.maybeBurnConfig(
         () -> {
-          SparkConfig.configNotLeader(collect);
+          SparkConfig.configLeaderFollower(collect);
 
-          collect.setIdleMode(IdleMode.kBrake);
-          collect.setSmartCurrentLimit(40);
+          collect.setIdleMode(IdleMode.kCoast);
+          collect.setSmartCurrentLimit(60);
           collect.enableVoltageCompensation(12.0);
 
           collectEncoder.setPosition(0.0);

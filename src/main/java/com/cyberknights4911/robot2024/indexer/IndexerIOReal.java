@@ -8,7 +8,6 @@
 package com.cyberknights4911.robot2024.indexer;
 
 import com.cyberknights4911.util.SparkBurnManager;
-import com.cyberknights4911.util.SparkConfig;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
@@ -18,7 +17,7 @@ import com.revrobotics.SparkPIDController;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.AnalogInput;
 
-public final class IndexerIOInputsReal implements IndexerIO {
+public final class IndexerIOReal implements IndexerIO {
   private final CANSparkFlex motor;
   private final RelativeEncoder encoder;
   private final SparkPIDController pidController;
@@ -27,7 +26,7 @@ public final class IndexerIOInputsReal implements IndexerIO {
 
   private final SparkBurnManager sparkBurnManager;
 
-  public IndexerIOInputsReal(IndexerConstants constants, SparkBurnManager sparkBurnManager) {
+  public IndexerIOReal(IndexerConstants constants, SparkBurnManager sparkBurnManager) {
     this.sparkBurnManager = sparkBurnManager;
 
     motor = new CANSparkFlex(constants.motorId(), MotorType.kBrushless);
@@ -58,6 +57,16 @@ public final class IndexerIOInputsReal implements IndexerIO {
   }
 
   @Override
+  public void setOutput(double percent) {
+    motor.set(percent);
+  }
+
+  @Override
+  public void setVoltage(double voltage) {
+    motor.setVoltage(voltage);
+  }
+
+  @Override
   public void setVelocity(double velocityRadPerSec) {
     pidController.setReference(
         Units.radiansPerSecondToRotationsPerMinute(velocityRadPerSec), ControlType.kVelocity);
@@ -71,15 +80,17 @@ public final class IndexerIOInputsReal implements IndexerIO {
   private void configureDevices() {
     sparkBurnManager.maybeBurnConfig(
         () -> {
-          SparkConfig.configNotLeader(motor);
+          // SparkConfig.configNotLeader(motor);
 
-          motor.setIdleMode(IdleMode.kBrake);
-          motor.setSmartCurrentLimit(40);
-          motor.enableVoltageCompensation(12.0);
+          motor.setIdleMode(IdleMode.kCoast);
+          motor.setSmartCurrentLimit(60);
+          // motor.enableVoltageCompensation(12.0);
 
           encoder.setPosition(0.0);
           encoder.setMeasurementPeriod(10);
           encoder.setAverageDepth(2);
+
+          motor.setInverted(true);
         },
         motor);
   }

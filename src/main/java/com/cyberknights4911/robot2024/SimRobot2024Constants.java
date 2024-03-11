@@ -35,7 +35,7 @@ public final class SimRobot2024Constants {
       ConstantsBuilder.builder()
           .name("SimRobot2024")
           .loopPeriodSecs(0.02)
-          .tuningMode(true)
+          .tuningMode(false)
           .logPath(null)
           .mode(Mode.SIM)
           .supplier(Robot2024::new)
@@ -100,28 +100,13 @@ public final class SimRobot2024Constants {
 
   public static CollectConstants COLLECT_CONSTANTS =
       CollectConstantsBuilder.builder()
-          .motorCollectId(11)
-          .sensorId(0)
-          .solenoidLeftId(0)
-          .solenoidRightId(0)
+          .motorCollectRightId(11)
+          .motorCollectLeftId(12)
           .collectGearRatio(24.0 / 18.0)
           .collectFeedBackValues(new PidValues(0, 0, 0))
           .build();
 
-  public static IndexerConstants INDEXER_CONSTANTS =
-      IndexerConstantsBuilder.builder()
-          .motorId(31)
-          .sensorId(0)
-          .speed(100)
-          .feedBackValues(new PidValues(0, 0, 0))
-          .build();
+  public static IndexerConstants INDEXER_CONSTANTS = IndexerConstantsBuilder.builder().build();
 
-  public static ShooterConstants SHOOTER_CONSTANTS =
-      ShooterConstantsBuilder.builder()
-          .shooterMotorTopId(0)
-          .shooterMotorBottomId(0)
-          .aimerGearRatio(1.0)
-          .feedBackValues(new PidValues(0, 0, 0))
-          .feedForwardValues(new FeedForwardValues(0, 0))
-          .build();
+  public static ShooterConstants SHOOTER_CONSTANTS = ShooterConstantsBuilder.builder().build();
 }

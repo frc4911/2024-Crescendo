@@ -2,10 +2,10 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 1.3,
-      "y": 5.56
+      "x": 0.65,
+      "y": 4.5
     },
-    "rotation": 180.0
+    "rotation": 120.0
   },
   "command": {
     "type": "sequential",
@@ -14,31 +14,19 @@
         {
           "type": "named",
           "data": {
-            "name": "Score"
+            "name": "SHOOT_SUB"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "CollectM"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "ScoreSpeaker"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Score"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "CollectL"
+            "pathName": "LeaveSubRightCollectCenterLineBottom"
           }
         }
       ]

@@ -158,7 +158,10 @@ public class Module {
     if (turnRelativeOffset == null) {
       return new Rotation2d();
     } else {
-      return inputs.turnPosition.plus(turnRelativeOffset);
+      // return inputs.turnPosition.plus(turnRelativeOffset);
+      // Turn position from relative encoder seems to be resetting after impact
+      // Use absolute position instead
+      return inputs.turnAbsolutePosition;
     }
   }
 

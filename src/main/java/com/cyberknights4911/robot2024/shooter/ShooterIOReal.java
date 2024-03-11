@@ -9,7 +9,6 @@ package com.cyberknights4911.robot2024.shooter;
 
 import com.cyberknights4911.util.SparkBurnManager;
 import com.cyberknights4911.util.SparkConfig;
-import com.revrobotics.CANSparkBase;
 import com.revrobotics.CANSparkBase.ControlType;
 import com.revrobotics.CANSparkBase.IdleMode;
 import com.revrobotics.CANSparkFlex;
@@ -65,6 +64,11 @@ public class ShooterIOReal implements ShooterIO {
   }
 
   @Override
+  public void setShooterOutput(double percent) {
+    shooterTop.set(percent);
+  }
+
+  @Override
   public void setShooterVoltage(double volts) {
     shooterTop.setVoltage(volts);
   }
@@ -80,13 +84,36 @@ public class ShooterIOReal implements ShooterIO {
   }
 
   @Override
+  public void setAimerOutput(double percent) {
+    aimer.set(percent);
+  }
+
+  @Override
+  public void setAimerVoltage(double voltage) {
+    aimer.setVoltage(voltage);
+  }
+
+  @Override
   public void setAimerPosition(double positionRadians, double ffVolts) {
+    // aimerPidController.setReference(
+    //     Units.radiansToDegrees(positionRadians) * aimerGearRatio,
+    //     ControlType.kSmartMotion,
+    //     0,
+    //     ffVolts,
+    //     ArbFFUnits.kVoltage);
+
     aimerPidController.setReference(
-        Units.radiansToDegrees(positionRadians) * aimerGearRatio,
-        ControlType.kSmartMotion,
-        0,
-        ffVolts,
-        ArbFFUnits.kVoltage);
+        Units.radiansToRotations(positionRadians) * aimerGearRatio, ControlType.kPosition);
+  }
+
+  @Override
+  public void setGuideOutput(double percent) {
+    guide.set(percent);
+  }
+
+  @Override
+  public void setGuideVoltage(double voltage) {
+    guide.setVoltage(voltage);
   }
 
   @Override
@@ -148,11 +175,27 @@ public class ShooterIOReal implements ShooterIO {
   }
 
   @Override
+  public void configureAimerPID(double kP, double kI, double kD) {
+    aimerPidController.setP(kP, 0);
+    aimerPidController.setI(kI, 0);
+    aimerPidController.setD(kD, 0);
+    aimerPidController.setFF(0, 0);
+  }
+
+  @Override
+  public void configureGuidePID(double kP, double kI, double kD) {
+    guidePidController.setP(kP, 0);
+    guidePidController.setI(kI, 0);
+    guidePidController.setD(kD, 0);
+    guidePidController.setFF(0, 0);
+  }
+
+  @Override
   public void configureLimits(double forwardLimit, double backwardLimit) {
-    aimer.enableSoftLimit(CANSparkBase.SoftLimitDirection.kForward, true);
-    aimer.enableSoftLimit(CANSparkBase.SoftLimitDirection.kReverse, true);
-    aimer.setSoftLimit(CANSparkBase.SoftLimitDirection.kForward, (float) forwardLimit);
-    aimer.setSoftLimit(CANSparkBase.SoftLimitDirection.kReverse, (float) backwardLimit);
+    // aimer.enableSoftLimit(CANSparkBase.SoftLimitDirection.kForward, true);
+    // aimer.enableSoftLimit(CANSparkBase.SoftLimitDirection.kReverse, true);
+    // aimer.setSoftLimit(CANSparkBase.SoftLimitDirection.kForward, (float) forwardLimit);
+    // aimer.setSoftLimit(CANSparkBase.SoftLimitDirection.kReverse, (float) backwardLimit);
   }
 
   private void configureDevices() {
@@ -164,18 +207,20 @@ public class ShooterIOReal implements ShooterIO {
           SparkConfig.configNotLeader(guide);
 
           shooterBottom.follow(shooterTop, true);
+          guide.setInverted(true);
+          // aimer.setInverted(true);
 
-          shooterTop.setSmartCurrentLimit(40);
-          shooterBottom.setSmartCurrentLimit(40);
-          aimer.setSmartCurrentLimit(40);
-          guide.setSmartCurrentLimit(30);
+          shooterTop.setSmartCurrentLimit(80);
+          shooterBottom.setSmartCurrentLimit(80);
+          aimer.setSmartCurrentLimit(80);
+          guide.setSmartCurrentLimit(60);
           shooterTop.enableVoltageCompensation(12);
           shooterBottom.enableVoltageCompensation(12);
           aimer.enableVoltageCompensation(12);
           guide.enableVoltageCompensation(12);
 
-          shooterTop.setIdleMode(IdleMode.kCoast);
-          shooterBottom.setIdleMode(IdleMode.kCoast);
+          shooterTop.setIdleMode(IdleMode.kBrake);
+          shooterBottom.setIdleMode(IdleMode.kBrake);
           aimer.setIdleMode(IdleMode.kBrake);
           guide.setIdleMode(IdleMode.kBrake);
 

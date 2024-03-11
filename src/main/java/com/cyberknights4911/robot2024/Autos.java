@@ -65,12 +65,14 @@ public final class Autos {
 
   public void addAllAutos(AutoCommandHandler handler) {
     handler.addDefaultOption("Nothing", Commands.none());
-    handler.addOption("Translate Test", new PathPlannerAuto("TranslationTest"));
+    handler.addOption("Leave, Bro", new PathPlannerAuto("LEAVE"));
+    handler.addOption("Score+Leave Source", new PathPlannerAuto("SHOOT_AND_LEAVE_SOURCE"));
+    // handler.addOption("Translate Test", new PathPlannerAuto("TranslationTest"));
 
-    addCharacterization("Climb", climb.getSysId(), handler);
-    addCharacterization("Collector", collect.getSysId(), handler);
-    addCharacterization("Shooter", shooter.getSysId(), handler);
-    addCharacterization("Drive", drive.getSysId(), handler);
+    // addCharacterization("Climb", climb.getSysId(), handler);
+    // addCharacterization("Collector", collect.getSysId(), handler);
+    // addCharacterization("Shooter", shooter.getSysId(), handler);
+    // addCharacterization("Drive", drive.getSysId(), handler);
   }
 
   private void addCharacterization(String name, SysIdRoutine routine, AutoCommandHandler handler) {

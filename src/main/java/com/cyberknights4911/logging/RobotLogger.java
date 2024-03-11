@@ -92,7 +92,7 @@ public final class RobotLogger {
         }
         Logger.addDataReceiver(new NT4Publisher());
         // TODO: set this up if using rev
-        // LoggedPowerDistribution.getInstance(50, ModuleType.kRev);
+        // LoggedPowerDistribution.getInstance(1, ModuleType.kRev);
         break;
 
       case SIM:

@@ -26,12 +26,12 @@ public final class WhamControllerBinding implements StickBinding, ButtonBinding 
   @Override
   public DoubleSupplier supplierFor(StickAction action) {
     switch (action) {
-      case FORWARD:
-        return () -> -driver.getLeftY();
-      case STRAFE:
-        return () -> -driver.getLeftX();
-      case ROTATE:
-        return () -> -driver.getRightX();
+        // case FORWARD:
+        //   return () -> -driver.getLeftY();
+        // case STRAFE:
+        //   return () -> -driver.getLeftX();
+        // case ROTATE:
+        //   return () -> -driver.getRightX();
       default:
         return ALWAYS_ZERO;
     }
@@ -40,16 +40,18 @@ public final class WhamControllerBinding implements StickBinding, ButtonBinding 
   @Override
   public Triggers triggersFor(ButtonAction action) {
     switch (action) {
-      case Brake:
-        return new Triggers(driver.x());
-      case ZeroGyro:
-        return new Triggers(driver.y());
-      case ZeroSpeaker:
-        return new Triggers(driver.start());
-      case AmpLockOn:
-        return new Triggers(driver.leftTrigger());
-      case SpeakerLockOn:
-        return new Triggers(driver.rightTrigger());
+        // case Brake:
+        //   return new Triggers(driver.x());
+        // case ZeroGyro:
+        //   return new Triggers(driver.y());
+        // case ZeroSpeaker:
+        //   return new Triggers(driver.start());
+        // case AmpLockOn:
+        //   return new Triggers(driver.leftTrigger());
+        // case SpeakerLockOn:
+        //   return new Triggers(driver.rightTrigger());
+      case Test2:
+        return new Triggers(driver.a());
       default:
         return new Triggers(ALWAYS_FALSE);
     }

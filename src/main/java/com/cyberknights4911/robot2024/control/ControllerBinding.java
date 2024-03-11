@@ -16,6 +16,7 @@ import com.cyberknights4911.control.Triggers;
 import com.cyberknights4911.logging.Alert;
 import com.cyberknights4911.logging.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import java.util.function.DoubleSupplier;
 
@@ -52,12 +53,24 @@ public final class ControllerBinding implements StickBinding, ButtonBinding {
     switch (action) {
       case ZeroGyro:
         return new Triggers(driver.y());
-      case ZeroSpeaker:
-        return new Triggers(driver.start());
-      case AmpLockOn:
-        return new Triggers(driver.leftTrigger());
-      case SpeakerLockOn:
-        return new Triggers(driver.rightTrigger());
+      case Brake:
+        return new Triggers(driver.x());
+        // case ZeroSpeaker:
+        //   return new Triggers(driver.start());
+        // case AmpLockOn:
+        //   retaurn new Triggers(driver.leftTrigger());
+        // case SpeakerLockOn:
+        //   return new Triggers(driver.rightTrigger());
+      case CollectNote:
+        return new Triggers(operator.a());
+      case StowCollector:
+        return new Triggers(operator.b());
+      case AimPodium:
+        return new Triggers(operator.povLeft());
+      case AimSpeaker:
+        return new Triggers(operator.povRight());
+      case FireNote:
+        return new Triggers(operator.rightTrigger());
       default:
         return new Triggers(ALWAYS_FALSE);
     }
@@ -73,10 +86,10 @@ public final class ControllerBinding implements StickBinding, ButtonBinding {
   }
 
   public void setDriverRumble(boolean enabled) {
-    // TODO: turn rumble on or off for the driver controller
+    driver.getHID().setRumble(RumbleType.kBothRumble, enabled ? 1 : 0);
   }
 
   public void setOperatorRumble(boolean enabled) {
-    // TODO: turn rumble on or off for the operator controller
+    operator.getHID().setRumble(RumbleType.kBothRumble, enabled ? 1 : 0);
   }
 }

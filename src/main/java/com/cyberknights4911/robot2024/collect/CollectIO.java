@@ -15,13 +15,9 @@ public interface CollectIO {
   public static class CollectIOInputs {
     public double collectPositionRad = 0.0;
     public double collectVelocityRadPerSec = 0.0;
-    public double guidePositionRad = 0.0;
-    public double guideVelocityRadPerSec = 0.0;
 
     public double collectAppliedVolts = 0.0;
     public double collectCurrentAmps = 0.0;
-    public double guideAppliedVolts = 0.0;
-    public double guideCurrentAmps = 0.0;
 
     public boolean leftSolenoid = false;
     public boolean rightSolenoid = false;
@@ -31,6 +27,8 @@ public interface CollectIO {
 
   /** Updates the set of loggable inputs. */
   public default void updateInputs(CollectIOInputs inputs) {}
+
+  public default void setCollectOutput(double percent) {}
 
   /** Run collector open loop at the specified voltage. */
   public default void setCollectVoltage(double volts) {}
