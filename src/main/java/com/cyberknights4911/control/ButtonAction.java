@@ -17,7 +17,9 @@ public enum ButtonAction {
   StowShooter,
   CollectNote,
   StowCollector,
-  FireNote,
+  FireNoteSpeaker,
+  FireNoteAmp,
+  FireNoteTrap, //todo: testing
   StowClimber,
   ExtendClimber,
   AimSubwoofer,

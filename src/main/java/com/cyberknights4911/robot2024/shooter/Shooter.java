@@ -54,6 +54,10 @@ public class Shooter extends SubsystemBase {
       new LoggedTunableNumber("Shooter/AimerSubwofferPositionDegrees");
   private static final LoggedTunableNumber aimerPodiumPosition =
       new LoggedTunableNumber("Shooter/AimerPodiumPositionDegrees");
+  private static final LoggedTunableNumber aimerAmpPosition =
+      new LoggedTunableNumber("Shooter/AimerAmpPositionDegrees");
+  private static final LoggedTunableNumber aimerTrapPosition =
+      new LoggedTunableNumber("Shooter/AimerTrapPositionDegrees");
   private static final LoggedTunableNumber forwardLimit =
       new LoggedTunableNumber("Shooter/forwardLimit");
   private static final LoggedTunableNumber backwardLimit =
@@ -91,6 +95,8 @@ public class Shooter extends SubsystemBase {
     aimerSubwooferPosition.initDefault(constants.speakerPositionDegrees());
     aimerCollectPosition.initDefault(constants.collectPositionDegrees());
     aimerPodiumPosition.initDefault(constants.podiumPositionDegrees());
+    aimerAmpPosition.initDefault(constants.ampPositionDegrees());
+    aimerTrapPosition.initDefault(constants.trapPositionDegrees());
     forwardLimit.initDefault(constants.aimerForwardLimit());
     backwardLimit.initDefault(constants.aimerBackwardLimit());
     beamThreshold.initDefault(constants.beamThreshold());
@@ -260,6 +266,18 @@ public class Shooter extends SubsystemBase {
     return Commands.runOnce(() -> setAimerPostion(aimerPodiumPosition.get()), this)
         .andThen(this::runShooterAtTunableSpeed, this);
   }
+
+  public Command aimAmp() {
+    return Commands.runOnce(() -> setAimerPostion(aimerAmpPosition.get()), this)
+        .andThen(this::runShooterAtTunableSpeed, this);
+  }
+
+  public Command aimTrap() {
+    return Commands.runOnce(() -> setAimerPostion(aimerTrapPosition.get()), this)
+        .andThen(this::runShooterAtTunableSpeed, this);
+  }
+
+  
 
   public Command fire() {
     return Commands.runOnce(() -> runGuideOutput(guideOutput.get()), this)
