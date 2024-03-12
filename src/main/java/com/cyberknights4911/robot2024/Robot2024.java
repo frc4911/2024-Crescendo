@@ -25,7 +25,8 @@ import com.cyberknights4911.robot2024.collect.CollectIO;
 import com.cyberknights4911.robot2024.collect.CollectIOReal;
 import com.cyberknights4911.robot2024.collect.CollectIOSim;
 import com.cyberknights4911.robot2024.control.ControllerBinding;
-import com.cyberknights4911.robot2024.drive.ModuleIOSparkFlex;
+import com.cyberknights4911.robot2024.drive.ModuleIOTalonFX;
+// import com.cyberknights4911.robot2024.drive.ModuleIOSparkFlex;
 import com.cyberknights4911.robot2024.indexer.Indexer;
 import com.cyberknights4911.robot2024.indexer.IndexerIO;
 import com.cyberknights4911.robot2024.indexer.IndexerIOReal;
@@ -244,22 +245,16 @@ public final class Robot2024 implements RobotContainer {
             constants,
             Robot2024Constants.DRIVE_CONSTANTS,
             new GyroIOPigeon2(Robot2024Constants.DRIVE_CONSTANTS),
-            new ModuleIOSparkFlex(
+            new ModuleIOTalonFX(
+                Robot2024Constants.DRIVE_CONSTANTS, Robot2024Constants.DRIVE_CONSTANTS.frontLeft()),
+            new ModuleIOTalonFX(
                 Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.frontLeft(),
-                burnManager),
-            new ModuleIOSparkFlex(
+                Robot2024Constants.DRIVE_CONSTANTS.frontRight()),
+            new ModuleIOTalonFX(
+                Robot2024Constants.DRIVE_CONSTANTS, Robot2024Constants.DRIVE_CONSTANTS.backLeft()),
+            new ModuleIOTalonFX(
                 Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.frontRight(),
-                burnManager),
-            new ModuleIOSparkFlex(
-                Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.backLeft(),
-                burnManager),
-            new ModuleIOSparkFlex(
-                Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.backRight(),
-                burnManager));
+                Robot2024Constants.DRIVE_CONSTANTS.backRight()));
       case REPLAY:
       default:
         return new Drive(
@@ -305,3 +300,5 @@ public final class Robot2024 implements RobotContainer {
 
 // TODO:
 // ehehehehehehehehehhehehehehehehehheehehhehehehehehehehehehehheehhehehehehehehehehehhehehehehehehehehehehehehe
+// TODO:
+// hows it going?
