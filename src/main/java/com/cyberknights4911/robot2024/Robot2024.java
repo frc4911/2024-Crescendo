@@ -304,3 +304,5 @@ public final class Robot2024 implements RobotContainer {
 // hows it going?
 // TODO:
 // pretty good, how about you?
+// TODO:
+// I am doing alright, bit tired though, can't wait to get vision working
