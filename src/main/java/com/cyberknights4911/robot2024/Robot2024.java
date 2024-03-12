@@ -33,12 +33,10 @@ import com.cyberknights4911.robot2024.shooter.Shooter;
 import com.cyberknights4911.robot2024.shooter.ShooterIO;
 import com.cyberknights4911.robot2024.shooter.ShooterIOReal;
 import com.cyberknights4911.robot2024.shooter.ShooterIOSim;
-import com.cyberknights4911.util.Alliance;
+import com.cyberknights4911.util.Field;
 import com.cyberknights4911.util.GameAlerts;
 import com.cyberknights4911.util.SparkBurnManager;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -71,15 +69,6 @@ public final class Robot2024 implements RobotContainer {
   }
 
   private void configureControls() {
-    double x;
-    double y;
-    if (Alliance.isRed()) {
-      x = 652.73;
-      y = 218.42;
-    } else {
-      x = -1.50;
-      y = 218.42;
-    }
     drive.setDefaultCommand(
         drive.joystickDrive(
             Robot2024Constants.CONTROL_CONSTANTS,
@@ -94,16 +83,7 @@ public final class Robot2024 implements RobotContainer {
 
     binding
         .triggersFor(ButtonAction.ZeroSpeaker)
-        .onTrue(
-            Commands.runOnce(
-                () -> {
-                  drive.setPose(
-                      new Pose2d(
-                          new Translation2d(
-                              Units.inchesToMeters(602.73), Units.inchesToMeters(218.42)),
-                          new Rotation2d()));
-                },
-                drive));
+        .onTrue(Commands.runOnce(() -> drive.setPose(Field.subWooferIndex()), drive));
 
     binding
         .triggersFor(ButtonAction.AmpLockOn)
@@ -112,8 +92,9 @@ public final class Robot2024 implements RobotContainer {
                 Robot2024Constants.CONTROL_CONSTANTS,
                 binding.supplierFor(StickAction.FORWARD),
                 binding.supplierFor(StickAction.STRAFE),
-                Math.PI / 2));
+                Field.ampOpeningAngle().getRadians()));
 
+    Translation2d speakerOpening = Field.speakerOpening();
     // TODO: combine with auto-aim.
     binding
         .triggersFor(ButtonAction.SpeakerLockOn)
@@ -122,8 +103,8 @@ public final class Robot2024 implements RobotContainer {
                 Robot2024Constants.CONTROL_CONSTANTS,
                 binding.supplierFor(StickAction.FORWARD),
                 binding.supplierFor(StickAction.STRAFE),
-                Units.inchesToMeters(x),
-                Units.inchesToMeters(y)));
+                Units.inchesToMeters(speakerOpening.getX()),
+                Units.inchesToMeters(speakerOpening.getY())));
 
     binding.triggersFor(ButtonAction.StowCollector).onTrue(stowEverything());
 
