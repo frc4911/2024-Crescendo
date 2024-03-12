@@ -28,8 +28,6 @@ public record ShooterConstants(
     double guideReversePercentOutput,
     double firePercentOutput,
     double collectPositionDegrees,
-    double ampPositionDegrees,
-    double trapPositionDegrees,
     double speakerPositionDegrees,
     double podiumPositionDegrees,
     PidValues shooterFeedBackValues,

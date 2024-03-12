@@ -26,7 +26,6 @@ import com.cyberknights4911.robot2024.collect.CollectIOReal;
 import com.cyberknights4911.robot2024.collect.CollectIOSim;
 import com.cyberknights4911.robot2024.control.ControllerBinding;
 import com.cyberknights4911.robot2024.drive.ModuleIOTalonFX;
-// import com.cyberknights4911.robot2024.drive.ModuleIOSparkFlex;
 import com.cyberknights4911.robot2024.indexer.Indexer;
 import com.cyberknights4911.robot2024.indexer.IndexerIO;
 import com.cyberknights4911.robot2024.indexer.IndexerIOReal;
@@ -134,11 +133,11 @@ public final class Robot2024 implements RobotContainer {
 
     binding.triggersFor(ButtonAction.AimPodium).onTrue(shooter.aimPodium());
 
-    binding.triggersFor(ButtonAction.FireNoteSpeaker).onTrue(shooter.fire()); // RT
+    binding.triggersFor(ButtonAction.FireNoteSpeaker).onTrue(shooter.fire());
 
-    binding.triggersFor(ButtonAction.FireNoteAmp).onTrue(shooter.fire()); // LT
+    binding.triggersFor(ButtonAction.FireNoteAmp).onTrue(shooter.fire());
 
-    binding.triggersFor(ButtonAction.FireNoteTrap).onTrue(shooter.fire()); // Y
+    binding.triggersFor(ButtonAction.FireNoteTrap).onTrue(shooter.fire());
   }
 
   private Command collectNote() {
