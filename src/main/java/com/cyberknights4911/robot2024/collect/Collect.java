@@ -16,6 +16,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import org.littletonrobotics.junction.Logger;
@@ -83,14 +85,6 @@ public class Collect extends SubsystemBase {
                 (voltage) -> runCollectVolts(voltage.in(Volts)), null, this));
   }
 
-  public boolean isBeamBreakBlocked() {
-    return inputs.beamBreakVoltage > beamThreshold.get();
-  }
-
-  public void runCollectOutput(double percent) {
-    collectIO.setCollectOutput(percent);
-  }
-
   /** Run collector open loop at the specified voltage. */
   public void runCollectVolts(double volts) {
     collectIO.setCollectVoltage(volts);
@@ -102,14 +96,6 @@ public class Collect extends SubsystemBase {
     collectIO.setCollectVelocity(velocityRadPerSec);
 
     Logger.recordOutput("Collect/SetpointRPM", velocityRpm);
-  }
-
-  public void extendCollecter() {
-    collectIO.setCollecterPosition(true);
-  }
-
-  public void retractCollecter() {
-    collectIO.setCollecterPosition(false);
   }
 
   @Override
@@ -134,7 +120,7 @@ public class Collect extends SubsystemBase {
     // Logger.recordOutput("Collect/Mechanism", mechanism);
 
     if (DriverStation.isDisabled()) {
-      stopCollector();
+      collectIO.stopCollector();
     }
   }
 
@@ -161,12 +147,21 @@ public class Collect extends SubsystemBase {
     return inputs.collectVelocityRadPerSec;
   }
 
-  /** Stops the collector. */
-  public void stopCollector() {
-    collectIO.stopCollector();
+  public Command extendCollecter() {
+    return Commands.runOnce(
+        () -> {
+          collectIO.setCollecterPosition(true);
+          collectIO.setCollectOutput(collectOutput.get());
+        },
+        this);
   }
 
-  public void collectAtTunableOutput() {
-    runCollectOutput(collectOutput.get());
+  public Command retractCollecter() {
+    return Commands.runOnce(
+        () -> {
+          collectIO.stopCollector();
+          collectIO.setCollecterPosition(false);
+        },
+        this);
   }
 }

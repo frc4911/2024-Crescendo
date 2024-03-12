@@ -67,7 +67,7 @@ public final class ControllerBinding implements StickBinding, ButtonBinding {
         return new Triggers(operator.b());
       case AimPodium:
         return new Triggers(operator.povLeft());
-      case AimSpeaker:
+      case AimSubwoofer:
         return new Triggers(operator.povRight());
       case FireNote:
         return new Triggers(operator.rightTrigger());

@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
@@ -49,12 +50,10 @@ public class Shooter extends SubsystemBase {
       new LoggedTunableNumber("Shooter/FireOutputPercent");
   private static final LoggedTunableNumber aimerCollectPosition =
       new LoggedTunableNumber("Shooter/AimerCollectPositionDegrees");
-  private static final LoggedTunableNumber aimerSpeakerPosition =
-      new LoggedTunableNumber("Shooter/AimerSpeakerPositionDegrees");
+  private static final LoggedTunableNumber aimerSubwooferPosition =
+      new LoggedTunableNumber("Shooter/AimerSubwofferPositionDegrees");
   private static final LoggedTunableNumber aimerPodiumPosition =
       new LoggedTunableNumber("Shooter/AimerPodiumPositionDegrees");
-  private static final LoggedTunableNumber aimerAmpPosition =
-      new LoggedTunableNumber("Shooter/AimerAmpPositionDegrees");
   private static final LoggedTunableNumber forwardLimit =
       new LoggedTunableNumber("Shooter/forwardLimit");
   private static final LoggedTunableNumber backwardLimit =
@@ -89,10 +88,9 @@ public class Shooter extends SubsystemBase {
     guideOutput.initDefault(constants.guidePercentOutput());
     guideReverseOutput.initDefault(constants.guideReversePercentOutput());
     fireOutput.initDefault(constants.firePercentOutput());
-    aimerSpeakerPosition.initDefault(constants.speakerPositionDegrees());
+    aimerSubwooferPosition.initDefault(constants.speakerPositionDegrees());
     aimerCollectPosition.initDefault(constants.collectPositionDegrees());
     aimerPodiumPosition.initDefault(constants.podiumPositionDegrees());
-    aimerAmpPosition.initDefault(constants.ampPositionDegrees());
     forwardLimit.initDefault(constants.aimerForwardLimit());
     backwardLimit.initDefault(constants.aimerBackwardLimit());
     beamThreshold.initDefault(constants.beamThreshold());
@@ -123,7 +121,7 @@ public class Shooter extends SubsystemBase {
   public void runShooterOutput(double percent) {
     shooterIO.setShooterOutput(percent);
 
-    Logger.recordOutput("Shooter/FlywheelPerent", percent);
+    Logger.recordOutput("Shooter/FlywheelPercent", percent);
   }
 
   /** Run shooter open loop at the specified voltage. */
@@ -149,17 +147,6 @@ public class Shooter extends SubsystemBase {
     return velocityRpm;
   }
 
-  /** Stops the shooter. */
-  public void stopShooter() {
-    shooterIO.stopShooter();
-  }
-
-  public void runAimerOutput(double percent) {
-    shooterIO.setAimerOutput(percent);
-
-    Logger.recordOutput("Shooter/AimerPercent", percent);
-  }
-
   public void runAimerVolts(double voltage) {
     shooterIO.setAimerVoltage(voltage);
 
@@ -174,24 +161,16 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/AimerSetpointDegrees", positionDegrees);
   }
 
-  public void setAimerForSpeaker() {
-    setAimerPostion(aimerSpeakerPosition.get());
-  }
-
-  public void setAimerForCollect() {
-    setAimerPostion(aimerCollectPosition.get());
-  }
-
-  public void setAimerForPodium() {
-    setAimerPostion(aimerPodiumPosition.get());
-  }
-
-  public void setAimerForAmp() {
-    setAimerPostion(aimerAmpPosition.get());
-  }
-
-  public void stopAimer() {
-    shooterIO.stopAimer();
+  /** Will not complete until beam break is blocked! */
+  public Command collectAndWaitForNote() {
+    return Commands.runOnce(
+            () -> {
+              shooterIO.stopShooter();
+              setAimerPostion(aimerCollectPosition.get());
+              runGuideOutput(guideOutput.get());
+            },
+            this)
+        .alongWith(Commands.waitUntil(() -> inputs.beamBreakValue > .1));
   }
 
   public void runGuideOutput(double percent) {
@@ -218,10 +197,6 @@ public class Shooter extends SubsystemBase {
     shooterIO.stopGuide();
   }
 
-  public boolean isBeamBreakBlocked() {
-    return inputs.beamBreakValue < .1;
-  }
-
   @Override
   public void periodic() {
     shooterIO.updateInputs(inputs);
@@ -245,11 +220,11 @@ public class Shooter extends SubsystemBase {
 
     // TODO: convert this to the actual angle (correct for gear ratio)
     segment.setAngle(Math.toDegrees(inputs.aimerPositionRad));
-    Logger.recordOutput("Shooter/Mechanism", mechanism);
+    // Logger.recordOutput("Shooter/Mechanism", mechanism);
 
     if (DriverStation.isDisabled()) {
-      stopShooter();
-      stopGuide();
+      shooterIO.stopShooter();
+      shooterIO.stopGuide();
     }
   }
 
@@ -258,24 +233,40 @@ public class Shooter extends SubsystemBase {
     return sysId;
   }
 
-  public void guideAtTunableOutput() {
-    runGuideOutput(guideOutput.get());
-  }
-
-  public void guideReverseAtTunableOutput() {
+  private void guideReverseAtTunableOutput() {
     runGuideOutput(guideReverseOutput.get());
   }
 
-  public void runShooterAtTunableSpeed() {
+  private void runShooterAtTunableSpeed() {
     runShooterOutput(fireOutput.get());
   }
 
-  public double feedTime() {
-    return feedTime.get();
+  public Command stow() {
+    return Commands.runOnce(
+        () -> {
+          shooterIO.stopGuide();
+          shooterIO.stopShooter();
+          setAimerPostion(aimerCollectPosition.get());
+        },
+        this);
   }
 
-  public double aimTime() {
-    return aimTime.get();
+  public Command aimSubwoofer() {
+    return Commands.runOnce(() -> setAimerPostion(aimerSubwooferPosition.get()), this)
+        .andThen(this::runShooterAtTunableSpeed, this);
+  }
+
+  public Command aimPodium() {
+    return Commands.runOnce(() -> setAimerPostion(aimerPodiumPosition.get()), this)
+        .andThen(this::runShooterAtTunableSpeed, this);
+  }
+
+  public Command fire() {
+    return Commands.runOnce(() -> runGuideOutput(guideOutput.get()), this)
+        .andThen(Commands.waitSeconds(feedTime.get()))
+        .andThen(shooterIO::stopShooter, this)
+        .andThen(shooterIO::stopGuide, this)
+        .andThen(this::collectAndWaitForNote);
   }
 
   /**

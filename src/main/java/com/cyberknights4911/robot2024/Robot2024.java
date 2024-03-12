@@ -125,208 +125,27 @@ public final class Robot2024 implements RobotContainer {
                 Units.inchesToMeters(x),
                 Units.inchesToMeters(y)));
 
-    binding.triggersFor(ButtonAction.StowCollector).onTrue(stow());
+    binding.triggersFor(ButtonAction.StowCollector).onTrue(stowEverything());
 
     binding.triggersFor(ButtonAction.CollectNote).onTrue(collectNote());
 
-    binding.triggersFor(ButtonAction.AimSpeaker).onTrue(aimSpeaker());
+    binding.triggersFor(ButtonAction.AimSubwoofer).onTrue(shooter.aimSubwoofer());
 
-    binding.triggersFor(ButtonAction.AimPodium).onTrue(aimPodium());
+    binding.triggersFor(ButtonAction.AimPodium).onTrue(shooter.aimPodium());
 
-    binding.triggersFor(ButtonAction.FireNote).onTrue(fire());
-
-    // binding
-    //     .triggersFor(ButtonAction.Test1)
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> {
-    //               shooter.setAimerPostion(34);
-    //               collect.extendCollecter();
-    //               collect.runCollectOutput(.4);
-    //               indexer.runOutput(.2);
-    //               shooter.runGuideOutput(.2);
-    //             }));
-
-    // binding
-    //     .triggersFor(ButtonAction.Test2)
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> {
-    //               shooter.setAimerPostion(1);
-    //               collect.retractCollecter();
-    //               collect.runCollectOutput(0);
-    //               indexer.runOutput(0);
-    //               shooter.runGuideOutput(0);
-    //             }));
-    // binding
-    //     .triggersFor(ButtonAction.Test3)
-    //     .onTrue(
-    //         Commands.runOnce(() -> shooter.setAimerPostion(54))
-    //             .andThen(() -> shooter.runGuideOutput(-.1))
-    //             .andThen(Commands.waitSeconds(.05))
-    //             .andThen(() -> shooter.runGuideOutput(0)));
-    // binding
-    //     .triggersFor(ButtonAction.Test4)
-    //     .onTrue(
-    //         Commands.runOnce(() -> shooter.runShooterOutput(.4))
-    //             .andThen(Commands.waitSeconds(2))
-    //             .andThen(() -> shooter.runGuideOutput(.5))
-    //             .andThen(Commands.waitSeconds(2))
-    //             .andThen(
-    //                 () -> {
-    //                   shooter.runShooterOutput(0);
-    //                   shooter.runGuideOutput(0);
-    //                   shooter.setAimerPostion(1);
-    //                 }));
-
-    // binding
-    //     .triggersFor(ButtonAction.Test1)
-    //     .onTrue(Commands.runOnce(() -> indexer.runOutput(.2), indexer));
-
-    // binding.triggersFor(ButtonAction.Test2).onTrue(Commands.runOnce(() -> indexer.runOutput(0)));
-
-    // binding
-    //     .triggersFor(ButtonAction.Test3)
-    //     .onTrue(Commands.runOnce(() -> shooter.runGuideOutput(.1), shooter));
-
-    // binding
-    //     .triggersFor(ButtonAction.Test4)
-    //     .onTrue(Commands.runOnce(() -> shooter.runGuideOutput(0)));
-
-    // binding
-    //     .triggersFor(ButtonAction.Test5)
-    //     .onTrue(Commands.runOnce(() -> collect.runCollectOutput(.6), collect));
-
-    // binding
-    //     .triggersFor(ButtonAction.Test6)
-    //     .onTrue(Commands.runOnce(() -> collect.runCollectOutput(0), collect));
-
-    // aimer test code
-    // binding
-    //     .triggersFor(ButtonAction.Test1)
-    //     .onTrue(Commands.runOnce(() -> shooter.setAimerPostion(1)));
-
-    // binding
-    //     .triggersFor(ButtonAction.Test2)
-    //     .onTrue(Commands.runOnce(() -> shooter.setAimerPostion(54)));
-
-    // binding
-    //     .triggersFor(ButtonAction.Test3)
-    //     .onTrue(Commands.runOnce(() -> shooter.setAimerPostion(45)));
-
-    // binding
-    //     .triggersFor(ButtonAction.Test3)
-    //     .onTrue(Commands.runOnce(() -> shooter.runAimerOutput(0)));
-
-    // collector test code
-    // binding
-    //     .triggersFor(ButtonAction.Test1)
-    //     .onTrue(Commands.runOnce(() -> collect.extendCollecter()));
-
-    // binding
-    //     .triggersFor(ButtonAction.Test2)
-    //     .onTrue(Commands.runOnce(() -> collect.retractCollecter()));
-
-    // binding
-    //     .triggersFor(ButtonAction.Test1)
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> {
-    //               collect.extendCollecter();
-    //               collect.runCollectOutput(.6);
-    //               indexer.runOutput(.2);
-    //               shooter.runGuideOutput(.1);
-    //             }));
-
-    // binding
-    //     .triggersFor(ButtonAction.Test2)
-    //     .onTrue(
-    //         Commands.runOnce(
-    //             () -> {
-    //               collect.retractCollecter();
-    //               collect.runCollectOutput(0);
-    //               indexer.runOutput(0);
-    //               shooter.runGuideOutput(0);
-    //             }));
+    binding.triggersFor(ButtonAction.FireNote).onTrue(shooter.fire());
   }
 
   private Command collectNote() {
-    return Commands.runOnce(
-            () -> {
-              shooter.stopShooter();
-              collect.collectAtTunableOutput();
-              collect.extendCollecter();
-              indexer.runIndexAtTunableOutput();
-              shooter.guideAtTunableOutput();
-              shooter.setAimerForCollect();
-              shooter.setAimerPostion(34);
-            },
-            shooter,
-            collect,
-            indexer)
-        .andThen(Commands.waitUntil(() -> shooter.isBeamBreakBlocked()))
-        .andThen(stow());
+    return collect
+        .extendCollecter()
+        .andThen(indexer.runIndexAtTunableOutput())
+        .andThen(shooter.collectAndWaitForNote())
+        .andThen(stowEverything());
   }
 
-  private Command stow() {
-    return Commands.runOnce(
-        () -> {
-          collect.retractCollecter();
-          collect.stopCollector();
-          indexer.stop();
-          shooter.stopGuide();
-          shooter.stopShooter();
-          shooter.setAimerForCollect();
-        },
-        collect,
-        indexer,
-        shooter);
-  }
-
-  private Command backNoteFromShooter() {
-    //   return Commands.runOnce(
-    //           () -> {
-    //             shooter.guideReverseAtTunableOutput();
-    //             shooter.setAimerForCollect();
-    //           })
-    //       .andThen(Commands.waitUntil(() -> !shooter.isBeamBreakBlocked()));
-    return Commands.runOnce(
-        () -> {
-          shooter.setAimerForCollect();
-        });
-  }
-
-  private Command aimSpeaker() {
-    return backNoteFromShooter()
-        .andThen(() -> shooter.setAimerForSpeaker())
-        .andThen(Commands.waitSeconds(shooter.aimTime()))
-        .andThen(
-            () -> {
-              shooter.runShooterAtTunableSpeed();
-              shooter.stopGuide();
-            });
-  }
-
-  private Command aimPodium() {
-    return backNoteFromShooter()
-        .andThen(() -> shooter.setAimerForPodium())
-        .andThen(Commands.waitSeconds(shooter.aimTime()))
-        .andThen(
-            () -> {
-              shooter.runShooterAtTunableSpeed();
-              shooter.stopGuide();
-            });
-  }
-
-  private Command fire() {
-    return Commands.runOnce(() -> shooter.guideAtTunableOutput())
-        .andThen(Commands.waitSeconds(shooter.feedTime()))
-        .andThen(
-            () -> {
-              shooter.stopShooter();
-              shooter.stopGuide();
-              shooter.setAimerForCollect();
-            });
+  private Command stowEverything() {
+    return shooter.stow().alongWith(indexer.stop()).alongWith(collect.retractCollecter());
   }
 
   @Override
@@ -346,7 +165,7 @@ public final class Robot2024 implements RobotContainer {
   public void setupAutos(AutoCommandHandler handler) {
     Autos autos = new Autos(Robot2024Constants.DRIVE_CONSTANTS, climb, collect, shooter, drive);
     autos.addAllAutos(handler);
-    NamedCommands.registerCommand("SHOOT_SUB", aimSpeaker().andThen(fire()));
+    NamedCommands.registerCommand("SHOOT_SUB", shooter.aimSubwoofer().andThen(shooter.fire()));
     NamedCommands.registerCommand("COLLECT", collectNote());
   }
 

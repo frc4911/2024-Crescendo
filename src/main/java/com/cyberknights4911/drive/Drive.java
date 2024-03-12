@@ -278,12 +278,8 @@ public class Drive extends SubsystemBase {
       x = -x;
       y = -y;
     }
-    System.out.println("x: " + x);
-    System.out.println("y: " + y);
     double linearMagnitude =
         MathUtil.applyDeadband(Math.hypot(x, y), controlConstants.stickDeadband());
-    System.out.println("linearMagnitude: " + linearMagnitude);
-    System.out.println("stickDeadband: " + controlConstants.stickDeadband());
     Rotation2d linearDirection = new Rotation2d(x, y);
     double omega =
         applyOmegaDeadbandAndScaling
@@ -300,15 +296,12 @@ public class Drive extends SubsystemBase {
             .transformBy(new Transform2d(linearMagnitude, 0.0, new Rotation2d()))
             .getTranslation();
 
-    System.out.println("linearVelocity: " + linearVelocity);
-
     // Convert to field relative speeds & send command
     return ChassisSpeeds.fromFieldRelativeSpeeds(
         linearVelocity.getX() * driveConstants.maxLinearSpeed(),
         linearVelocity.getY() * driveConstants.maxLinearSpeed(),
         omega * maxAngularSpeedMetersPerSecond,
         getRotation());
-    // return new ChassisSpeeds();
   }
 
   private ChassisSpeeds createChassisSpeeds(
