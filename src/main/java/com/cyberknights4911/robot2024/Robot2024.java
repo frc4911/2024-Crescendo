@@ -134,10 +134,6 @@ public final class Robot2024 implements RobotContainer {
     binding.triggersFor(ButtonAction.AimPodium).onTrue(shooter.aimPodium());
 
     binding.triggersFor(ButtonAction.FireNoteSpeaker).onTrue(shooter.fire());
-
-    binding.triggersFor(ButtonAction.FireNoteAmp).onTrue(shooter.fire());
-
-    binding.triggersFor(ButtonAction.FireNoteTrap).onTrue(shooter.fire());
   }
 
   private Command collectNote() {
