@@ -10,6 +10,8 @@ package com.cyberknights4911.robot2024.indexer;
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -73,11 +75,11 @@ public final class Indexer extends SubsystemBase {
     Logger.recordOutput("Indexer/SetpointRPM", velocityRpm);
   }
 
-  public void stop() {
-    indexerIO.stop();
+  public Command runIndexAtTunableOutput() {
+    return Commands.runOnce(() -> runOutput(percent.get()), this);
   }
 
-  public void runIndexAtTunableOutput() {
-    runOutput(percent.get());
+  public Command stop() {
+    return Commands.runOnce(() -> indexerIO.stop(), this);
   }
 }
