@@ -60,6 +60,7 @@ public final class Robot2024Constants {
           .turnGearRatio(DriveConstants.TURN_GEAR_RATIO)
           .driveGearRatio(DriveConstants.L2_GEAR_RATIO)
           .pigeonId(0)
+          .canBusId("rio")
           .turnFeedBackValues(new PidValues(7.0, 0.0, 0.0))
           .driveFeedBackValues(new PidValues(0.05, 0.0, 0.0))
           .driveFeedForwardValues(new FeedForwardValues(0.1, 0.13))

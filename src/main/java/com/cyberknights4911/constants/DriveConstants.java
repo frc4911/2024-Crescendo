@@ -23,6 +23,7 @@ public record DriveConstants(
     PidValues driveFeedBackValues,
     FeedForwardValues driveFeedForwardValues,
     int pigeonId,
+    String canBusId,
     ModuleConstants frontLeft,
     ModuleConstants frontRight,
     ModuleConstants backLeft,
