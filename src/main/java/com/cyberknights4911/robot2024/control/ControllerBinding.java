@@ -58,7 +58,7 @@ public final class ControllerBinding implements StickBinding, ButtonBinding {
         // case ZeroSpeaker:
         //   return new Triggers(driver.start());
         // case AmpLockOn:
-        //   retaurn new Triggers(driver.leftTrigger());
+        //   return new Triggers(driver.leftTrigger());
         // case SpeakerLockOn:
         //   return new Triggers(driver.rightTrigger());
       case CollectNote:
@@ -69,7 +69,7 @@ public final class ControllerBinding implements StickBinding, ButtonBinding {
         return new Triggers(operator.povLeft());
       case AimSubwoofer:
         return new Triggers(operator.povRight());
-      case FireNote:
+      case FireNoteSpeaker:
         return new Triggers(operator.rightTrigger());
       default:
         return new Triggers(ALWAYS_FALSE);
