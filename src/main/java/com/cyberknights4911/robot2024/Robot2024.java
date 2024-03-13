@@ -16,6 +16,7 @@ import com.cyberknights4911.drive.GyroIO;
 import com.cyberknights4911.drive.GyroIOPigeon2;
 import com.cyberknights4911.drive.ModuleIO;
 import com.cyberknights4911.drive.ModuleIOSim;
+import com.cyberknights4911.drive.ModuleIOTalonFX;
 import com.cyberknights4911.entrypoint.RobotContainer;
 import com.cyberknights4911.robot2024.climb.Climb;
 import com.cyberknights4911.robot2024.climb.ClimbIO;
@@ -25,7 +26,6 @@ import com.cyberknights4911.robot2024.collect.CollectIO;
 import com.cyberknights4911.robot2024.collect.CollectIOReal;
 import com.cyberknights4911.robot2024.collect.CollectIOSim;
 import com.cyberknights4911.robot2024.control.ControllerBinding;
-import com.cyberknights4911.robot2024.drive.ModuleIOSparkFlex;
 import com.cyberknights4911.robot2024.indexer.Indexer;
 import com.cyberknights4911.robot2024.indexer.IndexerIO;
 import com.cyberknights4911.robot2024.indexer.IndexerIOReal;
@@ -133,7 +133,7 @@ public final class Robot2024 implements RobotContainer {
 
     binding.triggersFor(ButtonAction.AimPodium).onTrue(shooter.aimPodium());
 
-    binding.triggersFor(ButtonAction.FireNote).onTrue(shooter.fire());
+    binding.triggersFor(ButtonAction.FireNoteSpeaker).onTrue(shooter.fire());
   }
 
   private Command collectNote() {
@@ -244,22 +244,16 @@ public final class Robot2024 implements RobotContainer {
             constants,
             Robot2024Constants.DRIVE_CONSTANTS,
             new GyroIOPigeon2(Robot2024Constants.DRIVE_CONSTANTS),
-            new ModuleIOSparkFlex(
+            new ModuleIOTalonFX(
+                Robot2024Constants.DRIVE_CONSTANTS, Robot2024Constants.DRIVE_CONSTANTS.frontLeft()),
+            new ModuleIOTalonFX(
                 Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.frontLeft(),
-                burnManager),
-            new ModuleIOSparkFlex(
+                Robot2024Constants.DRIVE_CONSTANTS.frontRight()),
+            new ModuleIOTalonFX(
+                Robot2024Constants.DRIVE_CONSTANTS, Robot2024Constants.DRIVE_CONSTANTS.backLeft()),
+            new ModuleIOTalonFX(
                 Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.frontRight(),
-                burnManager),
-            new ModuleIOSparkFlex(
-                Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.backLeft(),
-                burnManager),
-            new ModuleIOSparkFlex(
-                Robot2024Constants.DRIVE_CONSTANTS,
-                Robot2024Constants.DRIVE_CONSTANTS.backRight(),
-                burnManager));
+                Robot2024Constants.DRIVE_CONSTANTS.backRight()));
       case REPLAY:
       default:
         return new Drive(
@@ -305,3 +299,9 @@ public final class Robot2024 implements RobotContainer {
 
 // TODO:
 // ehehehehehehehehehhehehehehehehehheehehhehehehehehehehehehehheehhehehehehehehehehehhehehehehehehehehehehehehe
+// TODO:
+// hows it going?
+// TODO:
+// pretty good, how about you?
+// TODO:
+// I am doing alright, bit tired though, can't wait to get vision working
