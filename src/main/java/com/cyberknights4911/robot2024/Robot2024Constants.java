@@ -123,7 +123,7 @@ public final class Robot2024Constants {
       IndexerConstantsBuilder.builder()
           .motorId(31)
           .sensorId(1)
-          .percentOutput(.2)
+          .percentOutput(.5)
           .feedBackValues(new PidValues(0.1, 0, 0))
           .build();
 
@@ -142,7 +142,7 @@ public final class Robot2024Constants {
           .speakerPositionDegrees(54)
           .podiumPositionDegrees(34)
           .collectPositionDegrees(34)
-          .firePercentOutput(.5)
+          .firePercentOutput(.6)
           .shooterFeedBackValues(new PidValues(0.1, 0, 0))
           .shooterFeedForwardValues(new FeedForwardValues(0, 0))
           .aimerFeedBackValues(new PidValues(0.3, 0, 0))
