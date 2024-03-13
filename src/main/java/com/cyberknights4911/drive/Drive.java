@@ -260,7 +260,7 @@ public class Drive extends SubsystemBase {
    */
   public Command zeroPoseToCurrentRotation() {
     return Commands.runOnce(
-            () -> setPose(new Pose2d(getPose().getTranslation(), new Rotation2d())), this)
+            () -> setPose(new Pose2d(getPose().getTranslation(), new Rotation2d(Math.PI))), this)
         .ignoringDisable(true);
   }
 
