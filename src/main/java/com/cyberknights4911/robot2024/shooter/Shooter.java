@@ -277,8 +277,6 @@ public class Shooter extends SubsystemBase {
         .andThen(this::runShooterAtTunableSpeed, this);
   }
 
-  
-
   public Command fire() {
     return Commands.runOnce(() -> runGuideOutput(guideOutput.get()), this)
         .andThen(Commands.waitSeconds(feedTime.get()))
