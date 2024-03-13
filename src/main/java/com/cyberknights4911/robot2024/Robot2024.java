@@ -57,6 +57,9 @@ public final class Robot2024 implements RobotContainer {
   private final ControllerBinding binding;
   private final SparkBurnManager burnManager;
 
+  private boolean firstAlertHasRun = false;
+  private boolean secondAlertHasRun = false;
+
   public Robot2024() {
     constants = Constants.get();
     burnManager = new SparkBurnManager(constants);
@@ -152,11 +155,13 @@ public final class Robot2024 implements RobotContainer {
   public void onRobotPeriodic(LoggedRobot robot) {
     binding.checkControllers();
 
-    if (GameAlerts.shouldAlert(GameAlerts.Endgame1)) {
+    if (!firstAlertHasRun && GameAlerts.shouldAlert(GameAlerts.Endgame1)) {
+      firstAlertHasRun = true;
       CommandScheduler.getInstance().schedule(rumbleLongOnce());
     }
 
-    if (GameAlerts.shouldAlert(GameAlerts.Endgame2)) {
+    if (!secondAlertHasRun && GameAlerts.shouldAlert(GameAlerts.Endgame2)) {
+      secondAlertHasRun = true;
       CommandScheduler.getInstance().schedule(rumbleMediumTwice());
     }
   }
