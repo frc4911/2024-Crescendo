@@ -170,7 +170,7 @@ public class Shooter extends SubsystemBase {
               runGuideOutput(guideOutput.get());
             },
             this)
-        .alongWith(Commands.waitUntil(() -> inputs.beamBreakValue > .1));
+        .andThen(Commands.waitUntil(() -> inputs.beamBreakValue < .1));
   }
 
   public void runGuideOutput(double percent) {

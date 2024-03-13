@@ -53,14 +53,14 @@ public final class Robot2024Constants {
 
   public static final DriveConstants DRIVE_CONSTANTS =
       DriveConstantsBuilder.builder()
-          .maxLinearSpeed(Units.feetToMeters(17.6))
+          .maxLinearSpeed(Units.feetToMeters(16.5))
           .trackWidthX(Units.inchesToMeters(22.75))
           .trackWidthY(Units.inchesToMeters(22.75))
           .wheelRadius(Units.inchesToMeters(1.957237517086368))
           .turnGearRatio(DriveConstants.TURN_GEAR_RATIO)
           .driveGearRatio(DriveConstants.L2_GEAR_RATIO)
           .pigeonId(0)
-          .canBusId("rio")
+          .canBusId("CANivore")
           .turnFeedBackValues(new PidValues(7.0, 0.0, 0.0))
           .driveFeedBackValues(new PidValues(0.05, 0.0, 0.0))
           .driveFeedForwardValues(new FeedForwardValues(0.1, 0.13))
@@ -123,7 +123,7 @@ public final class Robot2024Constants {
       IndexerConstantsBuilder.builder()
           .motorId(31)
           .sensorId(1)
-          .percentOutput(.2)
+          .percentOutput(.5)
           .feedBackValues(new PidValues(0.1, 0, 0))
           .build();
 
@@ -142,7 +142,7 @@ public final class Robot2024Constants {
           .speakerPositionDegrees(54)
           .podiumPositionDegrees(34)
           .collectPositionDegrees(34)
-          .firePercentOutput(.5)
+          .firePercentOutput(.6)
           .shooterFeedBackValues(new PidValues(0.1, 0, 0))
           .shooterFeedForwardValues(new FeedForwardValues(0, 0))
           .aimerFeedBackValues(new PidValues(0.3, 0, 0))
