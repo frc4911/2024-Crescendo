@@ -56,4 +56,12 @@ public final class Field {
     // Same angle regardless of alliance
     return new Rotation2d(Math.PI / 2);
   }
+
+  public static Rotation2d forwardAngle() {
+    if (Alliance.isRed()) {
+      return new Rotation2d(Math.PI / 2);
+    } else {
+      return new Rotation2d();
+    }
+  }
 }

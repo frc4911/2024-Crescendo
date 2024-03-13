@@ -37,6 +37,7 @@ import com.cyberknights4911.util.Field;
 import com.cyberknights4911.util.GameAlerts;
 import com.cyberknights4911.util.SparkBurnManager;
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -77,7 +78,7 @@ public final class Robot2024 implements RobotContainer {
             binding.supplierFor(StickAction.ROTATE)));
 
     // TODO: Maybe remove this or make it harder to do by accident.
-    binding.triggersFor(ButtonAction.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
+    binding.triggersFor(ButtonAction.ZeroGyro).onTrue(zeroPoseToCurrentRotation());
 
     binding.triggersFor(ButtonAction.Brake).whileTrue(drive.stopWithX());
 
@@ -246,6 +247,16 @@ public final class Robot2024 implements RobotContainer {
             new ModuleIO() {},
             new ModuleIO() {});
     }
+  }
+
+  /**
+   * Resets the robot's current pose rotation to be zero. Will not modify robot pose translation.
+   */
+  private Command zeroPoseToCurrentRotation() {
+    return Commands.runOnce(
+            () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Field.forwardAngle())),
+            drive)
+        .ignoringDisable(true);
   }
 
   private Command rumbleLongOnce() {
