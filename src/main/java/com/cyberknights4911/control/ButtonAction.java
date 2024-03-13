@@ -18,8 +18,6 @@ public enum ButtonAction {
   CollectNote,
   StowCollector,
   FireNoteSpeaker,
-  FireNoteAmp,
-  FireNoteTrap,
   StowClimber,
   ExtendClimber,
   AimSubwoofer,
