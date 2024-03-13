@@ -18,7 +18,6 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.cyberknights4911.constants.DriveConstants;
-
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
@@ -57,9 +56,9 @@ public class ModuleIOTalonFX implements ModuleIO {
   public ModuleIOTalonFX(
       DriveConstants driveConstants, DriveConstants.ModuleConstants moduleConstants) {
     this.driveConstants = driveConstants;
-    driveTalon = new TalonFX(moduleConstants.driveMotorId(), driveConstants.canBusId());
-    turnTalon = new TalonFX(moduleConstants.turnMotorId(), driveConstants.canBusId());
-    cancoder = new CANcoder(moduleConstants.encoderId(), driveConstants.canBusId());
+    driveTalon = new TalonFX(moduleConstants.driveMotorId());
+    turnTalon = new TalonFX(moduleConstants.turnMotorId());
+    cancoder = new CANcoder(moduleConstants.encoderId());
     absoluteEncoderOffset = new Rotation2d(moduleConstants.encoderOffset());
 
     var driveConfig = new TalonFXConfiguration();
