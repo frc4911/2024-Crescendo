@@ -161,18 +161,6 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/AimerSetpointDegrees", positionDegrees);
   }
 
-  /** Will not complete until beam break is blocked! */
-  public Command collectAndWaitForNote() {
-    return Commands.runOnce(
-            () -> {
-              shooterIO.stopShooter();
-              setAimerPostion(aimerCollectPosition.get());
-              runGuideOutput(guideOutput.get());
-            },
-            this)
-        .andThen(Commands.waitUntil(() -> inputs.beamBreakValue < .1));
-  }
-
   public void runGuideOutput(double percent) {
     shooterIO.setGuideOutput(percent);
 
@@ -241,6 +229,24 @@ public class Shooter extends SubsystemBase {
     runShooterOutput(fireOutput.get());
   }
 
+  /** Will not complete until beam break is blocked! */
+  public Command collectAndWaitForNote() {
+    return Commands.runOnce(
+            () -> {
+              shooterIO.stopShooter();
+              setAimerPostion(aimerCollectPosition.get());
+              runGuideOutput(guideOutput.get());
+            },
+            this)
+        .andThen(Commands.waitUntil(() -> inputs.beamBreakValue < beamThreshold.get()));
+  }
+
+  /** Will not complete until beam break is unblocked! */
+  private Command backNoteUp() {
+    return Commands.runOnce(() -> runGuideOutput(guideReverseOutput.get()), this)
+        .andThen(Commands.waitUntil(() -> inputs.beamBreakValue > beamThreshold.get()));
+  }
+
   public Command stow() {
     return Commands.runOnce(
         () -> {
@@ -253,20 +259,31 @@ public class Shooter extends SubsystemBase {
 
   public Command aimSubwoofer() {
     return Commands.runOnce(() -> setAimerPostion(aimerSubwooferPosition.get()), this)
-        .andThen(this::runShooterAtTunableSpeed, this);
+        .andThen(backNoteUp());
   }
 
   public Command aimPodium() {
     return Commands.runOnce(() -> setAimerPostion(aimerPodiumPosition.get()), this)
-        .andThen(this::runShooterAtTunableSpeed, this);
+        .andThen(backNoteUp());
   }
 
-  public Command fire() {
+  /** Prepare to fire command. Spins up shooter wheels. */
+  public Command fireHold() {
+    return backNoteUp().andThen(this::runShooterAtTunableSpeed, this);
+  }
+
+  /**
+   * Mutli-step fire command. 1. Feed the note toward the shooter wheels 2. Wait for the beam break
+   * to be blocked 3. Wait for the beam break to be un-blocked 4. Stop the shooter wheels 5. Re-set
+   * aimer position for collect.
+   */
+  public Command fireRelease() {
     return Commands.runOnce(() -> runGuideOutput(guideOutput.get()), this)
-        .andThen(Commands.waitSeconds(feedTime.get()))
+        .andThen(Commands.waitUntil(() -> inputs.beamBreakValue < beamThreshold.get()))
+        .andThen(Commands.waitUntil(() -> inputs.beamBreakValue > beamThreshold.get()))
         .andThen(shooterIO::stopShooter, this)
         .andThen(shooterIO::stopGuide, this)
-        .andThen(this::collectAndWaitForNote);
+        .andThen(() -> setAimerPostion(aimerCollectPosition.get()), this);
   }
 
   /**

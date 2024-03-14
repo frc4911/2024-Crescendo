@@ -133,7 +133,10 @@ public final class Robot2024 implements RobotContainer {
 
     binding.triggersFor(ButtonAction.AimPodium).onTrue(shooter.aimPodium());
 
-    binding.triggersFor(ButtonAction.FireNoteSpeaker).onTrue(shooter.fire());
+    binding
+        .triggersFor(ButtonAction.FireNoteSpeaker)
+        .onTrue(shooter.fireHold())
+        .onFalse(shooter.fireRelease());
   }
 
   private Command collectNote() {
@@ -165,7 +168,7 @@ public final class Robot2024 implements RobotContainer {
   public void setupAutos(AutoCommandHandler handler) {
     Autos autos = new Autos(Robot2024Constants.DRIVE_CONSTANTS, climb, collect, shooter, drive);
     autos.addAllAutos(handler);
-    NamedCommands.registerCommand("SHOOT_SUB", shooter.aimSubwoofer().andThen(shooter.fire()));
+    // TODO: bind all named commands
     NamedCommands.registerCommand("COLLECT", collectNote());
   }
 
