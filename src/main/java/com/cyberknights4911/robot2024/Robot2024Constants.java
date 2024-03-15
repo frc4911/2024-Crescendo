@@ -171,8 +171,8 @@ public final class Robot2024Constants {
 
   public static final CameraConstants CAMERA_CONSTANTS_FRONT_LEFT =
       CameraConstantsBuilder.builder()
-          .name("photon3")
-          .photonCameraName("Camera_3")
+          .name("photonvision3")
+          .photonCameraName("Camera3")
           .robotToCamera(
               new Transform3d(
                   new Translation3d(
@@ -184,8 +184,8 @@ public final class Robot2024Constants {
 
   public static final CameraConstants CAMERA_CONSTANTS_FRONT_RIGHT =
       CameraConstantsBuilder.builder()
-          .name("photon4")
-          .photonCameraName("Camera_4")
+          .name("photonvision4")
+          .photonCameraName("Camera4")
           .robotToCamera(
               new Transform3d(
                   new Translation3d(

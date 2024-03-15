@@ -274,6 +274,7 @@ public final class Robot2024 implements RobotContainer {
     return new VisionSimple(
         Robot2024Constants.VISION_CONSTANTS,
         drive::addVisionMeasurement,
+        Robot2024Constants.CAMERA_CONSTANTS_FRONT_LEFT,
         Robot2024Constants.CAMERA_CONSTANTS_FRONT_RIGHT);
     // TODO: add other camera after validationg front right one
   }
