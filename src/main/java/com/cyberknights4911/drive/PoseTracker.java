@@ -28,7 +28,7 @@ import org.littletonrobotics.junction.Logger;
  * pose estimators in this class to improve performance.
  */
 public class PoseTracker {
-  private static final boolean ENABLE_BASE_ESTIMATOR = true;
+  private static final boolean ENABLE_BASE_ESTIMATOR = false;
 
   // Use for demo purposes only. This should be disabled in real usage
   private final Optional<SwerveDrivePoseEstimatorExperimental> odometry;

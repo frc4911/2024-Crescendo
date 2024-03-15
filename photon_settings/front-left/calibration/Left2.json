@@ -1,0 +1,36 @@
+{
+    "camera": "Arducam OV2311 USB Camera (0c45:6366)",
+    "platform": "Windows NT 10.0; Win64; x64",
+    "camera_matrix": [
+        [
+            726.197236601533,
+            0,
+            681.2599407362588
+        ],
+        [
+            0,
+            730.2819659273667,
+            407.9143535689878
+        ],
+        [
+            0,
+            0,
+            1
+        ]
+    ],
+    "distortion_coefficients": [
+        0.0345714627303516,
+        -0.04351816810593992,
+        0.00008477685533757162,
+        -0.003926198436982857,
+        -0.008951955720352693
+    ],
+    "distortion_model": "rectilinear",
+    "avg_reprojection_error": 0.33119302663300176,
+    "img_size": [
+        1280,
+        720
+    ],
+    "keyframes": 8,
+    "calibration_time": "Tue, 12 Mar 2024 03:43:07 GMT"
+}

@@ -36,6 +36,7 @@ import com.cyberknights4911.robot2024.shooter.ShooterIOSim;
 import com.cyberknights4911.util.Alliance;
 import com.cyberknights4911.util.GameAlerts;
 import com.cyberknights4911.util.SparkBurnManager;
+import com.cyberknights4911.vision.simple.VisionSimple;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -52,6 +53,7 @@ public final class Robot2024 implements RobotContainer {
   private final Collect collect;
   private final Indexer indexer;
   private final Shooter shooter;
+  private final VisionSimple vision;
   private final Drive drive;
   private final Constants constants;
   private final ControllerBinding binding;
@@ -65,6 +67,7 @@ public final class Robot2024 implements RobotContainer {
     indexer = createIndexer();
     shooter = createShooter();
     drive = createDrive();
+    vision = createVision();
 
     binding = new ControllerBinding(Robot2024Constants.CONTROL_CONSTANTS);
     configureControls();
@@ -265,6 +268,15 @@ public final class Robot2024 implements RobotContainer {
             new ModuleIO() {},
             new ModuleIO() {});
     }
+  }
+
+  private VisionSimple createVision() {
+    return new VisionSimple(
+        Robot2024Constants.VISION_CONSTANTS,
+        drive::addVisionMeasurement,
+        Robot2024Constants.CAMERA_CONSTANTS_FRONT_LEFT,
+        Robot2024Constants.CAMERA_CONSTANTS_FRONT_RIGHT);
+    // TODO: add other camera after validationg front right one
   }
 
   private Command rumbleLongOnce() {

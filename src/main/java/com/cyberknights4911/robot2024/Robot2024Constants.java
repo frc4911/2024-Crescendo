@@ -162,10 +162,17 @@ public final class Robot2024Constants {
   private static final double SWERVE_MOUNTED_CAMERA_PITCH = Units.degreesToRadians(-28.125);
   private static final double SWERVE_MOUNTED_CAMERA_YAW = Units.degreesToRadians(60);
 
+  public static final VisionConstants VISION_CONSTANTS =
+      VisionConstantsBuilder.builder()
+          .layout(Field.getFieldLayout())
+          .maxAmbiguity(0.03)
+          .maxValidDistanceMeters(3.0)
+          .build();
+
   public static final CameraConstants CAMERA_CONSTANTS_FRONT_LEFT =
       CameraConstantsBuilder.builder()
-          .name("photon1")
-          .photonCameraName("Camera_1")
+          .name("photonvision3")
+          .photonCameraName("Camera3")
           .robotToCamera(
               new Transform3d(
                   new Translation3d(
@@ -175,17 +182,10 @@ public final class Robot2024Constants {
                   new Rotation3d(0, SWERVE_MOUNTED_CAMERA_PITCH, SWERVE_MOUNTED_CAMERA_YAW)))
           .build();
 
-  public static final VisionConstants VISION_CONSTANTS =
-      VisionConstantsBuilder.builder()
-          .layout(Field.getFieldLayout())
-          .maxAmbiguity(0.03)
-          .maxValidDistanceMeters(3.0)
-          .build();
-
   public static final CameraConstants CAMERA_CONSTANTS_FRONT_RIGHT =
       CameraConstantsBuilder.builder()
-          .name("photon2")
-          .photonCameraName("Camera_2")
+          .name("photonvision4")
+          .photonCameraName("Camera4")
           .robotToCamera(
               new Transform3d(
                   new Translation3d(
@@ -193,20 +193,5 @@ public final class Robot2024Constants {
                       -SWERVE_MOUNTED_CAMERA_OFFSET_Y,
                       SWERVE_MOUNTED_CAMERA_OFFSET_Z),
                   new Rotation3d(0, SWERVE_MOUNTED_CAMERA_PITCH, -SWERVE_MOUNTED_CAMERA_YAW)))
-          .build();
-
-  // TODO: set the transforms for the back cameras once the mounts have been determined.
-  public static final CameraConstants CAMERA_CONSTANTS_BACK_LEFT =
-      CameraConstantsBuilder.builder()
-          .name("photon3")
-          .photonCameraName("Camera_3")
-          .robotToCamera(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)))
-          .build();
-
-  public static final CameraConstants CAMERA_CONSTANTS_BACK_RIGHT =
-      CameraConstantsBuilder.builder()
-          .name("photon4")
-          .photonCameraName("Camera_4")
-          .robotToCamera(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)))
           .build();
 }
