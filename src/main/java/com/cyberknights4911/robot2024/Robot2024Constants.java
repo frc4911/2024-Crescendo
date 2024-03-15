@@ -149,7 +149,7 @@ public final class Robot2024Constants {
           .aimerFeedForwardValues(new FeedForwardValues(0, 0))
           .guideFeedBackValues(new PidValues(0.1, 0, 0))
           .guideFeedForwardValues(new FeedForwardValues(0, 0))
-          .beamThreshold(.2)
+          .beamThreshold(.1)
           .build();
 
   // Note: these measurements are for the front right swerve-mounted camera
