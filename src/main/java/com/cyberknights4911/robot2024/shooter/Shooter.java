@@ -161,18 +161,6 @@ public class Shooter extends SubsystemBase {
     Logger.recordOutput("Shooter/AimerSetpointDegrees", positionDegrees);
   }
 
-  /** Will not complete until beam break is blocked! */
-  public Command collectAndWaitForNote() {
-    return Commands.runOnce(
-            () -> {
-              shooterIO.stopShooter();
-              setAimerPostion(aimerCollectPosition.get());
-              runGuideOutput(guideOutput.get());
-            },
-            this)
-        .andThen(Commands.waitUntil(() -> inputs.beamBreakValue < .1));
-  }
-
   public void runGuideOutput(double percent) {
     shooterIO.setGuideOutput(percent);
 
@@ -241,6 +229,26 @@ public class Shooter extends SubsystemBase {
     runShooterOutput(fireOutput.get());
   }
 
+  /** Will not complete until beam break is blocked! */
+  public Command collectAndWaitForNote() {
+    return Commands.runOnce(
+            () -> {
+              shooterIO.stopShooter();
+              setAimerPostion(aimerCollectPosition.get());
+              runGuideOutput(guideOutput.get());
+            },
+            this)
+        .andThen(Commands.waitUntil(() -> inputs.beamBreakValue < beamThreshold.get()))
+        .andThen(backNoteUp());
+  }
+
+  /** Will not complete until beam break is unblocked! */
+  private Command backNoteUp() {
+    return Commands.runOnce(() -> runGuideOutput(guideReverseOutput.get()), this)
+        .andThen(Commands.waitUntil(() -> inputs.beamBreakValue > beamThreshold.get()))
+        .andThen(() -> stopGuide(), this);
+  }
+
   public Command stow() {
     return Commands.runOnce(
         () -> {
@@ -253,11 +261,13 @@ public class Shooter extends SubsystemBase {
 
   public Command aimSubwoofer() {
     return Commands.runOnce(() -> setAimerPostion(aimerSubwooferPosition.get()), this)
+        .andThen(backNoteUp())
         .andThen(this::runShooterAtTunableSpeed, this);
   }
 
   public Command aimPodium() {
     return Commands.runOnce(() -> setAimerPostion(aimerPodiumPosition.get()), this)
+        .andThen(backNoteUp())
         .andThen(this::runShooterAtTunableSpeed, this);
   }
 

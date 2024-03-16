@@ -136,7 +136,7 @@ public final class Robot2024Constants {
           .sensorId(2)
           .aimerGearRatio((60 / 20) * (60 / 20))
           .guidePercentOutput(.2)
-          .guideReversePercentOutput(-0.025)
+          .guideReversePercentOutput(-0.1)
           .feedTime(2)
           .aimTime(.5)
           .speakerPositionDegrees(54)
@@ -149,7 +149,7 @@ public final class Robot2024Constants {
           .aimerFeedForwardValues(new FeedForwardValues(0, 0))
           .guideFeedBackValues(new PidValues(0.1, 0, 0))
           .guideFeedForwardValues(new FeedForwardValues(0, 0))
-          .beamThreshold(.2)
+          .beamThreshold(.1)
           .build();
 
   // Note: these measurements are for the front right swerve-mounted camera
