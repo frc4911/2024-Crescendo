@@ -136,7 +136,7 @@ public final class Robot2024Constants {
           .sensorId(2)
           .aimerGearRatio((60 / 20) * (60 / 20))
           .guidePercentOutput(.2)
-          .guideReversePercentOutput(-0.025)
+          .guideReversePercentOutput(-0.1)
           .feedTime(2)
           .aimTime(.5)
           .speakerPositionDegrees(54)
