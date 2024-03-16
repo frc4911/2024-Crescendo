@@ -130,7 +130,7 @@ public class Vision extends SubsystemBase {
 
     // TODO(rbrewer): this is gross, find an alternative
     synchronized (cameraConfig.constants()) {
-      cameraResult = cameraConfig.inputs().lastResult;
+      // cameraResult = cameraConfig.inputs().lastResult;
       timestamp = cameraConfig.inputs().lastTimestamp;
     }
 
