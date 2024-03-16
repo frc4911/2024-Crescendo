@@ -12,15 +12,45 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "SHOOT_SUB"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "CollectMiddle"
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "COLLECT"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "ScoreSpeakerPositionFront"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SHOOT_SUB"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
           }
         },
         {
@@ -30,9 +60,27 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "COLLECT"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "ScoreSpeakerPositionFront"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SHOOT_SUB"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
           }
         },
         {
@@ -42,15 +90,39 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "COLLECT"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "ScoreSpeakerPositionFront"
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "SHOOT_SUB"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "CollectCenterLineTop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "COLLECT"
           }
         }
       ]
