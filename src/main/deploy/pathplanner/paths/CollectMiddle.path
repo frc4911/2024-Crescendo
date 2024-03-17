@@ -33,7 +33,7 @@
   "eventMarkers": [
     {
       "name": "COLLECT",
-      "waypointRelativePos": 0.15,
+      "waypointRelativePos": 0.2,
       "command": {
         "type": "sequential",
         "data": {
