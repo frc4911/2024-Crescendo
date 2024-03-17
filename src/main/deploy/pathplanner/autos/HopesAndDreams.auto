@@ -12,9 +12,22 @@
     "data": {
       "commands": [
         {
-          "type": "path",
+          "type": "parallel",
           "data": {
-            "pathName": "CollectMiddle"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "COLLECT"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CollectMiddle"
+                }
+              }
+            ]
           }
         },
         {
@@ -24,9 +37,28 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "CollectLeft"
+            "name": "SHOOT_SUB"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CollectLeft"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "COLLECT"
+                }
+              }
+            ]
           }
         },
         {
@@ -36,9 +68,28 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "CollectRight"
+            "name": "SHOOT_SUB"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "COLLECT"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CollectRight"
+                }
+              }
+            ]
           }
         },
         {
@@ -48,9 +99,28 @@
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "CollectCenterLineTop"
+            "name": "SHOOT_SUB"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "COLLECT"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "CollectCenterLineTop"
+                }
+              }
+            ]
           }
         }
       ]

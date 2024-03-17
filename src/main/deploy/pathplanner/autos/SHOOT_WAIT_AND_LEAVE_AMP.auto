@@ -5,7 +5,7 @@
       "x": 0.63,
       "y": 6.63
     },
-    "rotation": 100.0
+    "rotation": -120.0
   },
   "command": {
     "type": "sequential",
@@ -18,9 +18,15 @@
           }
         },
         {
+          "type": "wait",
+          "data": {
+            "waitTime": 8.0
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "LeaveSubRight"
+            "pathName": "LeaveSubLeft"
           }
         }
       ]

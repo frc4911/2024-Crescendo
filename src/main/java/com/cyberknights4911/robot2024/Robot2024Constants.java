@@ -139,8 +139,8 @@ public final class Robot2024Constants {
           .guideReversePercentOutput(-0.05)
           .feedTime(2)
           .aimTime(.5)
-          .speakerPositionDegrees(54)
-          .podiumPositionDegrees(34)
+          .speakerPositionDegrees(55)
+          .podiumPositionDegrees(38) // was 34, did not try 36, trying 38
           .collectPositionDegrees(34)
           .firePercentOutput(.6)
           .shooterFeedBackValues(new PidValues(0.1, 0, 0))

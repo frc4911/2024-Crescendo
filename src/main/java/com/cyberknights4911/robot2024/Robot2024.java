@@ -167,9 +167,9 @@ public final class Robot2024 implements RobotContainer {
   private Command scoreForAuto() {
     return shooter
         .aimSubwoofer()
-        .andThen(Commands.waitSeconds(.5))
+        .andThen(Commands.waitSeconds(.3))
         .andThen(shooter.fire())
-        .andThen(Commands.waitSeconds(.5));
+        .andThen(Commands.waitSeconds(.25));
   }
 
   @Override

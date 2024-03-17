@@ -18,15 +18,53 @@
           }
         },
         {
-          "type": "wait",
+          "type": "parallel",
           "data": {
-            "waitTime": 2.0
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "COLLECT"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "LeaveSubRightCollectCenterLineBottom"
+                }
+              }
+            ]
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LeaveSubRightCollectCenterLineBottom"
+            "pathName": "Score Source Side"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SHOOT_SUB"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "Yoink Note 2"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "COLLECT"
+                }
+              }
+            ]
           }
         }
       ]
