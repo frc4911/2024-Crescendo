@@ -11,7 +11,9 @@ import com.cyberknights4911.logging.Alert;
 import com.cyberknights4911.logging.Alert.AlertType;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
@@ -33,11 +35,33 @@ public final class Field {
     }
   }
 
-  public static Transform2d speakerOpening() {
-    return new Transform2d();
+  public static Translation2d speakerOpening() {
+    if (Alliance.isRed()) {
+      return new Translation2d(652.73, 218.42);
+    } else {
+      return new Translation2d(-1.50, 218.42);
+    }
   }
 
-  public static Transform2d subWooferIndex() {
-    return new Transform2d();
+  public static Pose2d subWooferIndex() {
+    if (Alliance.isRed()) {
+      return new Pose2d(new Translation2d(602.73, 218.42), new Rotation2d());
+    } else {
+      // TODO: get values for blue alliance
+      return new Pose2d();
+    }
+  }
+
+  public static Rotation2d ampOpeningAngle() {
+    // Same angle regardless of alliance
+    return new Rotation2d(Math.PI / 2);
+  }
+
+  public static Rotation2d forwardAngle() {
+    if (Alliance.isRed()) {
+      return new Rotation2d(Math.PI / 2);
+    } else {
+      return new Rotation2d();
+    }
   }
 }

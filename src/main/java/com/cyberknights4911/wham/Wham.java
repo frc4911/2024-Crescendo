@@ -20,6 +20,7 @@ import com.cyberknights4911.drive.ModuleIOTalonFX;
 import com.cyberknights4911.entrypoint.RobotContainer;
 import com.cyberknights4911.robot2024.Robot2024Constants;
 import com.cyberknights4911.util.Alliance;
+import com.cyberknights4911.util.Field;
 import com.cyberknights4911.util.GameAlerts;
 import com.cyberknights4911.vision.simple.VisionSimple;
 import com.cyberknights4911.wham.slurpp.Slurpp;
@@ -30,6 +31,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -68,7 +70,7 @@ public final class Wham implements RobotContainer {
 
     binding.triggersFor(ButtonAction.Brake).whileTrue(drive.stopWithX());
 
-    binding.triggersFor(ButtonAction.ZeroGyro).onTrue(drive.zeroPoseToCurrentRotation());
+    binding.triggersFor(ButtonAction.ZeroGyro).onTrue(zeroPoseToCurrentRotation());
 
     binding
         .triggersFor(ButtonAction.ZeroSpeaker)
@@ -218,5 +220,15 @@ public final class Wham implements RobotContainer {
   public void setupAutos(AutoCommandHandler handler) {
     Autos autos = new Autos(WhamConstants.DRIVE_CONSTANTS, drive, slurpp);
     autos.addAllAutos(handler);
+  }
+
+  /**
+   * Resets the robot's current pose rotation to be zero. Will not modify robot pose translation.
+   */
+  private Command zeroPoseToCurrentRotation() {
+    return Commands.runOnce(
+            () -> drive.setPose(new Pose2d(drive.getPose().getTranslation(), Field.forwardAngle())),
+            drive)
+        .ignoringDisable(true);
   }
 }

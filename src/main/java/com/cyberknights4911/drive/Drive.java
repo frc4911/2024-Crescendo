@@ -255,15 +255,6 @@ public class Drive extends SubsystemBase {
         this);
   }
 
-  /**
-   * Resets the robot's current pose rotation to be zero. Will not modify robot pose translation.
-   */
-  public Command zeroPoseToCurrentRotation() {
-    return Commands.runOnce(
-            () -> setPose(new Pose2d(getPose().getTranslation(), new Rotation2d(Math.PI))), this)
-        .ignoringDisable(true);
-  }
-
   ChassisSpeeds createChassisSpeeds(
       ControlConstants controlConstants,
       DoubleSupplier xSupplier,
