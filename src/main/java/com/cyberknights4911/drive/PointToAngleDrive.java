@@ -33,6 +33,8 @@ public final class PointToAngleDrive extends Command {
       DoubleSupplier ySupplier,
       double x,
       double y) {
+    Logger.recordOutput("Drive/PointAt/XDesired", x);
+    Logger.recordOutput("Drive/PointAt/yDesired", y);
 
     DoubleSupplier angleSupplier =
         () -> {
@@ -42,7 +44,6 @@ public final class PointToAngleDrive extends Command {
           if (currentX > x) {
             desiredAngle += Math.PI;
           }
-          Logger.recordOutput("Drive/PointAt/Desired", desiredAngle);
           return desiredAngle;
         };
     return new PointToAngleDrive(drive, controlConstants, xSupplier, ySupplier, angleSupplier);
@@ -75,9 +76,9 @@ public final class PointToAngleDrive extends Command {
           double desiredAngle = desiredAngleSupplier.getAsDouble();
           double output = pointController.calculate(currentRotation, desiredAngle);
           output = MathUtil.clamp(output, -1, 1);
-          Logger.recordOutput("Drive/PointAt/Current", currentRotation);
-          Logger.recordOutput("Drive/PointAt/Desired", desiredAngle);
-          Logger.recordOutput("Drive/PointAt/OmegaOutput", output);
+          Logger.recordOutput("Drive/PointAt/AngleCurrent", currentRotation);
+          Logger.recordOutput("Drive/PointAt/AngleDesired", desiredAngle);
+          // Logger.recordOutput("Drive/PointAt/OmegaOutput", output);
           return output;
         };
 
