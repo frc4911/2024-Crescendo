@@ -110,8 +110,8 @@ public final class Robot2024Constants {
       CollectConstantsBuilder.builder()
           .motorCollectRightId(11)
           .sensorId(0)
-          .solenoidLeftForwardId(7)
-          .solenoidLeftReverseId(8)
+          .solenoidLeftForwardId(8)
+          .solenoidLeftReverseId(7)
           .solenoidRightForwardId(6)
           .solenoidRightReverseId(9)
           .collectPercent(0.6)
@@ -136,7 +136,7 @@ public final class Robot2024Constants {
           .sensorId(2)
           .aimerGearRatio((60 / 20) * (60 / 20))
           .guidePercentOutput(.2)
-          .guideReversePercentOutput(-0.025)
+          .guideReversePercentOutput(-0.1)
           .feedTime(2)
           .aimTime(.5)
           .speakerPositionDegrees(54)
@@ -149,7 +149,7 @@ public final class Robot2024Constants {
           .aimerFeedForwardValues(new FeedForwardValues(0, 0))
           .guideFeedBackValues(new PidValues(0.1, 0, 0))
           .guideFeedForwardValues(new FeedForwardValues(0, 0))
-          .beamThreshold(.2)
+          .beamThreshold(.1)
           .build();
 
   // Note: these measurements are for the front right swerve-mounted camera
@@ -162,10 +162,17 @@ public final class Robot2024Constants {
   private static final double SWERVE_MOUNTED_CAMERA_PITCH = Units.degreesToRadians(-28.125);
   private static final double SWERVE_MOUNTED_CAMERA_YAW = Units.degreesToRadians(60);
 
+  public static final VisionConstants VISION_CONSTANTS =
+      VisionConstantsBuilder.builder()
+          .layout(Field.getFieldLayout())
+          .maxAmbiguity(0.03)
+          .maxValidDistanceMeters(3.0)
+          .build();
+
   public static final CameraConstants CAMERA_CONSTANTS_FRONT_LEFT =
       CameraConstantsBuilder.builder()
-          .name("photon1")
-          .photonCameraName("Camera_1")
+          .name("photonvision3")
+          .photonCameraName("Camera3")
           .robotToCamera(
               new Transform3d(
                   new Translation3d(
@@ -175,17 +182,10 @@ public final class Robot2024Constants {
                   new Rotation3d(0, SWERVE_MOUNTED_CAMERA_PITCH, SWERVE_MOUNTED_CAMERA_YAW)))
           .build();
 
-  public static final VisionConstants VISION_CONSTANTS =
-      VisionConstantsBuilder.builder()
-          .layout(Field.getFieldLayout())
-          .maxAmbiguity(0.03)
-          .maxValidDistanceMeters(3.0)
-          .build();
-
   public static final CameraConstants CAMERA_CONSTANTS_FRONT_RIGHT =
       CameraConstantsBuilder.builder()
-          .name("photon2")
-          .photonCameraName("Camera_2")
+          .name("photonvision4")
+          .photonCameraName("Camera4")
           .robotToCamera(
               new Transform3d(
                   new Translation3d(
@@ -193,20 +193,5 @@ public final class Robot2024Constants {
                       -SWERVE_MOUNTED_CAMERA_OFFSET_Y,
                       SWERVE_MOUNTED_CAMERA_OFFSET_Z),
                   new Rotation3d(0, SWERVE_MOUNTED_CAMERA_PITCH, -SWERVE_MOUNTED_CAMERA_YAW)))
-          .build();
-
-  // TODO: set the transforms for the back cameras once the mounts have been determined.
-  public static final CameraConstants CAMERA_CONSTANTS_BACK_LEFT =
-      CameraConstantsBuilder.builder()
-          .name("photon3")
-          .photonCameraName("Camera_3")
-          .robotToCamera(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)))
-          .build();
-
-  public static final CameraConstants CAMERA_CONSTANTS_BACK_RIGHT =
-      CameraConstantsBuilder.builder()
-          .name("photon4")
-          .photonCameraName("Camera_4")
-          .robotToCamera(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)))
           .build();
 }
