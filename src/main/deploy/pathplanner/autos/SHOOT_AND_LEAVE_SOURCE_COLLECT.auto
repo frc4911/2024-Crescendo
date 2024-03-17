@@ -32,13 +32,25 @@
         {
           "type": "named",
           "data": {
-            "name": "SHOOT_SUB"
+            "name": "QUICK_SHOOT"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "Yoink Note 2"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score Source Side"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QUICK_SHOOT"
           }
         }
       ]
