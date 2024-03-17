@@ -18,22 +18,9 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "COLLECT"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "LeaveSubRightCollectCenterLineBottom"
-                }
-              }
-            ]
+            "pathName": "LeaveSubRightCollectCenterLineBottom"
           }
         },
         {
@@ -49,22 +36,9 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "Yoink Note 2"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "COLLECT"
-                }
-              }
-            ]
+            "pathName": "Yoink Note 2"
           }
         }
       ]

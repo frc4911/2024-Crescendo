@@ -12,22 +12,9 @@
     "data": {
       "commands": [
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "COLLECT"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CollectMiddle"
-                }
-              }
-            ]
+            "pathName": "CollectMiddle"
           }
         },
         {
@@ -43,22 +30,9 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CollectLeft"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "COLLECT"
-                }
-              }
-            ]
+            "pathName": "CollectLeft"
           }
         },
         {
@@ -74,22 +48,9 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "COLLECT"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CollectRight"
-                }
-              }
-            ]
+            "pathName": "CollectRight"
           }
         },
         {
@@ -105,22 +66,9 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "path",
           "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "COLLECT"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CollectCenterLineTop"
-                }
-              }
-            ]
+            "pathName": "CollectCenterLineTop"
           }
         }
       ]
