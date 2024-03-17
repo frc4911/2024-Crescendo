@@ -24,6 +24,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "SHOOT_SUB"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "CollectLeft"
@@ -36,6 +42,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "SHOOT_SUB"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "CollectRight"
@@ -45,6 +57,12 @@
           "type": "path",
           "data": {
             "pathName": "ScoreSpeakerPositionFront"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SHOOT_SUB"
           }
         },
         {

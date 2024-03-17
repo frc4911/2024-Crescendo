@@ -23,6 +23,8 @@ public final class VisionIOSimple implements VisionIO {
   private final PhotonCamera camera;
   private final PhotonPoseEstimator photonPoseEstimator;
 
+  private PhotonPipelineResult lastResult = new PhotonPipelineResult();
+
   public VisionIOSimple(VisionConstants visionConstants, CameraConstants constants) {
     camera = new PhotonCamera(constants.photonCameraName());
     camera.setDriverMode(false);
@@ -43,7 +45,7 @@ public final class VisionIOSimple implements VisionIO {
       PhotonPipelineResult newResult = camera.getLatestResult();
       double latestTimestamp = newResult.getTimestampSeconds();
       if (Math.abs(latestTimestamp - inputs.lastTimestamp) > 1e-5) {
-        inputs.lastResult = newResult;
+        lastResult = newResult;
         inputs.lastTimestamp = latestTimestamp;
       }
     }
@@ -57,5 +59,10 @@ public final class VisionIOSimple implements VisionIO {
   @Override
   public Optional<EstimatedRobotPose> update(PhotonPipelineResult cameraResult) {
     return photonPoseEstimator.update(cameraResult);
+  }
+
+  @Override
+  public PhotonPipelineResult getLastResult() {
+    return lastResult;
   }
 }

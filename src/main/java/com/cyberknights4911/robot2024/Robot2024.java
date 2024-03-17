@@ -126,6 +126,7 @@ public final class Robot2024 implements RobotContainer {
         .extendCollecter()
         .andThen(indexer.runIndexAtTunableOutput())
         .andThen(shooter.collectAndWaitForNote())
+        .andThen(rumbleQuickTwice())
         .andThen(stowEverything());
   }
 
@@ -146,12 +147,29 @@ public final class Robot2024 implements RobotContainer {
     }
   }
 
+  private Command scoreForAuto() {
+    return shooter
+        .aimSubwoofer()
+        .andThen(Commands.waitSeconds(.3))
+        .andThen(shooter.fire())
+        .andThen(Commands.waitSeconds(.25));
+  }
+
+  private Command quickscoreForAuto() {
+    return shooter.fire()
+        .andThen(Commands.waitSeconds(.25));
+  }
+
   @Override
   public void setupAutos(AutoCommandHandler handler) {
-    Autos autos = new Autos(Robot2024Constants.DRIVE_CONSTANTS, climb, collect, shooter, drive);
-    autos.addAllAutos(handler);
-    NamedCommands.registerCommand("SHOOT_SUB", shooter.aimSubwoofer().andThen(shooter.fire()));
+    NamedCommands.registerCommand("SHOOT_SUB", scoreForAuto());
     NamedCommands.registerCommand("COLLECT", collectNote());
+    NamedCommands.registerCommand("QUICK_SHOTE", quickscoreForAuto());
+    NamedCommands.registerCommand("AIM_SUB", shooter.aimSubwoofer());
+
+    Autos autos = new Autos(Robot2024Constants.DRIVE_CONSTANTS, climb, collect, shooter, drive);
+
+    autos.addAllAutos(handler);
   }
 
   private Climb createClimb() {
@@ -258,7 +276,6 @@ public final class Robot2024 implements RobotContainer {
         drive::addVisionMeasurement,
         Robot2024Constants.CAMERA_CONSTANTS_FRONT_LEFT,
         Robot2024Constants.CAMERA_CONSTANTS_FRONT_RIGHT);
-    // TODO: add other camera after validationg front right one
   }
 
   /**

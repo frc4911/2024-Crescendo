@@ -67,6 +67,10 @@ public final class Autos {
     handler.addDefaultOption("Nothing", Commands.none());
     handler.addOption("Leave, Bro", new PathPlannerAuto("LEAVE"));
     handler.addOption("Score+Leave Source", new PathPlannerAuto("SHOOT_AND_LEAVE_SOURCE"));
+    handler.addOption("Score+Wait+Leave Amp", new PathPlannerAuto("SHOOT_WAIT_AND_LEAVE_AMP"));
+    handler.addOption("Two Piece Source", new PathPlannerAuto("SHOOT_AND_LEAVE_SOURCE_COLLECT"));
+    handler.addOption("Hopez And Dreamz", new PathPlannerAuto("HOPES_AND_DREAMS"));
+
     // handler.addOption("Translate Test", new PathPlannerAuto("TranslationTest"));
 
     // addCharacterization("Climb", climb.getSysId(), handler);

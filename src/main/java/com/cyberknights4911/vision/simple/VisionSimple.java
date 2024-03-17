@@ -102,14 +102,14 @@ public final class VisionSimple extends SubsystemBase {
       return;
     }
     lastTimestamp.put(cameraConfig.constants().name(), cameraConfig.inputs().lastTimestamp);
-
+    PhotonPipelineResult lastResult = cameraConfig.visionIO().getLastResult();
     cameraConfig
         .visionIO()
-        .update(cameraConfig.inputs().lastResult)
+        .update(lastResult)
         .ifPresent(
             estimatedPose -> {
               var robotPose = estimatedPose.estimatedPose.toPose2d();
-              var stdDevs = getEstimationStdDevs(robotPose, cameraConfig.inputs().lastResult);
+              var stdDevs = getEstimationStdDevs(robotPose, lastResult);
 
               Logger.recordOutput(
                   "Vision/" + cameraConfig.constants().name() + "/RobotPose", robotPose);
