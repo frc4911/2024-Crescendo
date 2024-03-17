@@ -22,5 +22,6 @@ public enum ButtonAction {
   ExtendClimber,
   AimSubwoofer,
   AimPodium,
-  AimAmp
+  AimAmp,
+  ReverseCollect
 }

@@ -250,6 +250,10 @@ public class Shooter extends SubsystemBase {
         .andThen(() -> stopGuide(), this);
   }
 
+  public Command runBackwards() {
+    return Commands.runOnce(() -> runGuideOutput(-guideOutput.get()), this);
+  }
+
   public Command stow() {
     return Commands.runOnce(
         () -> {

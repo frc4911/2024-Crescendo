@@ -71,6 +71,8 @@ public final class ControllerBinding implements StickBinding, ButtonBinding {
         return new Triggers(operator.povRight());
       case FireNoteSpeaker:
         return new Triggers(operator.rightTrigger());
+      case ReverseCollect:
+        return new Triggers(operator.x());
       default:
         return new Triggers(ALWAYS_FALSE);
     }

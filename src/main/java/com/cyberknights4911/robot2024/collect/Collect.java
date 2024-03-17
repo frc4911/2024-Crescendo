@@ -147,6 +147,15 @@ public class Collect extends SubsystemBase {
     return inputs.collectVelocityRadPerSec;
   }
 
+  public Command ejectNote() {
+    return Commands.runOnce(
+        () -> {
+          collectIO.setCollecterPosition(true);
+          collectIO.setCollectOutput(-collectOutput.get());
+        },
+        this);
+  }
+
   public Command extendCollecter() {
     return Commands.runOnce(
         () -> {

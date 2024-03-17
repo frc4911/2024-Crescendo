@@ -137,6 +137,10 @@ public final class Robot2024 implements RobotContainer {
     binding.triggersFor(ButtonAction.AimPodium).onTrue(shooter.aimPodium());
 
     binding.triggersFor(ButtonAction.FireNoteSpeaker).onTrue(shooter.fire());
+    binding
+        .triggersFor(ButtonAction.ReverseCollect)
+        .onTrue(reverseNote())
+        .onFalse(stowEverything());
   }
 
   private Command collectNote() {
@@ -146,6 +150,10 @@ public final class Robot2024 implements RobotContainer {
         .andThen(shooter.collectAndWaitForNote())
         .andThen(rumbleQuickTwice())
         .andThen(stowEverything());
+  }
+
+  private Command reverseNote() {
+    return collect.ejectNote().andThen(indexer.runBackwards()).andThen(shooter.runBackwards());
   }
 
   private Command stowEverything() {
@@ -174,8 +182,7 @@ public final class Robot2024 implements RobotContainer {
   }
 
   private Command quickscoreForAuto() {
-    return shooter.fire()
-        .andThen(Commands.waitSeconds(.25));
+    return shooter.fire().andThen(Commands.waitSeconds(.25));
   }
 
   @Override
