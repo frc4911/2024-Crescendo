@@ -176,20 +176,20 @@ public final class Robot2024 implements RobotContainer {
   private Command scoreForAuto() {
     return shooter
         .aimSubwoofer()
-        .andThen(Commands.waitSeconds(.3))
+        .andThen(Commands.waitSeconds(.2))
         .andThen(shooter.fire())
-        .andThen(Commands.waitSeconds(.25));
+        .andThen(Commands.waitSeconds(.2));
   }
 
   private Command quickscoreForAuto() {
-    return shooter.fire().andThen(Commands.waitSeconds(.25));
+    return shooter.fire().andThen(Commands.waitSeconds(.1));
   }
 
   @Override
   public void setupAutos(AutoCommandHandler handler) {
     NamedCommands.registerCommand("SHOOT_SUB", scoreForAuto());
     NamedCommands.registerCommand("COLLECT", collectNote());
-    NamedCommands.registerCommand("QUICK_SHOTE", quickscoreForAuto());
+    NamedCommands.registerCommand("QUICK_SHOOT", quickscoreForAuto());
     NamedCommands.registerCommand("AIM_SUB", shooter.aimSubwoofer());
 
     Autos autos = new Autos(Robot2024Constants.DRIVE_CONSTANTS, climb, collect, shooter, drive);
