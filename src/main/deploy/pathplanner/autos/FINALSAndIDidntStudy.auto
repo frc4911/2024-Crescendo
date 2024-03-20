@@ -1,0 +1,55 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.3915358166286795,
+      "y": 1.990341161890377
+    },
+    "rotation": 178.0585136090857
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "EnglishExam"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QUICK_SHOOT"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MathExam"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "SpanishFinal"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "QUICK_SHOOT"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Yoink Note 2"
+          }
+        }
+      ]
+    }
+  },
+  "folder": null,
+  "choreoAuto": false
+}
