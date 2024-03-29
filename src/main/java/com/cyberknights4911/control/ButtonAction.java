@@ -23,5 +23,6 @@ public enum ButtonAction {
   AimSubwoofer,
   AimPodium,
   AimAmp,
-  ReverseCollect
+  ReverseCollect,
+  GoHome
 }

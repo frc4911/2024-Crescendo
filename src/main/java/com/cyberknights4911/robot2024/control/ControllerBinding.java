@@ -55,6 +55,8 @@ public final class ControllerBinding implements StickBinding, ButtonBinding {
         return new Triggers(driver.y());
       case Brake:
         return new Triggers(driver.x());
+      case GoHome:
+        return new Triggers(driver.b());
         // case ZeroSpeaker:
         //   return new Triggers(driver.start());
         // case AmpLockOn:

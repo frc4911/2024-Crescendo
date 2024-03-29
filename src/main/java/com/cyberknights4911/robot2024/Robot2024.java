@@ -116,6 +116,13 @@ public final class Robot2024 implements RobotContainer {
 
     binding.triggersFor(ButtonAction.AimSubwoofer).onTrue(shooter.aimSubwoofer());
 
+    binding.triggersFor(ButtonAction.GoHome).whileTrue(drive.goToPoint(
+                Robot2024Constants.CONTROL_CONSTANTS,
+                binding.supplierFor(StickAction.FORWARD),
+                binding.supplierFor(StickAction.STRAFE),
+                Units.inchesToMeters(speakerOpening.getX()),
+                Units.inchesToMeters(speakerOpening.getY())));
+
     binding.triggersFor(ButtonAction.AimPodium).onTrue(shooter.aimPodium());
 
     binding.triggersFor(ButtonAction.FireNoteSpeaker).onTrue(shooter.fire());

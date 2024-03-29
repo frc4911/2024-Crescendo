@@ -313,6 +313,16 @@ public class Drive extends SubsystemBase {
         this, controlConstants, xSupplier, ySupplier, x, y);
   }
 
+  public PointToPointDrive goToPoint(
+      ControlConstants controlConstants,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      double x,
+      double y) {
+    return PointToPointDrive.createDriveFacingPoint(
+        this, controlConstants, xSupplier, ySupplier, x, y);
+  }
+
   public PointToAngleDrive pointToAngleDrive(
       ControlConstants controlConstants,
       DoubleSupplier xSupplier,
@@ -346,4 +356,7 @@ public class Drive extends SubsystemBase {
       new Translation2d(-driveConstants.trackWidthX() / 2.0, -driveConstants.trackWidthY() / 2.0)
     };
   }
+
+  /** Go To: Takes the robots current position, drives it in a streight line to the desired position  */
+  public 
 }

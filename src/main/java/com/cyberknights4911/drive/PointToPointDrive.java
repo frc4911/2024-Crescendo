@@ -1,0 +1,121 @@
+// Copyright (c) 2024 FRC 4911
+// https://github.com/frc4911
+//
+// Use of this source code is governed by an MIT-style
+// license that can be found in the LICENSE file at
+// the root directory of this project.
+
+package com.cyberknights4911.drive;
+
+import com.cyberknights4911.constants.ControlConstants;
+import com.cyberknights4911.logging.LoggedTunableNumber;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj2.command.Command;
+import java.util.function.DoubleSupplier;
+import org.littletonrobotics.junction.Logger;
+
+public final class PointToPointDrive extends Command {
+  private static final LoggedTunableNumber pointKp = new LoggedTunableNumber("Drive/GoTo/kP", 0.5);
+  private static final LoggedTunableNumber pointKd = new LoggedTunableNumber("Drive/GoTo/kD", 0.0);
+
+  private final PIDController pointController;
+  private final Drive drive;
+  private final ControlConstants controlConstants;
+  private final DoubleSupplier xSupplier;
+  private final DoubleSupplier ySupplier;
+  private final DoubleSupplier omegaSupplier;
+
+  static PointToPointDrive createDriveFacingPoint(
+      Drive drive,
+      ControlConstants controlConstants,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      double x,
+      double y) {
+    Logger.recordOutput(
+        "Drive/GoTo/Desired", new Pose2d(new Translation2d(x, y), new Rotation2d()));
+
+    DoubleSupplier angleSupplier =
+        () -> {
+          double currentX = drive.getPose().getTranslation().getX();
+          double currentY = drive.getPose().getTranslation().getY();
+          double desiredAngle = Math.atan((y - currentY) / (x - currentX));
+          if (currentX > x) {
+            desiredAngle += Math.PI;
+          }
+          return desiredAngle;
+        };
+    return new PointToPointDrive(drive, controlConstants, xSupplier, ySupplier, angleSupplier);
+  }
+
+//   static PointToPointDrive createDriveFacingFixedAngle(
+//       Drive drive,
+//       ControlConstants controlConstants,
+//       DoubleSupplier xSupplier,
+//       DoubleSupplier ySupplier,
+//       double angleRadians) {
+//     return new PointToPointDrive(drive, controlConstants, xSupplier, ySupplier, () -> angleRadians);
+//   }
+
+  private PointToPointDrive(
+      Drive drive,
+      ControlConstants controlConstants,
+      DoubleSupplier xSupplier,
+      DoubleSupplier ySupplier,
+      DoubleSupplier desiredAngleSupplier) {
+    this.drive = drive;
+    this.controlConstants = controlConstants;
+    this.xSupplier = xSupplier;
+    this.ySupplier = ySupplier;
+    pointController = new PIDController(pointKp.get(), 0.0, pointKd.get());
+    omegaSupplier =
+        () -> {
+          double currentRotation =
+              MathUtil.inputModulus(drive.getRotation().getRadians(), 0, Math.PI * 2);
+          double desiredAngle = desiredAngleSupplier.getAsDouble();
+          double output = pointController.calculate(currentRotation, desiredAngle);
+          output = MathUtil.clamp(output, -1, 1);
+          Logger.recordOutput(
+              "Drive/GoTo/CurrentPose",
+              new Pose2d(
+                  new Translation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+                  new Rotation2d(currentRotation)));
+          Logger.recordOutput(
+              "Drive/GoTo/DesiredPose",
+              new Pose2d(
+                  new Translation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+                  new Rotation2d(desiredAngle)));
+          return output;
+        };
+
+    addRequirements(drive);
+  }
+
+  @Override
+  public void initialize() {
+    pointController.setPID(pointKp.get(), 0.0, pointKd.get());
+    pointController.enableContinuousInput(0, Math.PI * 2);
+  }
+
+  @Override
+  public void execute() {
+    if (pointKp.hasChanged(hashCode()) || pointKd.hasChanged(hashCode())) {
+      pointController.setPID(pointKp.get(), 0.0, pointKd.get());
+    }
+    drive.runVelocity(
+        drive.createChassisSpeeds(controlConstants, xSupplier, ySupplier, omegaSupplier, false));
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    pointController.close();
+  }
+
+  public boolean isFacingDesiredAngle() {
+    return pointController.atSetpoint();
+  }
+}
