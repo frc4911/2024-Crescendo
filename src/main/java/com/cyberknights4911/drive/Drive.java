@@ -314,13 +314,12 @@ public class Drive extends SubsystemBase {
   }
 
   public PointToPointDrive goToPoint(
-      ControlConstants controlConstants,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       double x,
       double y) {
-    return PointToPointDrive.createDriveFacingPoint(
-        this, controlConstants, xSupplier, ySupplier, x, y);
+    return PointToPointDrive.createDriveToPoint(
+        this, xSupplier, ySupplier, x, y);
   }
 
   public PointToAngleDrive pointToAngleDrive(
