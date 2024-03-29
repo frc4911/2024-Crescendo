@@ -2,31 +2,37 @@
   "version": 1.0,
   "startingPose": {
     "position": {
-      "x": 0.65,
-      "y": 4.5
+      "x": 0.3915358166286795,
+      "y": 1.990341161890377
     },
-    "rotation": 120.0
+    "rotation": 178.0585136090857
   },
   "command": {
     "type": "sequential",
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "EnglishExam"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "SHOOT_SUB"
+            "name": "QUICK_SHOOT"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "LeaveSubRightCollectCenterLineBottom"
+            "pathName": "MathExam"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Score Source Side"
+            "pathName": "SpanishFinal"
           }
         },
         {
@@ -39,18 +45,6 @@
           "type": "path",
           "data": {
             "pathName": "Yoink Note 2"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Score Source Side"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "QUICK_SHOOT"
           }
         }
       ]

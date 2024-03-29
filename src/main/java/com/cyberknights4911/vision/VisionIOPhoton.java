@@ -71,7 +71,6 @@ public class VisionIOPhoton implements VisionIO {
   @Override
   public synchronized void updateInputs(VisionIOInputs inputs) {
     inputs.isOnline = camera.isConnected();
-    inputs.lastResult = lastResult;
     inputs.lastTimestamp = lastTimestamp;
   }
 

@@ -18,7 +18,6 @@ public interface VisionIO {
   public static class VisionIOInputs {
     public boolean isOnline = false;
     public double lastTimestamp = 0;
-    public PhotonPipelineResult lastResult = new PhotonPipelineResult();
   }
 
   public default void updateInputs(VisionIOInputs inputs) {}
@@ -27,5 +26,9 @@ public interface VisionIO {
 
   public default Optional<EstimatedRobotPose> update(PhotonPipelineResult cameraResult) {
     return Optional.empty();
+  }
+
+  public default PhotonPipelineResult getLastResult() {
+    return new PhotonPipelineResult();
   }
 }

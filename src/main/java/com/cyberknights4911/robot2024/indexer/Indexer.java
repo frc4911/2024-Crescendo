@@ -82,4 +82,8 @@ public final class Indexer extends SubsystemBase {
   public Command stop() {
     return Commands.runOnce(() -> indexerIO.stop(), this);
   }
+
+  public Command runBackwards() {
+    return Commands.runOnce(() -> runOutput(-percent.get()), this);
+  }
 }

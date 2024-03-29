@@ -11,6 +11,9 @@ import com.cyberknights4911.constants.ControlConstants;
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
@@ -33,6 +36,8 @@ public final class PointToAngleDrive extends Command {
       DoubleSupplier ySupplier,
       double x,
       double y) {
+    Logger.recordOutput(
+        "Drive/PointAt/Desired", new Pose2d(new Translation2d(x, y), new Rotation2d()));
 
     DoubleSupplier angleSupplier =
         () -> {
@@ -42,7 +47,6 @@ public final class PointToAngleDrive extends Command {
           if (currentX > x) {
             desiredAngle += Math.PI;
           }
-          Logger.recordOutput("Drive/PointAt/Desired", desiredAngle);
           return desiredAngle;
         };
     return new PointToAngleDrive(drive, controlConstants, xSupplier, ySupplier, angleSupplier);
@@ -75,9 +79,16 @@ public final class PointToAngleDrive extends Command {
           double desiredAngle = desiredAngleSupplier.getAsDouble();
           double output = pointController.calculate(currentRotation, desiredAngle);
           output = MathUtil.clamp(output, -1, 1);
-          Logger.recordOutput("Drive/PointAt/Current", currentRotation);
-          Logger.recordOutput("Drive/PointAt/Desired", desiredAngle);
-          Logger.recordOutput("Drive/PointAt/OmegaOutput", output);
+          Logger.recordOutput(
+              "Drive/PointAt/AngleCurrent",
+              new Pose2d(
+                  new Translation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+                  new Rotation2d(currentRotation)));
+          Logger.recordOutput(
+              "Drive/PointAt/AngleDesired",
+              new Pose2d(
+                  new Translation2d(xSupplier.getAsDouble(), ySupplier.getAsDouble()),
+                  new Rotation2d(desiredAngle)));
           return output;
         };
 

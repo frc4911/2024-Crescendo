@@ -246,7 +246,12 @@ public class Shooter extends SubsystemBase {
   private Command backNoteUp() {
     return Commands.runOnce(() -> runGuideOutput(guideReverseOutput.get()), this)
         .andThen(Commands.waitUntil(() -> inputs.beamBreakValue > beamThreshold.get()))
+        .withTimeout(.5)
         .andThen(() -> stopGuide(), this);
+  }
+
+  public Command runBackwards() {
+    return Commands.runOnce(() -> runGuideOutput(-guideOutput.get()), this);
   }
 
   public Command stow() {
