@@ -8,7 +8,6 @@
 package com.cyberknights4911.logging;
 
 import com.cyberknights4911.BuildConstants;
-import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.logging.Alert.AlertType;
 import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -23,6 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -30,6 +32,7 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+@Singleton
 public final class RobotLogger {
   private static final double CAN_ERROR_TIME_THRESHOLD = 0.5; // Seconds to disable alert
   private static final double LOW_BATTERY_VOLTAGE = 10.0;
@@ -51,18 +54,30 @@ public final class RobotLogger {
           AlertType.WARNING);
 
   private final CommandScheduler scheduler;
-  private final Constants constants;
+  private final boolean tuningMode;
+  private final String robotName;
+  private final String logPath;
+  private final Mode mode;
 
-  public RobotLogger(Constants constants, CommandScheduler scheduler) {
-    this.constants = constants;
+  @Inject
+  public RobotLogger(
+      @Named("TuningMode") boolean tuningMode,
+      @Named("LogPath") String logPath,
+      @Named("RobotName") String robotName,
+      Mode mode,
+      CommandScheduler scheduler) {
+    this.tuningMode = tuningMode;
+    this.robotName = robotName;
+    this.logPath = logPath;
+    this.mode = mode;
     this.scheduler = scheduler;
   }
 
   public void startLogging(LoggedRobot robot) {
     // Record metadata
-    Logger.recordMetadata("Robot", constants.name());
+    Logger.recordMetadata("Robot", robotName);
     System.out.println("[Init] Starting AdvantageKit");
-    Logger.recordMetadata("TuningMode", Boolean.toString(constants.tuningMode()));
+    Logger.recordMetadata("TuningMode", Boolean.toString(tuningMode));
     Logger.recordMetadata("RuntimeType", LoggedRobot.getRuntimeType().toString());
     Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
     Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -82,11 +97,10 @@ public final class RobotLogger {
     }
 
     // Set up data receivers & replay source
-    switch (constants.mode()) {
+    switch (mode) {
       case REAL:
-        String folder = constants.logPath();
-        if (folder != null) {
-          Logger.addDataReceiver(new WPILOGWriter(folder));
+        if (logPath != null) {
+          Logger.addDataReceiver(new WPILOGWriter(logPath));
         } else {
           logNoFileAlert.set(true);
         }
@@ -107,7 +121,7 @@ public final class RobotLogger {
     }
 
     // Start AdvantageKit logger
-    robot.setUseTiming(constants.mode() != Mode.REPLAY);
+    robot.setUseTiming(mode != Mode.REPLAY);
     Logger.start();
 
     // Log active commands
@@ -136,7 +150,7 @@ public final class RobotLogger {
         });
 
     // Default to blue alliance in sim
-    if (constants.mode() == Mode.SIM) {
+    if (mode == Mode.SIM) {
       DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
     }
 

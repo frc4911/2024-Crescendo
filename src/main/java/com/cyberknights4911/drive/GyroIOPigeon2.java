@@ -12,9 +12,9 @@ import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
-import com.cyberknights4911.constants.DriveConstants;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
+import javax.inject.Inject;
 
 /** IO implementation for Pigeon2 */
 public class GyroIOPigeon2 implements GyroIO {
@@ -24,6 +24,7 @@ public class GyroIOPigeon2 implements GyroIO {
   private final StatusSignal<Double> roll;
   private final StatusSignal<Double> rollVelocity;
 
+  @Inject
   public GyroIOPigeon2(DriveConstants constants) {
     pigeon = new Pigeon2(constants.pigeonId(), constants.canBusId());
 

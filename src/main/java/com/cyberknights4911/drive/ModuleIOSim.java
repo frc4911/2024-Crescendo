@@ -11,6 +11,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
+import javax.inject.Inject;
 
 /**
  * Physics sim implementation of module IO.
@@ -28,6 +29,9 @@ public class ModuleIOSim implements ModuleIO {
   private final Rotation2d turnAbsoluteInitPosition = new Rotation2d(Math.random() * 2.0 * Math.PI);
   private double driveAppliedVolts = 0.0;
   private double turnAppliedVolts = 0.0;
+
+  @Inject
+  public ModuleIOSim() {}
 
   @Override
   public void updateInputs(ModuleIOInputs inputs) {

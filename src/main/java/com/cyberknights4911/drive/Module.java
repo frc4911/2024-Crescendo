@@ -7,9 +7,8 @@
 
 package com.cyberknights4911.drive;
 
-import com.cyberknights4911.constants.Constants;
-import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.logging.LoggedTunableNumber;
+import com.cyberknights4911.logging.LoggedTunableNumberFactory;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,18 +18,13 @@ import edu.wpi.first.math.util.Units;
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
-  private static final LoggedTunableNumber wheelRadius =
-      new LoggedTunableNumber("Drive/Module/WheelRadius");
-  private static final LoggedTunableNumber driveKp =
-      new LoggedTunableNumber("Drive/Module/DriveKp");
-  private static final LoggedTunableNumber driveKd =
-      new LoggedTunableNumber("Drive/Module/DriveKd");
-  private static final LoggedTunableNumber driveKs =
-      new LoggedTunableNumber("Drive/Module/DriveKs");
-  private static final LoggedTunableNumber driveKv =
-      new LoggedTunableNumber("Drive/Module/DriveKv");
-  private static final LoggedTunableNumber turnKp = new LoggedTunableNumber("Drive/Module/TurnKp");
-  private static final LoggedTunableNumber turnKd = new LoggedTunableNumber("Drive/Module/TurnKd");
+  private final LoggedTunableNumber wheelRadius;
+  private final LoggedTunableNumber driveKp;
+  private final LoggedTunableNumber driveKd;
+  private final LoggedTunableNumber driveKs;
+  private final LoggedTunableNumber driveKv;
+  private final LoggedTunableNumber turnKp;
+  private final LoggedTunableNumber turnKd;
 
   private final ModuleIO io;
   private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
@@ -45,21 +39,31 @@ public class Module {
   private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
 
   public Module(
-      Constants constants,
       DriveConstants driveConstants,
+      LoggedTunableNumberFactory numberFactory,
       DriveConstants.ModuleConstants moduleConstants,
       ModuleIO io) {
     this.driveConstants = driveConstants;
     this.moduleConstants = moduleConstants;
     this.io = io;
 
-    wheelRadius.initDefault(Units.inchesToMeters(driveConstants.wheelRadius()));
-    driveKp.initDefault(driveConstants.driveFeedBackValues().kP());
-    driveKd.initDefault(driveConstants.driveFeedBackValues().kD());
-    driveKs.initDefault(driveConstants.driveFeedForwardValues().kS());
-    driveKv.initDefault(driveConstants.driveFeedForwardValues().kV());
-    turnKp.initDefault(driveConstants.turnFeedBackValues().kP());
-    turnKd.initDefault(driveConstants.turnFeedBackValues().kD());
+    wheelRadius =
+        numberFactory.getNumber(
+            "Drive/Module/WheelRadius", Units.inchesToMeters(driveConstants.wheelRadius()));
+    driveKp =
+        numberFactory.getNumber("Drive/Module/DriveKp", driveConstants.driveFeedBackValues().kP());
+    driveKd =
+        numberFactory.getNumber("Drive/Module/DriveKd", driveConstants.driveFeedBackValues().kD());
+    driveKs =
+        numberFactory.getNumber(
+            "Drive/Module/DriveKs", driveConstants.driveFeedForwardValues().kS());
+    driveKv =
+        numberFactory.getNumber(
+            "Drive/Module/DriveKv", driveConstants.driveFeedForwardValues().kV());
+    turnKp =
+        numberFactory.getNumber("Drive/Module/TurnKp", driveConstants.turnFeedBackValues().kP());
+    turnKd =
+        numberFactory.getNumber("Drive/Module/TurnKd", driveConstants.turnFeedBackValues().kD());
 
     driveFeedforward = new SimpleMotorFeedforward(driveKs.get(), driveKv.get());
     driveFeedback = new PIDController(driveKp.get(), 0.0, driveKv.get());

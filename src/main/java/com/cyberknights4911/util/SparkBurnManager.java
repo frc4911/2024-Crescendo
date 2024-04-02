@@ -8,7 +8,6 @@
 package com.cyberknights4911.util;
 
 import com.cyberknights4911.BuildConstants;
-import com.cyberknights4911.constants.Constants;
 import com.cyberknights4911.logging.Mode;
 import com.revrobotics.CANSparkBase;
 import java.io.File;
@@ -17,6 +16,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import javax.inject.Inject;
 
 /** Determines whether to burn Spark configs to flash. */
 public final class SparkBurnManager {
@@ -27,8 +27,9 @@ public final class SparkBurnManager {
 
   private final boolean shouldBurn;
 
-  public SparkBurnManager(Constants constants) {
-    if (constants.mode() == Mode.SIM) {
+  @Inject
+  public SparkBurnManager(Mode mode) {
+    if (mode == Mode.SIM) {
       shouldBurn = false;
       return;
     }

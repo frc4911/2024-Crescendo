@@ -15,16 +15,71 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import javax.inject.Inject;
 
 public final class Field {
   private static Alert noAprilTagLayoutAlert =
       new Alert("No AprilTag layout file found. Update VisionConstants.", AlertType.WARNING);
 
-  private Field() {}
+  private final Alliance alliance;
+  private final AprilTagFieldLayout fieldLayout;
+  private final Translation2d speakerOpening;
+  private final Pose2d subWooferIndex;
+  private final Rotation2d ampOpeningAngle;
+  private final Rotation2d forwardAngle;
 
-  public static AprilTagFieldLayout getFieldLayout() {
+  @Inject
+  public Field(Alliance alliance) {
+    this.alliance = alliance;
+    fieldLayout = createFieldLayout();
+
+    if (alliance == Alliance.Red) {
+      speakerOpening = new Translation2d(652.73, 218.42);
+    } else {
+      speakerOpening = new Translation2d(-1.50, 218.42);
+    }
+
+    if (alliance == Alliance.Red) {
+      subWooferIndex = new Pose2d(new Translation2d(602.73, 218.42), new Rotation2d());
+    } else {
+      // TODO: get values for blue alliance
+      subWooferIndex = new Pose2d();
+    }
+
+    // Same angle regardless of alliance
+    ampOpeningAngle = new Rotation2d(Math.PI / 2);
+
+    if (alliance == Alliance.Red) {
+      forwardAngle = new Rotation2d(Math.PI / 2);
+    } else {
+      forwardAngle = new Rotation2d();
+    }
+  }
+
+  public AprilTagFieldLayout getFieldLayout() {
+    return fieldLayout;
+  }
+
+  public Translation2d speakerOpening() {
+    return speakerOpening;
+  }
+
+  public Pose2d subWooferIndex() {
+    return subWooferIndex;
+  }
+
+  public Rotation2d ampOpeningAngle() {
+    return ampOpeningAngle;
+  }
+
+  public Rotation2d forwardAngle() {
+    return forwardAngle;
+  }
+
+  private AprilTagFieldLayout createFieldLayout() {
     try {
       noAprilTagLayoutAlert.set(false);
       return AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
@@ -32,36 +87,6 @@ public final class Field {
       noAprilTagLayoutAlert.set(true);
       return new AprilTagFieldLayout(
           new ArrayList<>(), Units.feetToMeters(12), Units.feetToMeters(12));
-    }
-  }
-
-  public static Translation2d speakerOpening() {
-    if (Alliance.isRed()) {
-      return new Translation2d(652.73, 218.42);
-    } else {
-      return new Translation2d(-1.50, 218.42);
-    }
-  }
-
-  public static Pose2d subWooferIndex() {
-    if (Alliance.isRed()) {
-      return new Pose2d(new Translation2d(602.73, 218.42), new Rotation2d());
-    } else {
-      // TODO: get values for blue alliance
-      return new Pose2d();
-    }
-  }
-
-  public static Rotation2d ampOpeningAngle() {
-    // Same angle regardless of alliance
-    return new Rotation2d(Math.PI / 2);
-  }
-
-  public static Rotation2d forwardAngle() {
-    if (Alliance.isRed()) {
-      return new Rotation2d(Math.PI / 2);
-    } else {
-      return new Rotation2d();
     }
   }
 }

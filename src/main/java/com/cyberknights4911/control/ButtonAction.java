@@ -7,6 +7,8 @@
 
 package com.cyberknights4911.control;
 
+import dagger.MapKey;
+
 /** Robot actions that can be bound to button inputs. */
 public enum ButtonAction {
   Brake,
@@ -23,5 +25,10 @@ public enum ButtonAction {
   AimSubwoofer,
   AimPodium,
   AimAmp,
-  ReverseCollect
+  ReverseCollect;
+
+  @MapKey
+  @interface ButtonKey {
+    ButtonAction value();
+  }
 }

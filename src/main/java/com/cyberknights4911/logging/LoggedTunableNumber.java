@@ -7,7 +7,6 @@
 
 package com.cyberknights4911.logging;
 
-import com.cyberknights4911.constants.Constants;
 import java.util.HashMap;
 import java.util.Map;
 import org.littletonrobotics.junction.networktables.LoggedDashboardNumber;
@@ -20,6 +19,7 @@ public final class LoggedTunableNumber {
   private static final String tableKey = "TunableNumbers";
 
   private final String key;
+  private final boolean tuningMode;
   private boolean hasDefault = false;
   private double defaultValue;
   private LoggedDashboardNumber dashboardNumber;
@@ -29,9 +29,11 @@ public final class LoggedTunableNumber {
    * Create a new LoggedTunableNumber
    *
    * @param dashboardKey Key on dashboard
+   * @param tuningMode whether to make the number tunable in the dashboard
    */
-  public LoggedTunableNumber(String dashboardKey) {
+  LoggedTunableNumber(String dashboardKey, boolean tuningMode) {
     this.key = tableKey + "/" + dashboardKey;
+    this.tuningMode = tuningMode;
   }
 
   /**
@@ -39,9 +41,10 @@ public final class LoggedTunableNumber {
    *
    * @param dashboardKey Key on dashboard
    * @param defaultValue Default value
+   * @param tuningMode whether to make the number tunable in the dashboard
    */
-  public LoggedTunableNumber(String dashboardKey, double defaultValue) {
-    this(dashboardKey);
+  LoggedTunableNumber(String dashboardKey, double defaultValue, boolean tuningMode) {
+    this(dashboardKey, tuningMode);
     initDefault(defaultValue);
   }
 
@@ -54,7 +57,7 @@ public final class LoggedTunableNumber {
     if (!hasDefault) {
       hasDefault = true;
       this.defaultValue = defaultValue;
-      if (Constants.get().tuningMode()) {
+      if (tuningMode) {
         dashboardNumber = new LoggedDashboardNumber(key, defaultValue);
       }
     }
@@ -69,7 +72,7 @@ public final class LoggedTunableNumber {
     if (!hasDefault) {
       return 0.0;
     } else {
-      return Constants.get().tuningMode() ? dashboardNumber.get() : defaultValue;
+      return tuningMode ? dashboardNumber.get() : defaultValue;
     }
   }
 

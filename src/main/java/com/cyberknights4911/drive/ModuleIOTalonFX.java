@@ -17,7 +17,8 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.cyberknights4911.constants.DriveConstants;
+import dagger.assisted.Assisted;
+import dagger.assisted.AssistedInject;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
@@ -53,8 +54,9 @@ public class ModuleIOTalonFX implements ModuleIO {
   private final Rotation2d absoluteEncoderOffset;
   private final DriveConstants driveConstants;
 
+  @AssistedInject
   public ModuleIOTalonFX(
-      DriveConstants driveConstants, DriveConstants.ModuleConstants moduleConstants) {
+      DriveConstants driveConstants, @Assisted DriveConstants.ModuleConstants moduleConstants) {
     this.driveConstants = driveConstants;
     driveTalon = new TalonFX(moduleConstants.driveMotorId(), driveConstants.canBusId());
     turnTalon = new TalonFX(moduleConstants.turnMotorId(), driveConstants.canBusId());

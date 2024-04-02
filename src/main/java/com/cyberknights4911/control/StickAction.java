@@ -7,9 +7,16 @@
 
 package com.cyberknights4911.control;
 
+import dagger.MapKey;
+
 /** Robot actions that can be bound to stick inputs. */
 public enum StickAction {
   FORWARD,
   STRAFE,
-  ROTATE
+  ROTATE;
+
+  @MapKey
+  @interface StickKey {
+    StickAction value();
+  }
 }
