@@ -10,6 +10,7 @@ package com.cyberknights4911.auto;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import javax.inject.Inject;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public final class AutoCommandHandler {
@@ -18,6 +19,7 @@ public final class AutoCommandHandler {
   private boolean autoMessagePrinted;
   private Command currentAutoCommand;
 
+  @Inject
   public AutoCommandHandler() {
     loggedDashboardChooser = new LoggedDashboardChooser<Command>("Auto Routine");
   }

@@ -18,6 +18,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.inject.Inject;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
@@ -27,6 +28,9 @@ import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 public class LocalADStarAK implements Pathfinder {
   private final ADStarIO io = new ADStarIO();
+
+  @Inject
+  public LocalADStarAK() {}
 
   /**
    * Get if a new path has been calculated since the last time a path was retrieved

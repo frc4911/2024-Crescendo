@@ -7,8 +7,6 @@
 
 package com.cyberknights4911.drive;
 
-import com.cyberknights4911.constants.Constants;
-import com.cyberknights4911.constants.DriveConstants;
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -45,10 +43,7 @@ public class Module {
   private Rotation2d turnRelativeOffset = null; // Relative + Offset = Absolute
 
   public Module(
-      Constants constants,
-      DriveConstants driveConstants,
-      DriveConstants.ModuleConstants moduleConstants,
-      ModuleIO io) {
+      DriveConstants driveConstants, DriveConstants.ModuleConstants moduleConstants, ModuleIO io) {
     this.driveConstants = driveConstants;
     this.moduleConstants = moduleConstants;
     this.io = io;

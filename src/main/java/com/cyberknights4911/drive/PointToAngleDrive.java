@@ -7,7 +7,6 @@
 
 package com.cyberknights4911.drive;
 
-import com.cyberknights4911.constants.ControlConstants;
 import com.cyberknights4911.logging.LoggedTunableNumber;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -24,51 +23,16 @@ public final class PointToAngleDrive extends Command {
 
   private final PIDController pointController;
   private final Drive drive;
-  private final ControlConstants controlConstants;
   private final DoubleSupplier xSupplier;
   private final DoubleSupplier ySupplier;
   private final DoubleSupplier omegaSupplier;
 
-  static PointToAngleDrive createDriveFacingPoint(
+  public PointToAngleDrive(
       Drive drive,
-      ControlConstants controlConstants,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      double x,
-      double y) {
-    Logger.recordOutput(
-        "Drive/PointAt/Desired", new Pose2d(new Translation2d(x, y), new Rotation2d()));
-
-    DoubleSupplier angleSupplier =
-        () -> {
-          double currentX = drive.getPose().getTranslation().getX();
-          double currentY = drive.getPose().getTranslation().getY();
-          double desiredAngle = Math.atan((y - currentY) / (x - currentX));
-          if (currentX > x) {
-            desiredAngle += Math.PI;
-          }
-          return desiredAngle;
-        };
-    return new PointToAngleDrive(drive, controlConstants, xSupplier, ySupplier, angleSupplier);
-  }
-
-  static PointToAngleDrive createDriveFacingFixedAngle(
-      Drive drive,
-      ControlConstants controlConstants,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      double angleRadians) {
-    return new PointToAngleDrive(drive, controlConstants, xSupplier, ySupplier, () -> angleRadians);
-  }
-
-  private PointToAngleDrive(
-      Drive drive,
-      ControlConstants controlConstants,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier desiredAngleSupplier) {
     this.drive = drive;
-    this.controlConstants = controlConstants;
     this.xSupplier = xSupplier;
     this.ySupplier = ySupplier;
     pointController = new PIDController(pointKp.get(), 0.0, pointKd.get());
@@ -106,8 +70,7 @@ public final class PointToAngleDrive extends Command {
     if (pointKp.hasChanged(hashCode()) || pointKd.hasChanged(hashCode())) {
       pointController.setPID(pointKp.get(), 0.0, pointKd.get());
     }
-    drive.runVelocity(
-        drive.createChassisSpeeds(controlConstants, xSupplier, ySupplier, omegaSupplier, false));
+    drive.runVelocity(drive.createChassisSpeeds(xSupplier, ySupplier, omegaSupplier, false));
   }
 
   @Override

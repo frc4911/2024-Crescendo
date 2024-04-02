@@ -9,9 +9,7 @@ package com.cyberknights4911.drive;
 
 import static edu.wpi.first.units.Units.Volts;
 
-import com.cyberknights4911.constants.Constants;
-import com.cyberknights4911.constants.ControlConstants;
-import com.cyberknights4911.constants.DriveConstants;
+import com.cyberknights4911.control.ControlConstants;
 import com.cyberknights4911.util.Alliance;
 import com.cyberknights4911.vision.VisionUpdate;
 import edu.wpi.first.math.MathUtil;
@@ -30,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.util.function.DoubleSupplier;
+import javax.inject.Inject;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
@@ -38,6 +37,7 @@ public class Drive extends SubsystemBase {
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
   private final DriveConstants driveConstants;
+  private final ControlConstants controlConstants;
   private final double maxAngularSpeedMetersPerSecond;
   private final SysIdRoutine sysId;
 
@@ -53,15 +53,17 @@ public class Drive extends SubsystemBase {
       };
   private final PoseTracker poseEstimator;
 
+  @Inject
   public Drive(
-      Constants constants,
       DriveConstants driveConstants,
+      ControlConstants controlConstants,
       GyroIO gyroIO,
-      ModuleIO flModuleIO,
-      ModuleIO frModuleIO,
-      ModuleIO blModuleIO,
-      ModuleIO brModuleIO) {
+      @Location(label = Label.FrontLeft) Module flModule,
+      @Location(label = Label.FrontRight) Module frModule,
+      @Location(label = Label.BackLeft) Module blModule,
+      @Location(label = Label.BackRight) Module brModule) {
     this.driveConstants = driveConstants;
+    this.controlConstants = controlConstants;
     this.gyroIO = gyroIO;
 
     kinematics = new SwerveDriveKinematics(getModuleTranslations(driveConstants));
@@ -71,10 +73,10 @@ public class Drive extends SubsystemBase {
         Math.hypot(driveConstants.trackWidthX() / 2.0, driveConstants.trackWidthY() / 2.0);
     maxAngularSpeedMetersPerSecond = driveConstants.maxLinearSpeed() / driveBaseRadius;
 
-    modules[0] = new Module(constants, driveConstants, driveConstants.frontLeft(), flModuleIO);
-    modules[1] = new Module(constants, driveConstants, driveConstants.frontRight(), frModuleIO);
-    modules[2] = new Module(constants, driveConstants, driveConstants.backLeft(), blModuleIO);
-    modules[3] = new Module(constants, driveConstants, driveConstants.backRight(), brModuleIO);
+    modules[0] = flModule;
+    modules[1] = frModule;
+    modules[2] = blModule;
+    modules[3] = brModule;
 
     sysId =
         new SysIdRoutine(
@@ -256,7 +258,6 @@ public class Drive extends SubsystemBase {
   }
 
   ChassisSpeeds createChassisSpeeds(
-      ControlConstants controlConstants,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
       DoubleSupplier omegaSupplier,
@@ -296,43 +297,41 @@ public class Drive extends SubsystemBase {
   }
 
   private ChassisSpeeds createChassisSpeeds(
-      ControlConstants controlConstants,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier) {
-    return createChassisSpeeds(controlConstants, xSupplier, ySupplier, omegaSupplier, true);
+      DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
+    return createChassisSpeeds(xSupplier, ySupplier, omegaSupplier, true);
   }
 
   public PointToAngleDrive pointToPointDrive(
-      ControlConstants controlConstants,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      double x,
-      double y) {
-    return PointToAngleDrive.createDriveFacingPoint(
-        this, controlConstants, xSupplier, ySupplier, x, y);
+      DoubleSupplier xSupplier, DoubleSupplier ySupplier, double x, double y) {
+    Logger.recordOutput(
+        "Drive/PointAt/Desired", new Pose2d(new Translation2d(x, y), new Rotation2d()));
+
+    DoubleSupplier angleSupplier =
+        () -> {
+          double currentX = getPose().getTranslation().getX();
+          double currentY = getPose().getTranslation().getY();
+          double desiredAngle = Math.atan((y - currentY) / (x - currentX));
+          if (currentX > x) {
+            desiredAngle += Math.PI;
+          }
+          return desiredAngle;
+        };
+    return new PointToAngleDrive(this, xSupplier, ySupplier, angleSupplier);
   }
 
   public PointToAngleDrive pointToAngleDrive(
-      ControlConstants controlConstants,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      double angleRadians) {
-    return PointToAngleDrive.createDriveFacingFixedAngle(
-        this, controlConstants, xSupplier, ySupplier, angleRadians);
+      DoubleSupplier xSupplier, DoubleSupplier ySupplier, double angleRadians) {
+    return new PointToAngleDrive(this, xSupplier, ySupplier, () -> angleRadians);
   }
 
   /**
    * Field relative drive command using two joysticks (controlling linear and angular velocities).
    */
   public Command joystickDrive(
-      ControlConstants controlConstants,
-      DoubleSupplier xSupplier,
-      DoubleSupplier ySupplier,
-      DoubleSupplier omegaSupplier) {
+      DoubleSupplier xSupplier, DoubleSupplier ySupplier, DoubleSupplier omegaSupplier) {
     return Commands.run(
         () -> {
-          runVelocity(createChassisSpeeds(controlConstants, xSupplier, ySupplier, omegaSupplier));
+          runVelocity(createChassisSpeeds(xSupplier, ySupplier, omegaSupplier));
         },
         this);
   }

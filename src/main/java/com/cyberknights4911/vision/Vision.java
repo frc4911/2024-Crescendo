@@ -13,37 +13,21 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Optional;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import javax.inject.Inject;
 import org.littletonrobotics.junction.Logger;
-import org.photonvision.EstimatedRobotPose;
 import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
-public class Vision extends SubsystemBase {
-  private final Supplier<Pose2d> poseSupplier;
-  private final Consumer<VisionUpdate> visionConsumer;
-  private final CameraConfig[] cameraConfigs;
-
-  private final HashMap<String, Double> lastTimestamp = new HashMap<>();
-
-  private boolean updatePoseWithVisionReadings = true;
-  private boolean useMaxValidDistanceAway = true;
-
-  private final VisionConstants visionConstants;
-
-  private static double MAX_ALLOWABLE_PITCH = 3;
-  private static double MAX_ALLOWABLE_ROLL = 3;
-
+public final class Vision extends SubsystemBase {
+  private static final Matrix<N3, N1> SINGLE_TAGS_STD_DEVS = VecBuilder.fill(4, 4, 8);
+  private static final Matrix<N3, N1> MULTI_TAG_STD_DEVS = VecBuilder.fill(0.5, 0.5, 1);
   private static final LoggedTunableNumber twoTargetDeviation =
       new LoggedTunableNumber("Vision/deviations/twoTarget", 0.6);
   private static final LoggedTunableNumber threeTargetDeviation =
@@ -51,41 +35,46 @@ public class Vision extends SubsystemBase {
   private static final LoggedTunableNumber fourTargetDeviation =
       new LoggedTunableNumber("Vision/deviations/fourTarget", 0.2);
 
-  private static final Matrix<N3, N1> defaultDeviation = VecBuilder.fill(0.9, 0.9, 0.9);
+  private final Consumer<VisionUpdate> visionConsumer;
+  private final CameraConfig[] cameraConfigs;
 
+  private boolean updatePoseWithVisionReadings = true;
+  private boolean useMaxValidDistanceAway = true;
+
+  private final VisionConstants visionConstants;
+
+  private final HashMap<String, Double> lastTimestamp = new HashMap<>();
+
+  @Inject
   public Vision(
       VisionConstants visionConstants,
-      Supplier<Pose2d> poseSupplier,
       Consumer<VisionUpdate> visionConsumer,
-      CameraConfig... cameraConfigs) {
+      Set<CameraConstants> cameraConstantsSet) {
     super();
     this.visionConstants = visionConstants;
-    this.poseSupplier = poseSupplier;
     this.visionConsumer = visionConsumer;
-    this.cameraConfigs = cameraConfigs;
 
-    Logger.recordOutput("Vision/updatePoseWithVisionReadings", true);
-    Logger.recordOutput("Vision/useMaxValidDistanceAway", true);
+    List<CameraConstants> cameraConstants = new ArrayList<>(cameraConstantsSet);
+
+    Logger.recordOutput("Vision/updatePoseWithVisionReadings", updatePoseWithVisionReadings);
+    Logger.recordOutput("Vision/useMaxValidDistanceAway", useMaxValidDistanceAway);
 
     for (AprilTag tag : visionConstants.layout().getTags()) {
       Logger.recordOutput("Vision/AprilTags/" + tag.ID, tag.pose);
     }
 
-    for (int i = 0; i < cameraConfigs.length; i++) {
+    cameraConfigs = new CameraConfig[cameraConstants.size()];
+    for (int i = 0; i < cameraConstants.size(); i++) {
+      cameraConfigs[i] =
+          new CameraConfig(
+              cameraConstants.get(i),
+              new VisionIOReal(visionConstants, cameraConstants.get(i)),
+              new VisionIOInputsAutoLogged());
       Logger.recordOutput(
-          "Vision/" + cameraConfigs[i].constants().name(),
-          new Pose3d().transformBy(cameraConfigs[i].constants().robotToCamera()));
-      lastTimestamp.put(cameraConfigs[i].constants().name(), 0.0);
+          "Vision/" + cameraConstants.get(i).name(),
+          new Pose3d().transformBy(cameraConstants.get(i).robotToCamera()));
+      lastTimestamp.put(cameraConstants.get(i).name(), 0.0);
     }
-
-    // TODO(rbrewer): warn for no cameras
-    // NOTE: the camera object is not getting set in SIM or REPLAY
-    // if (R_VisionIO.getCamera() == null) {
-    //   System.out.println("NO RIGHT CAMERA");
-    // }
-    // if (L_VisionIO.getCamera() == null) {
-    //   System.out.println("NO LEFT CAMERA");
-    // }
   }
 
   @Override
@@ -100,15 +89,6 @@ public class Vision extends SubsystemBase {
       return;
     }
 
-    // TODO(rbrewer): test whether necessary
-    // if (Math.abs(drivetrain.getGyroPitch()) >= MAX_ALLOWABLE_PITCH
-    //     || Math.abs(drivetrain.getGyroRoll()) >= MAX_ALLOWABLE_ROLL) {
-
-    //   Logger.recordOutput("Vision/ValidGyroAngle", false);
-    //   return;
-    // }
-    // Logger.recordOutput("Vision/ValidGyroAngle", true);
-
     for (int i = 0; i < cameraConfigs.length; i++) {
       updatePose(cameraConfigs[i]);
       Logger.recordOutput(
@@ -118,223 +98,54 @@ public class Vision extends SubsystemBase {
   }
 
   private void updatePose(CameraConfig cameraConfig) {
-    boolean updated = false;
-    boolean pnpFailed = false;
-    Pose2d prevEstimatedRobotPose = poseSupplier.get();
-    double timestamp = 0;
-    double distance = 0.0;
-    PhotonPipelineResult cameraResult = null;
-    Pose3d robotPose = null;
-
-    double standardDeviation = -1.0;
-
-    // TODO(rbrewer): this is gross, find an alternative
-    synchronized (cameraConfig.constants()) {
-      // cameraResult = cameraConfig.inputs().lastResult;
-      timestamp = cameraConfig.inputs().lastTimestamp;
-    }
-
     // is this a new camera result?
     double prevTimestamp = lastTimestamp.get(cameraConfig.constants().name());
-    if (prevTimestamp >= timestamp) {
+    if (prevTimestamp >= cameraConfig.inputs().lastTimestamp) {
       return;
     }
-    lastTimestamp.put(cameraConfig.constants().name(), timestamp);
+    lastTimestamp.put(cameraConfig.constants().name(), cameraConfig.inputs().lastTimestamp);
+    PhotonPipelineResult lastResult = cameraConfig.visionIO().getLastResult();
+    cameraConfig
+        .visionIO()
+        .update(lastResult)
+        .ifPresent(
+            estimatedPose -> {
+              var robotPose = estimatedPose.estimatedPose.toPose2d();
+              var stdDevs = getEstimationStdDevs(robotPose, lastResult);
 
-    int targetsSeen = cameraResult.getTargets().size();
-    Logger.recordOutput("Vision/" + cameraConfig.constants().name() + "/SeenTargets", targetsSeen);
-
-    if (targetsSeen > 1) {
-      // more than one target seen, use PNP with PV estimator
-
-      cameraConfig.visionIO().setReferencePose(prevEstimatedRobotPose);
-      Optional<EstimatedRobotPose> result = cameraConfig.visionIO().update(cameraResult);
-
-      if (result.isPresent()) {
-        robotPose = result.get().estimatedPose;
-
-        standardDeviation = getDeviationForNumTargets(targetsSeen);
-
-        Logger.recordOutput(
-            "Vision/" + cameraConfig.constants().name() + "/CameraPose",
-            robotPose.transformBy(cameraConfig.constants().robotToCamera()));
-      } else {
-        pnpFailed = true;
-      }
-
-      Logger.recordOutput("Vision/" + cameraConfig.constants().name() + "/Ambiguity", 0.0);
-
-    } else {
-      // zero or 1 target, manually check if it is accurate enough
-      for (PhotonTrackedTarget target : cameraResult.getTargets()) {
-        if (isValidTarget(target)) {
-          Transform3d cameraToTarget = target.getBestCameraToTarget();
-          Optional<Pose3d> tagPoseOptional =
-              visionConstants.layout().getTagPose(target.getFiducialId());
-          if (tagPoseOptional.isEmpty()) {
-            break;
-          }
-
-          Pose3d cameraPose = tagPoseOptional.get().transformBy(cameraToTarget.inverse());
-
-          // TODO(rbrewer) verify this! naming was super sketch
-          robotPose = cameraPose.transformBy(cameraConfig.constants().robotToCamera().inverse());
-
-          standardDeviation = cameraToTarget.getTranslation().getNorm() / 2.0;
-
-          Logger.recordOutput(
-              "Vision/" + cameraConfig.constants().name() + "/distanceNorm3D",
-              cameraToTarget.getTranslation().getNorm());
-
-          Logger.recordOutput(
-              "Vision/" + cameraConfig.constants().name() + "/Ambiguity",
-              target.getPoseAmbiguity());
-          Logger.recordOutput(
-              "Vision/" + cameraConfig.constants().name() + "/CameraPose", cameraPose);
-        }
-      }
-    }
-
-    if (robotPose != null) {
-      distance =
-          prevEstimatedRobotPose
-              .getTranslation()
-              .getDistance(new Translation2d(robotPose.getX(), robotPose.getY()));
-
-      Logger.recordOutput(
-          "Vision/" + cameraConfig.constants().name() + "/DistanceFromRobot", distance);
-      Logger.recordOutput(
-          "Vision/" + cameraConfig.constants().name() + "/RobotPose", robotPose.toPose2d());
-      Logger.recordOutput("Vision/" + cameraConfig.constants().name() + "/3DRobotPose", robotPose);
-
-      // distance from vision estimate to last position estimate
-      if (!useMaxValidDistanceAway
-          || distance <= visionConstants.maxValidDistanceMeters() * targetsSeen) {
-        // we passed all the checks, update the pose
-        updated = true;
-
-        Matrix<N3, N1> updateDeviation;
-        // -1 = error when calculating deviation
-        if (standardDeviation == -1) {
-          updateDeviation = defaultDeviation;
-        } else {
-          updateDeviation = VecBuilder.fill(standardDeviation, standardDeviation, 0.9);
-        }
-
-        synchronized (visionConsumer) {
-          visionConsumer.accept(new VisionUpdate(timestamp, robotPose.toPose2d(), updateDeviation));
-        }
-      }
-    }
-
-    Logger.recordOutput("Vision/" + cameraConfig.constants().name() + "/Updated", updated);
-    Logger.recordOutput("Vision/" + cameraConfig.constants().name() + "/pnpFailed", pnpFailed);
-    Logger.recordOutput(
-        "Vision/" + cameraConfig.constants().name() + "/standardDeviation", standardDeviation);
+              Logger.recordOutput(
+                  "Vision/" + cameraConfig.constants().name() + "/RobotPose", robotPose);
+              Logger.recordOutput(
+                  "Vision/" + cameraConfig.constants().name() + "/3DRobotPose",
+                  estimatedPose.estimatedPose);
+              Logger.recordOutput(
+                  "Vision/" + cameraConfig.constants().name() + "/stdDev", stdDevs.toString());
+              visionConsumer.accept(
+                  new VisionUpdate(cameraConfig.inputs().lastTimestamp, robotPose, stdDevs));
+            });
   }
 
-  public boolean tagVisible(int id, PhotonPipelineResult result) {
-    for (PhotonTrackedTarget target : result.getTargets()) {
-      if (target.getFiducialId() == id && isValidTarget(target)) {
-        return true;
-      }
+  private Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose, PhotonPipelineResult result) {
+    var estStdDevs = SINGLE_TAGS_STD_DEVS;
+    var targets = result.getTargets();
+    int numTags = 0;
+    double avgDist = 0;
+    for (var tgt : targets) {
+      var tagPose = visionConstants.layout().getTagPose(tgt.getFiducialId());
+      if (tagPose.isEmpty()) continue;
+      numTags++;
+      avgDist +=
+          tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
     }
-    return false;
-  }
+    if (numTags == 0) return estStdDevs;
+    avgDist /= numTags;
+    // Decrease std devs if multiple targets are visible
+    if (numTags > 1) estStdDevs = MULTI_TAG_STD_DEVS;
+    // Increase std devs based on (average) distance
+    if (numTags == 1 && avgDist > 4)
+      estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+    else estStdDevs = estStdDevs.times(1 + (avgDist * avgDist / 30));
 
-  /**
-   * returns the best Rotation3d from the robot to the given target.
-   *
-   * @param id
-   * @return the Transform3d or null if there isn't
-   */
-  public Transform3d getTransform3dToTag(
-      int id, PhotonPipelineResult result, Transform3d robotToCamera) {
-    Transform3d bestTransform3d = null;
-
-    for (PhotonTrackedTarget target : result.getTargets()) {
-      // the target must be the same as the given target id, and the target must be available
-      if (target.getFiducialId() != id || !isValidTarget(target)) {
-        break;
-      }
-
-      bestTransform3d = robotToCamera.plus(target.getBestCameraToTarget());
-    }
-    return bestTransform3d;
-  }
-
-  public Rotation2d getAngleToTag(int id, PhotonPipelineResult result, Transform3d robotToCamera) {
-    Transform3d transform = getTransform3dToTag(id, result, robotToCamera);
-    if (transform != null) {
-      return new Rotation2d(transform.getTranslation().getX(), transform.getTranslation().getY());
-    } else {
-      return null;
-    }
-  }
-
-  public double getDistanceToTag(int id, PhotonPipelineResult result, Transform3d robotToCamera) {
-    Transform3d transform = getTransform3dToTag(id, result, robotToCamera);
-    if (transform != null) {
-      return transform.getTranslation().toTranslation2d().getNorm();
-    } else {
-      return -1;
-    }
-  }
-
-  public boolean isValidTarget(PhotonTrackedTarget target) {
-    return target.getFiducialId() != -1
-        && target.getPoseAmbiguity() != -1
-        && target.getPoseAmbiguity() < visionConstants.maxAmbiguity()
-        && visionConstants.layout().getTagPose(target.getFiducialId()).isPresent();
-  }
-
-  public void enableMaxDistanceAwayForTags() {
-    Logger.recordOutput("Vision/useMaxValidDistanceAway", true);
-    useMaxValidDistanceAway = true;
-  }
-
-  public void disableMaxDistanceAwayForTags() {
-    Logger.recordOutput("Vision/useMaxValidDistanceAway", false);
-    useMaxValidDistanceAway = false;
-  }
-
-  public void enableUpdatePoseWithVisionReadings() {
-    Logger.recordOutput("Vision/updatePoseWithVisionReadings", true);
-    updatePoseWithVisionReadings = true;
-  }
-
-  public void disableUpdatePoseWithVisionReadings() {
-    Logger.recordOutput("Vision/updatePoseWithVisionReadings", false);
-    updatePoseWithVisionReadings = false;
-  }
-
-  private double getDeviationForNumTargets(int numTargets) {
-    if (numTargets == 2) {
-      return twoTargetDeviation.get();
-    }
-
-    if (numTargets == 3) {
-      return threeTargetDeviation.get();
-    }
-
-    if (numTargets > 3) {
-      return fourTargetDeviation.get();
-    }
-
-    return 1.2;
-  }
-}
-
-final class TargetComparator implements Comparator<PhotonTrackedTarget> {
-  @Override
-  public int compare(PhotonTrackedTarget a, PhotonTrackedTarget b) {
-    double ambiguityDiff = a.getPoseAmbiguity() - b.getPoseAmbiguity();
-    if (ambiguityDiff < 0.0) {
-      return -1;
-    }
-    if (ambiguityDiff > 0.0) {
-      return 1;
-    }
-    return 0;
+    return estStdDevs;
   }
 }
