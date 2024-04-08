@@ -13,32 +13,32 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import javax.inject.Inject;
 
 public final class ShooterIOSim implements ShooterIO {
-  private final DCMotorSim sim;
-  private final PIDController pid;
+  private final DCMotorSim aimer;
+  private final PIDController aimerPid;
 
   private double appliedVolts = 0.0;
 
   @Inject
   public ShooterIOSim(ShooterConstants constants) {
     // TODO: determine moment of inertia
-    sim = new DCMotorSim(DCMotor.getNeoVortex(2), constants.aimerGearRatio(), 0.004);
-    pid = new PIDController(0.0, 0.0, 0.0);
+    aimer = new DCMotorSim(DCMotor.getNeoVortex(1), constants.aimerGearRatio(), 0.004);
+    aimerPid = new PIDController(0.0, 0.0, 0.0);
   }
 
   @Override
   public void updateInputs(ShooterIOInputs inputs) {
-    sim.update(0.02);
+    aimer.update(0.02);
 
     inputs.shooterTopPositionRad = 0.0;
-    inputs.shooterTopVelocityRadPerSec = sim.getAngularVelocityRadPerSec();
+    inputs.shooterTopVelocityRadPerSec = aimer.getAngularVelocityRadPerSec();
     inputs.shooterTopAppliedVolts = appliedVolts;
-    inputs.shooterTopCurrentAmps = sim.getCurrentDrawAmps();
+    inputs.shooterTopCurrentAmps = aimer.getCurrentDrawAmps();
   }
 
   @Override
   public void setShooterVoltage(double volts) {
     appliedVolts = 0.0;
-    sim.setInputVoltage(volts);
+    aimer.setInputVoltage(volts);
   }
 
   @Override
@@ -48,6 +48,6 @@ public final class ShooterIOSim implements ShooterIO {
 
   @Override
   public void configureShooterPID(double kP, double kI, double kD) {
-    pid.setPID(kP, kI, kD);
+    aimerPid.setPID(kP, kI, kD);
   }
 }
