@@ -99,7 +99,7 @@ public final class RobotLogger {
     // Set up data receivers & replay source
     switch (mode) {
       case REAL:
-        if (logPath != null) {
+        if (logPath != null && !logPath.isEmpty()) {
           Logger.addDataReceiver(new WPILOGWriter(logPath));
         } else {
           logNoFileAlert.set(true);

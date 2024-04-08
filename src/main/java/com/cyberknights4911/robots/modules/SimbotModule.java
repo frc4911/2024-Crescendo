@@ -24,7 +24,7 @@ public interface SimbotModule {
 
   @Provides
   public static @Named("LogPath") String providesLogPath() {
-    return null;
+    return "";
   }
 
   @Provides

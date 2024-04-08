@@ -16,6 +16,7 @@ import com.cyberknights4911.control.ControllerModule;
 import com.cyberknights4911.drive.modules.DriveConstantsHotwheelsModule;
 import com.cyberknights4911.drive.modules.DriveIOStubModule;
 import com.cyberknights4911.drive.modules.DriveModule;
+import com.cyberknights4911.entrypoint.CyberKnightsRobot;
 import com.cyberknights4911.indexer.modules.IndexerConstantsHotwheelsModule;
 import com.cyberknights4911.indexer.modules.IndexerIOStubModule;
 import com.cyberknights4911.robots.modules.HotwheelsModule;
@@ -27,6 +28,7 @@ import com.cyberknights4911.vision.modules.VisionConstantsHotwheelsModule;
 import com.cyberknights4911.vision.modules.VisionIOStubModule;
 import com.cyberknights4911.vision.modules.VisionModule;
 import dagger.Component;
+import javax.inject.Singleton;
 
 @Component(
     modules = {
@@ -50,4 +52,7 @@ import dagger.Component;
       VisionIOStubModule.class,
       VisionModule.class,
     })
-public interface HotwheelsReplayComponent {}
+@Singleton
+public interface HotwheelsReplayComponent {
+  public CyberKnightsRobot robot();
+}

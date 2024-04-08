@@ -17,6 +17,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -32,19 +34,13 @@ public class Collect extends SubsystemBase {
   private static final Translation2d SEGMENT_1_END = new Translation2d(13.81, 8.322);
   private static final Translation2d SEGMENT_2_START = new Translation2d(6.435, 12.094);
   private static final Translation2d SEGMENT_2_END = new Translation2d(7.1, 11.773);
-  private static final double SEGMENT_1_START_ANGLE =
-      Math.toDegrees(Math.atan(SEGMENT_1_START.getY() / SEGMENT_1_START.getX()));
-  private static final double SEGMENT_1_END_ANGLE =
-      Math.toDegrees(Math.atan(SEGMENT_1_END.getY() / SEGMENT_1_END.getX()));
+  private static final double SEGMENT_1_START_ANGLE = Math.toDegrees(Math.atan(SEGMENT_1_START.getY() / SEGMENT_1_START.getX()));
+  private static final double SEGMENT_1_END_ANGLE = Math.toDegrees(Math.atan(SEGMENT_1_END.getY() / SEGMENT_1_END.getX()));
   // Add the angles to get the relative angle
   private static final double SEGMENT_2_START_ANGLE =
-      -Math.toDegrees(
-          Math.atan(SEGMENT_1_START.getX() / SEGMENT_1_START.getY())
-              + Math.atan(SEGMENT_2_START.getX() / SEGMENT_2_START.getY()));
+      -(Math.toDegrees(Math.atan(SEGMENT_1_START.getY() / SEGMENT_1_START.getX())) + Math.toDegrees(Math.atan(SEGMENT_2_START.getY() / SEGMENT_2_START.getX())));
   private static final double SEGMENT_2_END_ANGLE =
-      -Math.toDegrees(
-          Math.atan(SEGMENT_1_END.getX() / SEGMENT_1_END.getY())
-              + Math.atan(SEGMENT_2_END.getX() / SEGMENT_2_END.getY()));
+      -(Math.toDegrees(Math.atan(SEGMENT_1_END.getY() / SEGMENT_1_END.getX())) + Math.toDegrees(Math.atan(SEGMENT_2_END.getY() / SEGMENT_2_END.getX())));
 
   private final LoggedTunableNumber collectOutput;
   private final LoggedTunableNumber collectKp;
@@ -71,13 +67,13 @@ public class Collect extends SubsystemBase {
 
     collectIO.configureCollectPID(collectKp.get(), 0.0, collectKd.get());
 
-    mechanism = new Mechanism2d(28.0, 28.0);
+    mechanism = new Mechanism2d(Units.inchesToMeters(40.0), Units.inchesToMeters(28.0));
     // Where the collector is attached to the frame
-    MechanismRoot2d root = mechanism.getRoot("collector", 14.0, 4.66);
+    MechanismRoot2d root = mechanism.getRoot("collector", Units.inchesToMeters(20.0), Units.inchesToMeters(4.66));
     // The first collector segment. This is the portion that is moved by the solenoid.
-    segment1 = root.append(new MechanismLigament2d("segment1", 16.073, SEGMENT_1_START_ANGLE));
+    segment1 = root.append(new MechanismLigament2d("segment1", Units.inchesToMeters(16.073), 180 - SEGMENT_1_START_ANGLE, 4, new Color8Bit(Color.kRed)));
     // The second collector segment. This represents the section reaches the ground.
-    segment2 = segment1.append(new MechanismLigament2d("segment2", 13.794, SEGMENT_2_START_ANGLE));
+    segment2 = segment1.append(new MechanismLigament2d("segment2", Units.inchesToMeters(13.794), - SEGMENT_2_START_ANGLE, 4, new Color8Bit(Color.kPurple)));
 
     sysId =
         new SysIdRoutine(
@@ -113,16 +109,16 @@ public class Collect extends SubsystemBase {
     }
 
     if (inputs.leftSolenoid && inputs.rightSolenoid) {
-      segment1.setAngle(SEGMENT_1_END_ANGLE);
-      segment2.setAngle(SEGMENT_2_END_ANGLE);
+      segment1.setAngle(180 - SEGMENT_1_END_ANGLE);
+      segment2.setAngle(-SEGMENT_2_END_ANGLE);
     } else if (!inputs.leftSolenoid && !inputs.rightSolenoid) {
-      segment1.setAngle(SEGMENT_1_START_ANGLE);
-      segment2.setAngle(SEGMENT_2_START_ANGLE);
+      segment1.setAngle(180 - SEGMENT_1_START_ANGLE);
+      segment2.setAngle(-SEGMENT_2_START_ANGLE);
     } else {
       System.out.println("ERROR: collector solenoids are in different states.");
     }
 
-    // Logger.recordOutput("Collect/Mechanism", mechanism);
+    Logger.recordOutput("Collect/Mechanism", mechanism);
 
     if (DriverStation.isDisabled()) {
       collectIO.stopCollector();

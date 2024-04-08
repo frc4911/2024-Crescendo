@@ -69,8 +69,8 @@ public class CollectIOReal implements CollectIO {
     inputs.collectAppliedVolts = collect.getAppliedOutput() * collect.getBusVoltage();
     inputs.collectCurrentAmps = collect.getOutputCurrent();
 
-    // inputs.leftSolenoid = left.get() == Value.kForward;
-    // inputs.rightSolenoid = right.get() == Value.kForward;
+    inputs.leftSolenoid = left.get() == Value.kForward;
+    inputs.rightSolenoid = right.get() == Value.kForward;
 
     inputs.beamBreakVoltage = beamBreak.getVoltage();
   }

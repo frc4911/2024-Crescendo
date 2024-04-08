@@ -18,10 +18,13 @@ public interface CollectConstantsSimModule {
   @Provides
   public static CollectConstants providesCollectConstants() {
     return CollectConstantsBuilder.builder()
-        .motorCollectRightId(11)
-        .motorCollectLeftId(12)
+        .solenoidLeftForwardId(8)
+        .solenoidLeftReverseId(7)
+        .solenoidRightForwardId(6)
+        .solenoidRightReverseId(9)
+        .collectPercent(0.6)
         .collectGearRatio(24.0 / 18.0)
-        .collectFeedBackValues(new PidValues(0, 0, 0))
+        .collectFeedBackValues(new PidValues(0.1, 0, 0))
         .build();
   }
 }

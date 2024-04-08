@@ -21,22 +21,19 @@ public interface DriveIOSimModule {
 
   @Binds
   @Location(label = Label.FrontLeft)
-  public abstract ModuleIO bindsFrontLeftModuleIO(
-      @Location(label = Label.FrontLeft) ModuleIOSim sim);
+  public abstract ModuleIO bindsFrontLeftModuleIO(ModuleIOSim sim);
 
   @Binds
   @Location(label = Label.FrontRight)
-  public abstract ModuleIO bindsFrontRightModuleIO(
-      @Location(label = Label.FrontRight) ModuleIOSim sim);
+  public abstract ModuleIO bindsFrontRightModuleIO(ModuleIOSim sim);
 
   @Binds
   @Location(label = Label.BackLeft)
-  public abstract ModuleIO bindsBackLeftModuleIO(@Location(label = Label.BackLeft) ModuleIOSim sim);
+  public abstract ModuleIO bindsBackLeftModuleIO(ModuleIOSim sim);
 
   @Binds
   @Location(label = Label.BackRight)
-  public abstract ModuleIO bindsBackRightModuleIO(
-      @Location(label = Label.BackRight) ModuleIOSim sim);
+  public abstract ModuleIO bindsBackRightModuleIO(ModuleIOSim sim);
 
   @Provides
   public static GyroIO providesGyroIO() {

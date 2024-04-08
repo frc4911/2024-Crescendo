@@ -9,6 +9,7 @@ package com.cyberknights4911.indexer.modules;
 
 import com.cyberknights4911.indexer.IndexerConstants;
 import com.cyberknights4911.indexer.IndexerConstantsBuilder;
+import com.cyberknights4911.util.PidValues;
 import dagger.Module;
 import dagger.Provides;
 
@@ -17,6 +18,9 @@ public interface IndexerConstantsSimModule {
 
   @Provides
   public static IndexerConstants providesIndexerConstants() {
-    return IndexerConstantsBuilder.builder().build();
+    return IndexerConstantsBuilder.builder()
+        .percentOutput(.5)
+        .feedBackValues(new PidValues(0.1, 0, 0))
+        .build();
   }
 }

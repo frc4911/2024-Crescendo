@@ -7,13 +7,13 @@
 
 package com.cyberknights4911.entrypoint;
 
-import com.cyberknights4911.robots.components.DaggerHotwheelsComponent;
+import com.cyberknights4911.robots.components.DaggerHotwheelsSimComponent;
 import edu.wpi.first.wpilibj.RobotBase;
 
 public final class EntryPoint {
   private EntryPoint() {}
 
   public static void main(String... args) {
-    RobotBase.startRobot(() -> DaggerHotwheelsComponent.create().robot());
+    RobotBase.startRobot(() -> DaggerHotwheelsSimComponent.create().robot());
   }
 }

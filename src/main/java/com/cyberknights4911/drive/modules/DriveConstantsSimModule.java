@@ -31,10 +31,9 @@ public interface DriveConstantsSimModule {
         .wheelRadius(Units.inchesToMeters(2))
         .turnGearRatio(DriveConstants.TURN_GEAR_RATIO)
         .driveGearRatio(DriveConstants.L3_GEAR_RATIO)
-        .pigeonId(0)
-        .turnFeedBackValues(new PidValues(0.0, 0.0, 0.0))
-        .driveFeedBackValues(new PidValues(0.0, 0.0, 0.0))
-        .driveFeedForwardValues(new FeedForwardValues(0.0, 0.0))
+        .turnFeedBackValues(new PidValues(7.0, 0.0, 0.0))
+        .driveFeedBackValues(new PidValues(0.05, 0.0, 0.0))
+        .driveFeedForwardValues(new FeedForwardValues(0.1, 0.13))
         .build();
   }
 

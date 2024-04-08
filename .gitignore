@@ -170,3 +170,7 @@ out/
 
 # Simulation GUI and other tools window save file
 *-window.json
+ctre_sim/
+simgui-ds.json
+networktables.json
+simgui.json

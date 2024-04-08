@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -32,7 +34,7 @@ public class Shooter extends SubsystemBase {
   // Measured in OnShape
   // motor distance 5.558
   // pivot to lower motor 7.115
-  private static final Translation2d MOUNT_POINT = new Translation2d(9.141, 10.882);
+  private static final Translation2d MOUNT_POINT = new Translation2d(4.994, 10.882);
   private static final double MOUNT_TO_SHOOTER_FRONT = 10.5;
 
   private final LoggedTunableNumber beamThreshold;
@@ -109,11 +111,11 @@ public class Shooter extends SubsystemBase {
     shooterIO.configureAimerPID(aimerKp.get(), 0.0, aimerKd.get());
     shooterIO.configureLimits(forwardLimit.get(), backwardLimit.get());
 
-    mechanism = new Mechanism2d(28.0, 28.0);
+    mechanism = new Mechanism2d(Units.inchesToMeters(40.0), Units.inchesToMeters(28.0));
     // Where the shooter is attached to the frame
-    MechanismRoot2d root = mechanism.getRoot("shooter", MOUNT_POINT.getX(), MOUNT_POINT.getY());
+    MechanismRoot2d root = mechanism.getRoot("shooter", Units.inchesToMeters(20.0 + MOUNT_POINT.getX()), Units.inchesToMeters(MOUNT_POINT.getY()));
     // The the tilting segment. This is the portion that is moved by the aimer.
-    segment = root.append(new MechanismLigament2d("segment", MOUNT_TO_SHOOTER_FRONT, 0));
+    segment = root.append(new MechanismLigament2d("segment", Units.inchesToMeters(MOUNT_TO_SHOOTER_FRONT), 0));
 
     sysId =
         new SysIdRoutine(
@@ -216,7 +218,7 @@ public class Shooter extends SubsystemBase {
 
     // TODO: convert this to the actual angle (correct for gear ratio)
     segment.setAngle(Math.toDegrees(inputs.aimerPositionRad));
-    // Logger.recordOutput("Shooter/Mechanism", mechanism);
+    Logger.recordOutput("Shooter/Mechanism", mechanism);
 
     if (DriverStation.isDisabled()) {
       shooterIO.stopShooter();

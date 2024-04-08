@@ -57,6 +57,14 @@ public interface ControllerModule {
 
   @Provides
   @IntoMap
+  @ButtonKey(ButtonAction.ZeroSpeaker)
+  public static Triggers providesZeroSpeaker(
+      @ControllerQualifier(ControllerType.Driver) CommandXboxController driver) {
+    return new Triggers(driver.start());
+  }
+
+  @Provides
+  @IntoMap
   @ButtonKey(ButtonAction.ZeroGyro)
   public static Triggers providesZeroGyro(
       @ControllerQualifier(ControllerType.Driver) CommandXboxController driver) {
@@ -77,6 +85,14 @@ public interface ControllerModule {
   public static Triggers providesSpeakerLockOn(
       @ControllerQualifier(ControllerType.Driver) CommandXboxController driver) {
     return new Triggers(driver.rightTrigger());
+  }
+
+  @Provides
+  @IntoMap
+  @ButtonKey(ButtonAction.AmpLockOn)
+  public static Triggers providesAmpLockOn(
+      @ControllerQualifier(ControllerType.Driver) CommandXboxController driver) {
+    return new Triggers(driver.leftTrigger());
   }
 
   @Provides
