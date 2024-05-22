@@ -1,8 +1,8 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2024.3.2"
-    id "com.peterabeles.gversion" version "1.10.2"
-    id "com.diffplug.spotless" version "6.12.0"
+    alias(libs.plugins.gversion)
+    alias(libs.plugins.spotless)
 }
 
 java {
@@ -74,11 +74,11 @@ def includeDesktopSupport = false
 // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
 // Also defines JUnit 5.
 dependencies {
-    annotationProcessor "io.soabase.record-builder:record-builder-processor:40"
-    compileOnly "io.soabase.record-builder:record-builder-core:40"
+    annotationProcessor(libs.record.builder.processor)
+    compileOnly(libs.record.builder.core)
 
-    implementation "com.google.dagger:dagger:2.51.1"
-    annotationProcessor "com.google.dagger:dagger-compiler:2.51.1"
+    implementation(libs.dagger)
+    annotationProcessor(libs.dagger.compiler)
     
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
@@ -97,9 +97,9 @@ dependencies {
     nativeRelease wpi.java.vendor.jniRelease(wpi.platforms.desktop)
     simulationRelease wpi.sim.enableRelease()
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
-    testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
-    testImplementation 'org.mockito:mockito-core:5.11.0'
+    testImplementation(libs.jupiter)
+    testImplementation(libs.mockito.jupiter)
+    testImplementation(libs.mockito.core)
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     
     def akitJson = new groovy.json.JsonSlurper().parseText(new File(projectDir.getAbsolutePath() + "/vendordeps/AdvantageKit.json").text)

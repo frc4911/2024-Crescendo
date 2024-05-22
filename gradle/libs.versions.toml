@@ -1,0 +1,22 @@
+[versions]
+record-builder = "41"
+dagger = "2.51.1"
+gradle-rio = "2024.3.2"
+gversion = "1.10.2"
+spotless = "6.12.0"
+mockito = "5.11.0"
+jupiter = "5.10.1"
+
+[libraries]
+record-builder-core = { group = "io.soabase.record-builder", name = "record-builder-core", version.ref = "record-builder" }
+record-builder-processor = { group = "io.soabase.record-builder", name = "record-builder-processor", version.ref = "record-builder" }
+dagger = { group = "com.google.dagger", name = "dagger", version.ref = "dagger" }
+dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
+mockito-jupiter = { group = "org.mockito", name = "mockito-junit-jupiter", version.ref = "mockito" }
+jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "jupiter" }
+
+[plugins]
+gradlerio = { id = "edu.wpi.first.GradleRIO", version.ref = "gradle-rio" }
+gversion = { id = "com.peterabeles.gversion", version.ref = "gversion" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
